@@ -1,7 +1,7 @@
 """
 Using the protocol:
 
-Plotters should see if .effective_entries() is None - if not, this is a Profile
+Plotters should see if .counts() is None - if not, this is a Profile
 Then check .variances; if not None, this storage holds variance information and
 error bars should be included. If it is None, then a plotter can avoid showing
 error bars (recommended), or use np.sqrt(h.values()).
@@ -61,7 +61,7 @@ class PlottableHistogram(Protocol):
         If counts is none, variance returns NaN for that cell (mean storages).
         """
 
-    def effective_entries(self) -> Optional[ArrayLike]:
+    def counts(self) -> Optional[ArrayLike]:
         """
         Count returns the number of values in a mean accumulator (also known as
         a Profile histogram), or is None for normal storages.
