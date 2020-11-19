@@ -16,14 +16,18 @@ ArrayLike = Iterable[float]
 
 
 @runtime_checkable
-class PlottableAxis(Protocol):
-    # label: str - Optional, not part of Protocol
-
+class PlottableOptions(Protocol):
     # True if the axis "wraps around"
     circular: bool
 
     # True if each bin is discrete - Integer, Boolean, or Category, for example
     discrete: bool
+
+@runtime_checkable
+class PlottableAxis(Protocol):
+    # label: str - Optional, not part of Protocol
+
+    options: PlottableOptions
 
     def __getitem__(self, index: int) -> Union[Tuple[float, float], int, str]:
         """
