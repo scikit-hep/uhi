@@ -8,10 +8,19 @@ error bars (recommended), or use np.sqrt(h.values()).
 """
 
 
-# from numpy.typing import ArrayLike # requires unreleased NumPy 1.20
-from typing import Any, Iterable, Optional, Protocol, Sequence, Tuple, Union
+from typing import (
+    Any,
+    Iterable,
+    Literal,
+    Protocol,
+    Sequence,
+    Tuple,
+    TypeVar,
+    Union,
+)
 from typing import runtime_checkable
 
+# from numpy.typing import ArrayLike # requires unreleased NumPy 1.20
 ArrayLike = Iterable[float]
 
 
@@ -23,13 +32,17 @@ class PlottableOptions(Protocol):
     # True if each bin is discrete - Integer, Boolean, or Category, for example
     discrete: bool
 
+
+T = TypeVar("T", covariant=True)
+
+
 @runtime_checkable
-class PlottableAxis(Protocol):
+class PlottableAxisGeneric(Protocol[T]):
     # label: str - Optional, not part of Protocol
 
     options: PlottableOptions
 
-    def __getitem__(self, index: int) -> Union[Tuple[float, float], int, str]:
+    def __getitem__(self, index: int) -> T:
         """
         Get the pair of edges (not discrete) or bin label (discrete).
         """
@@ -46,9 +59,19 @@ class PlottableAxis(Protocol):
         """
 
 
+PlottableAxisContinuous = PlottableAxisGeneric[Tuple[float, float]]
+PlottableAxisInt = PlottableAxisGeneric[int]
+PlottableAxisStr = PlottableAxisGeneric[str]
+
+PlottableAxis = Union[PlottableAxisContinuous, PlottableAxisInt, PlottableAxisStr]
+
+
 @runtime_checkable
 class PlottableHistogram(Protocol):
     axes: Sequence[PlottableAxis]
+
+    weighted: bool
+    interpretation: Literal["count", "mean", "median"]
 
     def values(self) -> ArrayLike:
         """
@@ -58,15 +81,16 @@ class PlottableHistogram(Protocol):
         All methods can have a flow=False argument - not part of Protocol.
         """
 
-    def variances(self) -> Optional[ArrayLike]:
+    def variances(self) -> ArrayLike:
         """
-        Variance returns the variance if applicable, otherwise None.
+        Variance returns the variance. If unweighed, this is identical to .counts().
 
         If counts is none, variance returns NaN for that cell (mean storages).
         """
 
-    def counts(self) -> Optional[ArrayLike]:
+    def counts(self) -> ArrayLike:
         """
-        Count returns the number of values in a mean accumulator (also known as
-        a Profile histogram), or is None for normal storages.
+        Count returns the number of values counted in a mean accumulator (also
+        known as a Profile histogram), or is identical to .values if
+        interpretation is "count".
         """
