@@ -23,24 +23,18 @@ from typing import runtime_checkable
 # from numpy.typing import ArrayLike # requires unreleased NumPy 1.20
 ArrayLike = Iterable[float]
 
-
-@runtime_checkable
-class PlottableOptions(Protocol):
-    # True if the axis "wraps around"
-    circular: bool
-
-    # True if each bin is discrete - Integer, Boolean, or Category, for example
-    discrete: bool
-
-
 T = TypeVar("T", covariant=True)
 
 
 @runtime_checkable
 class PlottableAxisGeneric(Protocol[T]):
-    # label: str - Optional, not part of Protocol
+    # label: str - Optional, not part of Protocol=
+        
+    # True if the axis "wraps around"
+    circular: bool
 
-    options: PlottableOptions
+    # True if each bin is discrete - Integer, Boolean, or Category, for example
+    discrete: bool
 
     def __getitem__(self, index: int) -> T:
         """
@@ -71,7 +65,7 @@ class PlottableHistogram(Protocol):
     axes: Sequence[PlottableAxis]
 
     weighted: bool
-    interpretation: Literal["count", "mean", "median"]
+    interpretation: Literal["count", "mean"]
 
     def values(self) -> ArrayLike:
         """
