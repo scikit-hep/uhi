@@ -25,7 +25,7 @@ ArrayLike = Iterable[float]
 
 
 @runtime_checkable
-class PlottableOptions(Protocol):
+class PlottableTraits(Protocol):
     # True if the axis "wraps around"
     circular: bool
 
@@ -40,7 +40,7 @@ T = TypeVar("T", covariant=True)
 class PlottableAxisGeneric(Protocol[T]):
     # label: str - Optional, not part of Protocol
 
-    options: PlottableOptions
+    traits: PlottableTraits
 
     def __getitem__(self, index: int) -> T:
         """
@@ -70,7 +70,6 @@ PlottableAxis = Union[PlottableAxisContinuous, PlottableAxisInt, PlottableAxisSt
 class PlottableHistogram(Protocol):
     axes: Sequence[PlottableAxis]
 
-    weighted: bool
     interpretation: Literal["count", "mean"]
 
     def values(self) -> ArrayLike:
