@@ -1,11 +1,15 @@
 """
 Using the protocol:
 
-Plotters should see if .counts() is None - if not, this is a Profile
-Then check .variances; if not None, this storage holds variance information and
-error bars should be included. If it is None, then a plotter can avoid showing
-error bars (recommended), or use np.sqrt(h.values()).
+Producers: use isinstance(myhist, PlottableHistogram) in your tests; part of
+the protocol is checkable at runtime, though ideally you should use MyPy; if
+your histogram class supports PlottableHistogram, this will pass.
+
+Consumers: Make your functions the accept PlottableHistogram static type, and
+MyPy will force you to only use items in the Protocol.
 """
+
+protocol_version = 1
 
 
 from typing import (
@@ -85,18 +89,24 @@ class PlottableHistogram(Protocol):
 
     def values(self) -> ArrayLike:
         """
-        Values returns the array or the values array for specialized
-        accumulators.
+        Values returns the counts for simple histograms or the mean for mean
+        histograms.  If this has a "mean" interpretation, then values is
+        undefined and left up to the Producer implementation if counts is less
+        than 1. A Consumer should check counts before using this.
 
-        All methods can have a flow=False argument - not part of Protocol.
+        All methods can have a flow=False argument - not part of Protocol.  If
+        this is included, it should return an array with flow bins added,
+        normal ordering.
         """
 
     def variances(self) -> Optional[ArrayLike]:
         """
-        Variance returns the variance of the values (for mean histograms, this
-        is not the variance of the counts). If unweighed, this returns None.
+        Variance returns the variance of the values (for "mean" histograms,
+        this is not the variance of the counts, but the variance of the mean).
+        If unweighed, this returns None.
 
-        If counts is less than 2, the variance in that cell is undefined for mean storages.
+        If counts is less than 2, the variance in that cell is undefined if
+        interpretation=="mean".
         """
 
     def counts(self) -> ArrayLike:
@@ -105,3 +115,7 @@ class PlottableHistogram(Protocol):
         known as a Profile histogram), or is identical to .values if
         interpretation is "count".
         """
+
+    # This version of the protocol does not define "counts_variance" - but if
+    # included, it should have that name for forward compatibility with future
+    # versions of this Protocol.
