@@ -12,6 +12,7 @@ from typing import (
     Any,
     Iterable,
     Literal,
+    Optional,
     Protocol,
     Sequence,
     Tuple,
@@ -23,6 +24,16 @@ from typing import runtime_checkable
 # from numpy.typing import ArrayLike # requires unreleased NumPy 1.20
 ArrayLike = Iterable[float]
 
+# Known kinds of histograms. A Producer can add types not defined here; a
+# Consumer should check for known types if it matters.
+# Interpretation = Literal["count", "mean"] - left as a generic string so it
+# can be added to.
+Interpretation = str
+
+# Implementations are highly encouraged to use the following construct:
+# class Interpretation(str, enum.Enum):
+#     count = "count"
+#     mean = "mean"
 
 @runtime_checkable
 class PlottableTraits(Protocol):
@@ -70,7 +81,7 @@ PlottableAxis = Union[PlottableAxisContinuous, PlottableAxisInt, PlottableAxisSt
 class PlottableHistogram(Protocol):
     axes: Sequence[PlottableAxis]
 
-    interpretation: Literal["count", "mean"]
+    interpretation: Interpretation
 
     def values(self) -> ArrayLike:
         """
@@ -80,11 +91,12 @@ class PlottableHistogram(Protocol):
         All methods can have a flow=False argument - not part of Protocol.
         """
 
-    def variances(self) -> ArrayLike:
+    def variances(self) -> Optional[ArrayLike]:
         """
-        Variance returns the variance. If unweighed, this is identical to .counts().
+        Variance returns the variance of the values (for mean histograms, this
+        is not the variance of the counts). If unweighed, this returns None.
 
-        If counts is none, variance returns NaN for that cell (mean storages).
+        If counts is less than 2, the variance in that cell is undefined for mean storages.
         """
 
     def counts(self) -> ArrayLike:
