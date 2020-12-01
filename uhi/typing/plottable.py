@@ -5,7 +5,7 @@ Producers: use isinstance(myhist, PlottableHistogram) in your tests; part of
 the protocol is checkable at runtime, though ideally you should use MyPy; if
 your histogram class supports PlottableHistogram, this will pass.
 
-Consumers: Make your functions the accept PlottableHistogram static type, and
+Consumers: Make your functions accept the PlottableHistogram static type, and
 MyPy will force you to only use items in the Protocol.
 """
 
@@ -138,4 +138,3 @@ class PlottableHistogram(Protocol):
                 out=np.zeros_like(sum_of_weights, dtype=np.float64),
                 where=sum_of_weights_squared!=0)
         """
-
