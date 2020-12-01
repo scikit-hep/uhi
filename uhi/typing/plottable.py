@@ -102,8 +102,8 @@ class PlottableHistogram(Protocol):
         undefined and left up to the Producer implementation if counts is less
         than 1. A Consumer should check counts before using this.
 
-        All methods can have a flow=False argument - not part of Protocol.  If
-        this is included, it should return an array with flow bins added,
+        All methods can have a flow=False argument - not part of this Protocol.
+        If this is included, it should return an array with flow bins added,
         normal ordering.
         """
 
@@ -117,11 +117,12 @@ class PlottableHistogram(Protocol):
         kind=="MEAN".
         """
 
-    def counts(self) -> Optional[ArrayLike]:
+    def effective_counts(self) -> Optional[ArrayLike]:
         """
-        Count returns the effective number of entries. Current Kinds of common histograms
-        all have a defined counts, but an exotic histogram could have a None .counts, so
-        this is Optional and should be checked by Consumers.
+        Count returns the effective number of entries in each bin. Current Kinds
+        of common histograms all have a defined counts, but an exotic histogram
+        could have a None .counts, so this is Optional and should be checked by
+        Consumers.
 
         For a weighted histogram, counts is defined as sum_of_weights ** 2 /
         sum_of_weights_squared. It is always equal to or smaller than the
@@ -136,5 +137,5 @@ class PlottableHistogram(Protocol):
                 sum_of_weights**2,
                 sum_of_weights_squared,
                 out=np.zeros_like(sum_of_weights, dtype=np.float64),
-                where=sum_of_weights_squared!=0)
+                where=sum_of_weights_squared != 0)
         """
