@@ -93,7 +93,7 @@ PlottableAxis = Union[PlottableAxisContinuous, PlottableAxisInt, PlottableAxisSt
 class PlottableHistogram(Protocol):
     axes: Sequence[PlottableAxis]
 
-    interpretation: Interpretation
+    kind: Kind
 
     def values(self) -> ArrayLike:
         """
