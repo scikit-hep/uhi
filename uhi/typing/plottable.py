@@ -117,7 +117,7 @@ class PlottableHistogram(Protocol):
         kind=="MEAN".
         """
 
-    def effective_counts(self) -> Optional[ArrayLike]:
+    def counts(self) -> Optional[ArrayLike]:
         """
         Count returns the effective number of entries in each bin. Current Kinds
         of common histograms all have a defined counts, but an exotic histogram
