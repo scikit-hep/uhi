@@ -112,7 +112,8 @@ class PlottableHistogram(Protocol):
         """
         Returns the estimated variance of the accumulated values. The sum of squared 
         weights for weighted histograms, the variance of samples for profiles, etc.
-        For an unweighed histogram, this returns the same as values.
+        For an unweighed histogram where kind == "COUNT", this should return the same
+        as values if the histogram was not filled with weights, and None otherwise.
 
         If counts is equal to 1 or less, the variance in that cell is undefined if
         kind == "MEAN".
