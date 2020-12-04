@@ -97,11 +97,12 @@ class PlottableHistogram(Protocol):
 
     def values(self) -> ArrayLike:
         """
-        Values returns the counts for simple histograms or the mean for mean
-        histograms.  If this has a "mean" interpretation, then values is
-        undefined and left up to the Producer implementation if counts is less
-        than 1. A Consumer should check counts before using this.
-
+        Returns the accumulated values. The counts for simple histograms, the
+        sum of weights for weighted histograms, the mean for profiles, etc.
+ 
+        If counts is equal to 0, the value in that cell is undefined if
+        kind == "MEAN".
+        
         All methods can have a flow=False argument - not part of this Protocol.
         If this is included, it should return an array with flow bins added,
         normal ordering.
@@ -109,27 +110,38 @@ class PlottableHistogram(Protocol):
 
     def variances(self) -> Optional[ArrayLike]:
         """
-        Variance returns the variance of the values (for "MEAN" histograms,
-        this is not the variance of the counts, but the variance of the mean).
-        If unweighed, this returns None.
+        Returns the estimated variance of the accumulated values. The sum of squared 
+        weights for weighted histograms, the variance of samples for profiles, etc.
+        For an unweighed histogram where kind == "COUNT", this should return the same
+        as values if the histogram was not filled with weights, and None otherwise.
 
         If counts is equal to 1 or less, the variance in that cell is undefined if
-        kind=="MEAN".
+        kind == "MEAN".
+        
+        If kind == "MEAN", the counts can be used to compute the error on the mean
+        as sqrt(variances / counts), this works whether or not the entries are 
+        weighted if the weight variance was tracked by the implementation.
         """
 
     def counts(self) -> Optional[ArrayLike]:
         """
-        Count returns the effective number of entries in each bin. Current Kinds
-        of common histograms all have a defined counts, but an exotic histogram
-        could have a None .counts, so this is Optional and should be checked by
+        Count returns the number of entries in each bin for an unweighted
+        histogram or profile and an effective number of entries (defined below)
+        for a weighted histogram or profile. An exotic generalized histogram could
+        have no sensible .counts, so this is Optional and should be checked by
         Consumers.
 
         For a weighted histogram, counts is defined as sum_of_weights ** 2 /
-        sum_of_weights_squared. It is always equal to or smaller than the
-        number of times the histogram was filled. If there is no variance in
-        the weights, this is exactly equal to the number of times this was
-        filled. The larger the spread in weights, this is smaller, but always 0
-        if filled 0 times, and 1 if filled once, and more than 1.
+        sum_of_weights_squared. It is equal or less than the number of times
+        the bin was filled, the equality holds when all filled weights are equal.
+        The larger the spread in weights, the smaller it is, but it is always 0
+        if filled 0 times, and 1 if filled once, and more than 1 otherwise.
+        
+        If kind == "MEAN", counts (effective or not) can and should be used to
+        determine whether the mean value and its variance should be displayed 
+        (see documentation of values and variances, respectively). The counts
+        should also be used to compute the error on the mean (see documentation
+        of variances).
 
         A suggested implementation is:
 
