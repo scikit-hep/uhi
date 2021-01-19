@@ -13,6 +13,8 @@
 [![Scikit-HEP][sk-badge]](https://scikit-hep.org/)
 
 
+This is a package meant primarily for documenting histogram indexing and the PlottableProtocol and any future cross-library standards. It also contains the code for the PlottableProtocol, to be used in type checking libraries wanting to conform to the protocol. Eventually, it might gain a set of tools for testing conformance to UHI indexing, as well. It is not intended to be a runtime dependency, but only a type checking, testing, and/or docs dependency in support of our other libraries (boost-histogram, hist, mplhep, histoprint). It requires Python 3.6+.
+
 
 [actions-badge]:            https://github.com/Scikit-HEP/uhi/workflows/CI/badge.svg
 [actions-link]:             https://github.com/Scikit-HEP/uhi/actions

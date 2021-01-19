@@ -8,7 +8,7 @@ UHI: Unified Histogram Interface
 
 This is the home for the Unified Histogram Interface documentation.
 
-This currently holds the Indexing specification, and the PlottibleProtocol
+This currently holds the Indexing specification, and the PlottableProtocol
 definition.
 
 
