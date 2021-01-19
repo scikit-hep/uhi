@@ -3,6 +3,21 @@ name = "uhi"
 version = "0.1.0"
 description = "Unified Histogram Indexing"
 authors = ["Henry Schreiner <henryschreineriii@gmail.com>"]
+maintainers = [
+    "The Scikit-HEP admins <scikit-hep-admins@googlegroups.com>",
+]
+homepage = "https://github.com/Scikit-HEP/uhi"
+repository = "https://github.com/Scikit-HEP/uhi"
+license = "BSD-3-Clause"
+
+classifiers = [
+  "Topic :: Scientific/Engineering",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Development Status :: 1 - Planning",
+]
+
 
 [tool.poetry.dependencies]
 python = "^3.6"
@@ -10,13 +25,22 @@ typing_extensions = { version = "^3.7", python = "<3.8" }
 
 sphinx = {version = "3", optional = true}
 sphinx-rtd-theme = { version = "^0.5.1", optional = true }
+pytest = { version = "^5.2", optional = true }
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
 
 [tool.poetry.extras]
 docs = ["sphinx", "sphinx-rtd-theme"]
+test = ["pytest"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.pytest.ini_config]
+addopts = "-rs -s -Wd"
+testpaths = [
+    "tests",
+]

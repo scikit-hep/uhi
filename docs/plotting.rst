@@ -36,5 +36,5 @@ on an unweighted histogram).
 
 The full protocol version 1 follows:
 
-.. literalinclude:: ../../tests/plottable.py
+.. literalinclude:: ../src/uhi/typing/plottable.py
    :language: python

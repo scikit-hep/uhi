@@ -3,8 +3,14 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to uhi's documentation!
-===============================
+UHI: Unified Histogram Interface
+=================================
+
+This is the home for the Unified Histogram Interface documentation.
+
+This currently holds the Indexing specification, and the PlottibleProtocol
+definition.
+
 
 .. toctree::
    :maxdepth: 2
