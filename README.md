@@ -6,7 +6,6 @@
 [![Code style: black][black-badge]][black-link]
 
 [![PyPI version][pypi-version]][pypi-link]
-[![Conda-Forge][conda-badge]][conda-link]
 [![PyPI platforms][pypi-platforms]][pypi-link]
 
 [![GitHub Discussion][github-discussions-badge]][github-discussions-link]
@@ -15,10 +14,8 @@
 
 
 
-
-
 [actions-badge]:            https://github.com/Scikit-HEP/uhi/workflows/CI/badge.svg
-[actions-link]:             https://github.com/Scikit-HEP/uhiactions
+[actions-link]:             https://github.com/Scikit-HEP/uhi/actions
 [black-badge]:              https://img.shields.io/badge/code%20style-black-000000.svg
 [black-link]:               https://github.com/psf/black
 [conda-badge]:              https://img.shields.io/conda/vn/conda-forge/uhi
@@ -32,4 +29,4 @@
 [pypi-version]:             https://badge.fury.io/py/uhi.svg
 [rtd-badge]:                https://readthedocs.org/projects/uhi/badge/?version=latest
 [rtd-link]:                 https://uhi.readthedocs.io/en/latest/?badge=latest
-[sk-badge]:                 https://scikit-hep.org/assets/images/Scikit--HEP-Project-build
+[sk-badge]:                 https://scikit-hep.org/assets/images/Scikit--HEP-Project-blue.svg
