@@ -96,6 +96,10 @@ class PlottableHistogram(Protocol):
 
     kind: Kind
 
+    # All methods can have a flow=False argument - not part of this Protocol.
+    # If this is included, it should return an array with flow bins added,
+    # normal ordering.
+
     def values(self) -> ArrayLike:
         """
         Returns the accumulated values. The counts for simple histograms, the
@@ -103,10 +107,6 @@ class PlottableHistogram(Protocol):
 
         If counts is equal to 0, the value in that cell is undefined if
         kind == "MEAN".
-
-        All methods can have a flow=False argument - not part of this Protocol.
-        If this is included, it should return an array with flow bins added,
-        normal ordering.
         """
 
     def variances(self) -> Optional[ArrayLike]:
@@ -126,7 +126,7 @@ class PlottableHistogram(Protocol):
 
     def counts(self) -> Optional[ArrayLike]:
         """
-        Count returns the number of entries in each bin for an unweighted
+        Returns the number of entries in each bin for an unweighted
         histogram or profile and an effective number of entries (defined below)
         for a weighted histogram or profile. An exotic generalized histogram could
         have no sensible .counts, so this is Optional and should be checked by
