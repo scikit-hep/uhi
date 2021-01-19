@@ -2,7 +2,11 @@
 name = "uhi"
 version = "0.1.0"
 description = "Unified Histogram Indexing"
-authors = ["Henry Schreiner <henryschreineriii@gmail.com>"]
+authors = [
+    "Henry Schreiner <henryschreineriii@gmail.com>",
+    "Hans Dembinski <hans.dembinski@gmail.com>",
+    "Jim Pivaski <pivarski@princeton.edu>",
+]
 maintainers = [
     "The Scikit-HEP admins <scikit-hep-admins@googlegroups.com>",
 ]
