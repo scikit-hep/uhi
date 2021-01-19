@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Using the protocol:
 
@@ -9,13 +10,9 @@ Consumers: Make your functions accept the PlottableHistogram static type, and
 MyPy will force you to only use items in the Protocol.
 """
 
-protocol_version = 1
-
-
 from typing import (
     Any,
     Iterable,
-    Literal,
     Optional,
     Protocol,
     Sequence,
@@ -24,6 +21,9 @@ from typing import (
     Union,
 )
 from typing import runtime_checkable
+
+
+protocol_version = 1
 
 # from numpy.typing import ArrayLike # requires unreleased NumPy 1.20
 ArrayLike = Iterable[float]
@@ -41,6 +41,7 @@ Kind = str
 #     COUNT = "COUNT"
 #     MEAN = "MEAN"
 # Then return and use Kind.COUNT or Kind.MEAN.
+
 
 @runtime_checkable
 class PlottableTraits(Protocol):
@@ -99,10 +100,10 @@ class PlottableHistogram(Protocol):
         """
         Returns the accumulated values. The counts for simple histograms, the
         sum of weights for weighted histograms, the mean for profiles, etc.
- 
+
         If counts is equal to 0, the value in that cell is undefined if
         kind == "MEAN".
-        
+
         All methods can have a flow=False argument - not part of this Protocol.
         If this is included, it should return an array with flow bins added,
         normal ordering.
@@ -110,16 +111,16 @@ class PlottableHistogram(Protocol):
 
     def variances(self) -> Optional[ArrayLike]:
         """
-        Returns the estimated variance of the accumulated values. The sum of squared 
+        Returns the estimated variance of the accumulated values. The sum of squared
         weights for weighted histograms, the variance of samples for profiles, etc.
         For an unweighed histogram where kind == "COUNT", this should return the same
         as values if the histogram was not filled with weights, and None otherwise.
 
         If counts is equal to 1 or less, the variance in that cell is undefined if
         kind == "MEAN".
-        
+
         If kind == "MEAN", the counts can be used to compute the error on the mean
-        as sqrt(variances / counts), this works whether or not the entries are 
+        as sqrt(variances / counts), this works whether or not the entries are
         weighted if the weight variance was tracked by the implementation.
         """
 
@@ -131,17 +132,17 @@ class PlottableHistogram(Protocol):
         have no sensible .counts, so this is Optional and should be checked by
         Consumers.
 
+        If kind == "MEAN", counts (effective or not) can and should be used to
+        determine whether the mean value and its variance should be displayed
+        (see documentation of values and variances, respectively). The counts
+        should also be used to compute the error on the mean (see documentation
+        of variances).
+
         For a weighted histogram, counts is defined as sum_of_weights ** 2 /
         sum_of_weights_squared. It is equal or less than the number of times
         the bin was filled, the equality holds when all filled weights are equal.
         The larger the spread in weights, the smaller it is, but it is always 0
         if filled 0 times, and 1 if filled once, and more than 1 otherwise.
-        
-        If kind == "MEAN", counts (effective or not) can and should be used to
-        determine whether the mean value and its variance should be displayed 
-        (see documentation of values and variances, respectively). The counts
-        should also be used to compute the error on the mean (see documentation
-        of variances).
 
         A suggested implementation is:
 
