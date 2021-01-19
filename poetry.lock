@@ -120,7 +120,7 @@ testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xm
 name = "typing-extensions"
 version = "3.7.4.3"
 description = "Backported and Experimental Type Hints for Python 3.5+"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -147,7 +147,7 @@ testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "29ec873a29b3906a45ee10d05bd7d86265b16243b9b1521d055252217b57decf"
+content-hash = "8ac49a5dbd867d4ae77acbca2b5808a1c318493cfd0643847d0895cd7411d3e6"
 
 [metadata.files]
 atomicwrites = [

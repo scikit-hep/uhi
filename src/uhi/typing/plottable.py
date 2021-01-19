@@ -10,17 +10,23 @@ Consumers: Make your functions accept the PlottableHistogram static type, and
 MyPy will force you to only use items in the Protocol.
 """
 
+import sys
 from typing import (
     Any,
     Iterable,
     Optional,
-    Protocol,
     Sequence,
     Tuple,
     TypeVar,
     Union,
 )
-from typing import runtime_checkable
+
+
+if sys.version_info < (3, 8):
+    from typing_extensions import Protocol, runtime_checkable
+
+else:
+    from typing import Protocol, runtime_checkable
 
 
 protocol_version = 1

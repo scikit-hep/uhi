@@ -6,6 +6,7 @@ authors = ["Henry Schreiner <henryschreineriii@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.6"
+typing_extensions = { version = "^3.7", python = "<3.8" }
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
