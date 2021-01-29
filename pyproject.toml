@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "uhi"
-version = "0.1.0"
-description = "Unified Histogram Indexing"
+version = "0.1.1"
+description = "Unified Histogram Interface: tools to help library authors work with histograms"
 authors = [
     "Henry Schreiner <henryschreineriii@gmail.com>",
     "Hans Dembinski <hans.dembinski@gmail.com>",
@@ -12,6 +12,7 @@ maintainers = [
 ]
 homepage = "https://github.com/Scikit-HEP/uhi"
 repository = "https://github.com/Scikit-HEP/uhi"
+readme = "README.md"
 license = "BSD-3-Clause"
 
 classifiers = [
