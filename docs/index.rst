@@ -6,10 +6,21 @@
 UHI: Unified Histogram Interface
 =================================
 
-This is the home for the Unified Histogram Interface documentation.
+UHI is a library that helps connect other Histogramming libraries. It is
+primarily indented to be a guide and static type check helper; you do not need
+an runtime dependency on UHI. It currently does so with the following
+components:
 
-This currently holds the Indexing specification, and the PlottableProtocol
-definition.
+UHI Indexing, which describes a powerful indexing system for histograms,
+designed to extend standard Array indexing for Histogram operations.
+
+UHI Indexing+ (referred to as UHI+ for short), which describes a set of
+extensions to the standard indexing that make it easier to use on the command
+line.
+
+The PlottableProtocol, which describes the minimal and complete set of
+requirements for a source library to produce and a plotting library to consume
+to plot a histogram, including error bars.
 
 
 .. toctree::
@@ -17,6 +28,7 @@ definition.
    :caption: Contents:
 
    indexing.rst
+   indexing+.rst
    plotting.rst
 
 
