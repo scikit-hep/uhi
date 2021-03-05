@@ -12,7 +12,7 @@ libraries can implement support for this as well, and the "tag" functors, like
 Syntax
 ------
 
-The following examples assume you have imported ``loc``, ``sum``, ``rebin``,
+The following examples assume you have imported ``loc``, ``rebin``,
 ``underflow``, and ``overflow`` from boost-histogram or any other library that
 implements UHI.
 
@@ -89,9 +89,9 @@ to recover the original slicing syntax inside the dict:
 
     s = bh.tag.Slicer()
 
-    h[{0: s[::bh.rebin(2)]}]   # rebin axis 0 by two
-    h[{1: s[0:bh.loc(3.5)]}]   # slice axis 1 from 0 to the data coordinate 3.5
-    h[{7: s[0:2:bh.rebin(4)]}] # slice and rebin axis 7
+    h[{0: s[::rebin(2)]}]   # rebin axis 0 by two
+    h[{1: s[0:loc(3.5)]}]   # slice axis 1 from 0 to the data coordinate 3.5
+    h[{7: s[0:2:rebin(4)]}] # slice and rebin axis 7
 
 
 
@@ -103,6 +103,15 @@ Invalid syntax:
    h[1.0] # Floats are not allowed, just like numpy
    h[::2] # Skipping is not (currently) supported
    h[..., None] # None == np.newaxis is not supported
+
+
+Reordering axes
+^^^^^^^^^^^^^^^
+
+It is not possible to reorder axis with this syntax; libraries are expected to
+provide a ``.project(*axis: int)`` method which provides a way to reorder, as well
+as fast access to a small subset of a large histogram in a complementary way to
+the above indexing.
 
 Rejected proposals or proposals for future consideration, maybe ``hist``-only:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -172,7 +181,7 @@ example:
    h[:] = np.ones(10) # underflow/overflow still 0
    h[:] = np.ones(12) # underflow/overflow now set too
 
-Note that for clarity, while basic Numpy broadcasting is supported,
+Note that for clarity, while basic NumPy broadcasting is supported,
 axis-adding broadcasting is not supported; you must set a 2D histogram
 with a 2D array or a scalar, not a 1D array.
 
@@ -222,11 +231,6 @@ Details
 -------
 
 
-Axis indexing
-^^^^^^^^^^^^^
-
-TODO: Possibly extend to axes. Would follow the 1D cases above.
-
 Implementation notes
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -243,7 +247,7 @@ form is more powerful, slower, optional, and is currently not supported by
 boost-histogram.  A fully conforming UHI implementation must allow the tag form
 without the operators.
 
-Basic implementation (WIP):
+Basic implementation example (WIP):
 
 .. code:: python3
 
