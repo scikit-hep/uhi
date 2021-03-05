@@ -14,6 +14,13 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+import sys
+
+if sys.version_info < (3, 8):
+    import importlib_metadata as metadata
+else:
+    import importlib.metadata as metadata
+
 
 # -- Project information -----------------------------------------------------
 
@@ -22,7 +29,7 @@ copyright = "2021, Henry Schreiner, Hans Dembinski, Jim Pivarski"
 author = "Henry Schreiner, Hans Dembinski, Jim Pivarski"
 
 # The full version, including alpha/beta/rc tags
-release = "0.1.0"
+release = metadata.version("uhi")
 
 
 # -- General configuration ---------------------------------------------------
@@ -32,6 +39,7 @@ release = "0.1.0"
 # ones.
 extensions = [
     "sphinx.ext.napoleon",
+    "sphinx_copybutton",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -48,9 +56,19 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "alabaster"
+html_theme = "sphinx_book_theme"
+
+html_baseurl = "https://uhi.readthedocs.io/en/latest/"
+
+html_theme_options = {
+    "home_page_in_toc": True,
+    "repository_url": "https://github.com/scikit-hep/uhi",
+    "use_repository_button": True,
+    "use_issues_button": True,
+    "use_edit_page_button": True,
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
+html_static_path = []  # _static
