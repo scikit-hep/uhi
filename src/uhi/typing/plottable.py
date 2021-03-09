@@ -10,7 +10,10 @@ MyPy will force you to only use items in the Protocol.
 """
 
 import sys
-from typing import Any, Iterable, Optional, Sequence, Tuple, TypeVar, Union
+from typing import Any, Iterator, Optional, Sequence, Tuple, TypeVar, Union
+
+# NumPy 1.20+ will work much, much better than previous versions when type checking
+import numpy as np
 
 if sys.version_info < (3, 8):
     from typing_extensions import Protocol, runtime_checkable
@@ -19,10 +22,7 @@ else:
     from typing import Protocol, runtime_checkable
 
 
-protocol_version = (1, 1)
-
-# from numpy.typing import ArrayLike # requires NumPy 1.20
-ArrayLike = Iterable[float]
+protocol_version = (1, 2)
 
 # Known kinds of histograms. A Producer can add Kinds not defined here; a
 # Consumer should check for known types if it matters. A simple plotter could
@@ -86,6 +86,11 @@ class PlottableAxisGeneric(Protocol[T]):
         Required to be sequence-like.
         """
 
+    def __iter__(self) -> Iterator[T]:
+        """
+        Useful element of a Sequence to include.
+        """
+
 
 PlottableAxisContinuous = PlottableAxisGeneric[Tuple[float, float]]
 PlottableAxisInt = PlottableAxisGeneric[int]
@@ -108,7 +113,7 @@ class PlottableHistogram(Protocol):
     # If this is included, it should return an array with flow bins added,
     # normal ordering.
 
-    def values(self) -> ArrayLike:
+    def values(self) -> np.ndarray:
         """
         Returns the accumulated values. The counts for simple histograms, the
         sum of weights for weighted histograms, the mean for profiles, etc.
@@ -117,7 +122,7 @@ class PlottableHistogram(Protocol):
         kind == "MEAN".
         """
 
-    def variances(self) -> Optional[ArrayLike]:
+    def variances(self) -> Optional[np.ndarray]:
         """
         Returns the estimated variance of the accumulated values. The sum of squared
         weights for weighted histograms, the variance of samples for profiles, etc.
@@ -132,7 +137,7 @@ class PlottableHistogram(Protocol):
         weighted if the weight variance was tracked by the implementation.
         """
 
-    def counts(self) -> Optional[ArrayLike]:
+    def counts(self) -> Optional[np.ndarray]:
         """
         Returns the number of entries in each bin for an unweighted
         histogram or profile and an effective number of entries (defined below)
