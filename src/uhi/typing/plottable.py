@@ -67,7 +67,8 @@ class PlottableAxisGeneric(Protocol[T]):
     # available on all histograms and not part of the Protocol.
 
     @property
-    def traits(self) -> PlottableTraits: ...
+    def traits(self) -> PlottableTraits:
+        ...
 
     def __getitem__(self, index: int) -> T:
         """
@@ -95,12 +96,13 @@ PlottableAxis = Union[PlottableAxisContinuous, PlottableAxisInt, PlottableAxisSt
 
 @runtime_checkable
 class PlottableHistogram(Protocol):
+    @property
+    def axes(self) -> Sequence[PlottableAxis]:
+        ...
 
     @property
-    def axes(self) -> Sequence[PlottableAxis]: ...
-
-    @property
-    def kind(self) -> Kind: ...
+    def kind(self) -> Kind:
+        ...
 
     # All methods can have a flow=False argument - not part of this Protocol.
     # If this is included, it should return an array with flow bins added,
