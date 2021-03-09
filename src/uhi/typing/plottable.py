@@ -19,9 +19,9 @@ else:
     from typing import Protocol, runtime_checkable
 
 
-protocol_version = 1
+protocol_version = (1, 1)
 
-# from numpy.typing import ArrayLike # requires unreleased NumPy 1.20
+# from numpy.typing import ArrayLike # requires NumPy 1.20
 ArrayLike = Iterable[float]
 
 # Known kinds of histograms. A Producer can add Kinds not defined here; a
@@ -41,11 +41,17 @@ Kind = str
 
 @runtime_checkable
 class PlottableTraits(Protocol):
-    # True if the axis "wraps around"
-    circular: bool
+    @property
+    def circular(self) -> bool:
+        """
+        True if the axis "wraps around"
+        """
 
-    # True if each bin is discrete - Integer, Boolean, or Category, for example
-    discrete: bool
+    @property
+    def discrete(self) -> bool:
+        """
+        True if each bin is discrete - Integer, Boolean, or Category, for example
+        """
 
 
 T = TypeVar("T", covariant=True)
@@ -60,7 +66,8 @@ class PlottableAxisGeneric(Protocol[T]):
     # name otherwise if it exists and is not None, but these properties are not
     # available on all histograms and not part of the Protocol.
 
-    traits: PlottableTraits
+    @property
+    def traits(self) -> PlottableTraits: ...
 
     def __getitem__(self, index: int) -> T:
         """
@@ -88,9 +95,12 @@ PlottableAxis = Union[PlottableAxisContinuous, PlottableAxisInt, PlottableAxisSt
 
 @runtime_checkable
 class PlottableHistogram(Protocol):
-    axes: Sequence[PlottableAxis]
 
-    kind: Kind
+    @property
+    def axes(self) -> Sequence[PlottableAxis]: ...
+
+    @property
+    def kind(self) -> Kind: ...
 
     # All methods can have a flow=False argument - not part of this Protocol.
     # If this is included, it should return an array with flow bins added,

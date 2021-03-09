@@ -66,7 +66,7 @@ Then, check your library against the Protocol like this:
 The full protocol version 1 follows:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-(Also available as ``uhi.typing.plottoble.PlottableProtocol``, for use in tests, etc.
+(Also available as ``uhi.typing.plottable.PlottableProtocol``, for use in tests, etc.
 
 .. literalinclude:: ../src/uhi/typing/plottable.py
    :language: python
