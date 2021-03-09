@@ -63,8 +63,8 @@ Then, check your library against the Protocol like this:
         _: PlottableHistogram = cast(MyHistogram, None)
 
 
-The full protocol version 1 follows:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The full protocol version 1.1 follows:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 (Also available as ``uhi.typing.plottable.PlottableProtocol``, for use in tests, etc.
 

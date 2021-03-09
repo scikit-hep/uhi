@@ -1,5 +1,6 @@
-from uhi import __version__
 import sys
+
+from uhi import __version__
 
 if sys.version_info < (3, 8):
     import importlib_metadata as metadata
