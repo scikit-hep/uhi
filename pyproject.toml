@@ -27,21 +27,24 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.6"
+numpy = ">=1.13.3"
 typing_extensions = { version = ">=3.7", python = "<3.8" }
 
 sphinx = {version = "^3.0", optional = true}
 sphinx_book_theme = { version = ">=0.0.40", optional = true }
 sphinx_copybutton = { version = ">=0.3.1", optional = true }
 pytest = { version = ">=5.2", optional = true }
-importlib_metadata = {version = ">=1.0", optional = true, python = "<3.8" }
+importlib_metadata = { version = ">=1.0", optional = true, python = "<3.8" }
+boost-histogram = { version = "~=1.0.0", optional = true }
 
 [tool.poetry.dev-dependencies]
 pytest = ">=5.2"
 importlib_metadata = {version = ">=1.0", python = "<3.8" }
+boost_histogram = "~=1.0.0"
 
 [tool.poetry.extras]
 docs = ["sphinx", "sphinx_book_theme", "sphinx_copybutton"]
-test = ["pytest", "importlib_metadata"]
+test = ["pytest", "importlib_metadata", "boost_histogram" ]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
