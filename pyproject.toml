@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "uhi"
-version = "0.1.2"
+version = "0.2.0"
 description = "Unified Histogram Interface: tools to help library authors work with histograms"
 authors = [
     "Henry Schreiner <henryschreineriii@gmail.com>",
