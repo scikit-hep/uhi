@@ -1,5 +1,4 @@
-# UHI
-
+# UHI: Universal Histogram Interface
 
 [![Actions Status][actions-badge]][actions-link]
 [![Documentation Status][rtd-badge]][rtd-link]
@@ -11,10 +10,26 @@
 [![GitHub Discussion][github-discussions-badge]][github-discussions-link]
 [![Gitter][gitter-badge]][gitter-link]
 [![Scikit-HEP][sk-badge]](https://scikit-hep.org/)
+[![pre-commit.ci status][pre-commit-badge]][pre-commit-link]
 
 
-This is a package meant primarily for [documenting][rtd-link] histogram indexing and the PlottableProtocol and any future cross-library standards. It also contains the code for the PlottableProtocol, to be used in type checking libraries wanting to conform to the protocol. Eventually, it might gain a set of tools for testing conformance to UHI indexing, as well. It is not currently intended to be a runtime dependency, but only a type checking, testing, and/or docs dependency in support of other libraries (such as [boost-histogram][], [hist][], [mplhep][], [uproot4][], and eventually [histoprint][]). It requires Python 3.6+.
+This is a package meant primarily for [documenting][rtd-link] histogram
+indexing and the PlottableHistogram Protocol and any future cross-library
+standards. It also contains the code for the PlottableHistogram Protocol, to be
+used in type checking libraries wanting to conform to the protocol. Eventually,
+it might gain a set of tools for testing conformance to UHI indexing, as well.
+It is not usually a runtime dependency, but only a type checking, testing,
+and/or docs dependency in support of other libraries (such as
+[boost-histogram][], [hist][], [mplhep][], [uproot4][], and eventually
+[histoprint][]). It requires Python 3.6+. [See what's
+new](https://github.com/scikit-hep/uhi/releases).
 
+To assist plotting libraries in accepting Histograms from classic sources, see
+`uhi.numpy_plotting.ensure_plottable_histogram`, which will adapt NumPy style
+tuples into a simple PlottableHistogram.
+
+The protocol provided do support runtime checking, so
+`isinstance(h, uhi.typing.plotting.PlottableHistogram)` is valid at runtime.
 
 [actions-badge]:            https://github.com/Scikit-HEP/uhi/workflows/CI/badge.svg
 [actions-link]:             https://github.com/Scikit-HEP/uhi/actions
@@ -26,6 +41,8 @@ This is a package meant primarily for [documenting][rtd-link] histogram indexing
 [github-discussions-link]:  https://github.com/Scikit-HEP/uhi/discussions
 [gitter-badge]:             https://badges.gitter.im/https://github.com/Scikit-HEP/uhi/community.svg
 [gitter-link]:              https://gitter.im/https://github.com/Scikit-HEP/uhi/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
+[pre-commit-badge]:         https://results.pre-commit.ci/badge/github/scikit-hep/uhi/main.svg
+[pre-commit-link]:          https://results.pre-commit.ci/repo/github/309772485
 [pypi-link]:                https://pypi.org/project/uhi/
 [pypi-platforms]:           https://img.shields.io/pypi/pyversions/uhi
 [pypi-version]:             https://badge.fury.io/py/uhi.svg
