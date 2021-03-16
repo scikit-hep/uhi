@@ -6,7 +6,9 @@ Plotting
 This is a description of the ``PlottableProtocol``,. Any plotting library that
 accepts an object that follows the ``PlottableProtocol`` can plot object that
 follow this protocol, and libraries that follow this protocol are compatible
-with plotters.
+with plotters. The Protocol is runtime checkable, though as usual, that will
+only check for the presence of the needed methods at runtime, not for the
+static types.
 
 
 Using the protocol:
@@ -61,6 +63,19 @@ Then, check your library against the Protocol like this:
 
     if TYPE_CHECKING:
         _: PlottableHistogram = cast(MyHistogram, None)
+
+Help for plotters
+^^^^^^^^^^^^^^^^^
+
+The module ``uhi.numpy_plottable`` has a utility to simplify the common use
+case of accepting a PlottableProtocol or other common formats, primarily a
+NumPy ``histogram/histogram2d/histogramdd`` tuple. The
+``ensure_plottable_histogram`` function will take a histogram or NumPy tuple,
+or an object that implements ``.to_numpy`` or ``.numpy`` and convert it to a
+``NumPyPlottableHistogram``, which is a minimal implementation of the Protocol.
+By calling this function on your input, you can then write your plotting
+function knowing that you always have a ``PlottableProtocol`` object, greatly
+simplifying your code.
 
 
 The full protocol version 1.1 follows:
