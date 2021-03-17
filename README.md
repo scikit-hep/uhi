@@ -2,6 +2,7 @@
 
 [![Actions Status][actions-badge]][actions-link]
 [![Documentation Status][rtd-badge]][rtd-link]
+[![pre-commit.ci Status][pre-commit-badge]][pre-commit-link]
 [![Code style: black][black-badge]][black-link]
 
 [![PyPI version][pypi-version]][pypi-link]
@@ -10,7 +11,6 @@
 [![GitHub Discussion][github-discussions-badge]][github-discussions-link]
 [![Gitter][gitter-badge]][gitter-link]
 [![Scikit-HEP][sk-badge]](https://scikit-hep.org/)
-[![pre-commit.ci status][pre-commit-badge]][pre-commit-link]
 
 
 This is a package meant primarily for [documenting][rtd-link] histogram
@@ -20,16 +20,18 @@ used in type checking libraries wanting to conform to the protocol. Eventually,
 it might gain a set of tools for testing conformance to UHI indexing, as well.
 It is not usually a runtime dependency, but only a type checking, testing,
 and/or docs dependency in support of other libraries (such as
-[boost-histogram][], [hist][], [mplhep][], [uproot4][], and eventually
-[histoprint][]). It requires Python 3.6+. [See what's
+[boost-histogram][] 0.13+, [hist][] 2.1+, [mplhep][] 0.2.15+, [uproot][] 4+,
+and [histoprint][] 2+).  There are a few useful runtime usable components
+(listed below). It requires Python 3.6+. [See what's
 new](https://github.com/scikit-hep/uhi/releases).
 
 To assist plotting libraries in accepting Histograms from classic sources, see
-`uhi.numpy_plotting.ensure_plottable_histogram`, which will adapt NumPy style
+`uhi.numpy_plottable.ensure_plottable_histogram`, which will adapt NumPy style
 tuples into a simple PlottableHistogram.
 
-The protocol provided do support runtime checking, so
-`isinstance(h, uhi.typing.plotting.PlottableHistogram)` is valid at runtime.
+The Protocols provided do support runtime checking, so
+`isinstance(h, uhi.typing.plotting.PlottableHistogram)` is valid at runtime and
+might be simpler than manually checking for the expected methods.
 
 [actions-badge]:            https://github.com/Scikit-HEP/uhi/workflows/CI/badge.svg
 [actions-link]:             https://github.com/Scikit-HEP/uhi/actions
@@ -53,5 +55,5 @@ The protocol provided do support runtime checking, so
 [boost-histogram]:          https://github.com/scikit-hep/boost-histogram
 [hist]:                     https://github.com/scikit-hep/hist
 [mplhep]:                   https://github.com/scikit-hep/mplhep
-[uproot4]:                  https://github.com/scikit-hep/uproot4
+[uproot]:                  https://github.com/scikit-hep/uproot4
 [histoprint]:               https://github.com/scikit-hep/histoprint

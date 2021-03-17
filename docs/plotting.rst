@@ -24,8 +24,9 @@ Plotters should only depend on the methods and attributes listed below. In short
 
 Axes have:
 
-* ``ax[i]``: A sequence of lower, upper bin, or the discrete bin value (integer or sting)
+* ``ax[i]``: A tuple of (lower, upper) bin, or the discrete bin value (integer or sting)
 * ``len(ax)``: The number of bins
+* Iteration is supported
 * ``ax.traits.circular``: True if circular
 * ``ax.traits.discrete``: True if the bin represents a single value (e.g. Integer or Category axes) instead of an interval (e.g. Regular or Variable axes)
 
@@ -69,16 +70,16 @@ Help for plotters
 
 The module ``uhi.numpy_plottable`` has a utility to simplify the common use
 case of accepting a PlottableProtocol or other common formats, primarily a
-NumPy ``histogram/histogram2d/histogramdd`` tuple. The
+NumPy ``histogram``/``histogram2d``/``histogramdd`` tuple. The
 ``ensure_plottable_histogram`` function will take a histogram or NumPy tuple,
-or an object that implements ``.to_numpy`` or ``.numpy`` and convert it to a
+or an object that implements ``.to_numpy()`` or ``.numpy()`` and convert it to a
 ``NumPyPlottableHistogram``, which is a minimal implementation of the Protocol.
 By calling this function on your input, you can then write your plotting
 function knowing that you always have a ``PlottableProtocol`` object, greatly
 simplifying your code.
 
 
-The full protocol version 1.1 follows:
+The full protocol version 1.2 follows:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 (Also available as ``uhi.typing.plottable.PlottableProtocol``, for use in tests, etc.
