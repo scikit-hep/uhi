@@ -24,6 +24,8 @@ classifiers = [
   "Typing :: Typed",
 ]
 
+include = [ { path = "tests/**/*", format = "sdist" } ]
+
 
 [tool.poetry.dependencies]
 python = ">=3.6"
