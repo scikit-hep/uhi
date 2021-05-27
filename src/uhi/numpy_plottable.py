@@ -258,16 +258,16 @@ class ROOTPlottableHistogram:
             return self.values()
 
     def counts(self) -> np.ndarray:
-        if self.hasWeights:
-            sumw = self.values()
-            return np.divide(  # type: ignore
-                sumw ** 2,
-                self.variances(),
-                out=np.zeros_like(sumw, dtype=np.float64),
-                where=sumw != 0,
-            )
-        else:
+        if not self.hasWeights:
             return self.values()
+
+        sumw = self.values()
+        return np.divide(  # type: ignore
+            sumw ** 2,
+            self.variances(),
+            out=np.zeros_like(sumw, dtype=np.float64),
+            where=sumw != 0,
+        )
 
 
 if TYPE_CHECKING:
