@@ -225,7 +225,9 @@ class DiscreteROOTAxis(ROOTAxis):
             yield self[i]
 
 
-class ROOTPlottableHistogram:
+class ROOTPlottableHistBase:
+    """Common base for ROOT histograms and TProfile"""
+
     def __init__(self, thist: Any) -> None:
         self.thist: Any = thist
         nDim = thist.GetDimension()
@@ -235,6 +237,15 @@ class ROOTPlottableHistogram:
         self.axes: Tuple[Union[ContinuousROOTAxis, DiscreteROOTAxis], ...] = tuple(
             ROOTAxis.create(getattr(thist, f"Get{ax}axis")()) for ax in "XYZ"[:nDim]
         )
+
+    @property
+    def name(self) -> str:
+        return self.thist.GetName()  # type: ignore
+
+
+class ROOTPlottableHistogram(ROOTPlottableHistBase):
+    def __init__(self, thist: Any) -> None:
+        super().__init__(thist)
 
     @property
     def hasWeights(self) -> bool:
@@ -270,11 +281,49 @@ class ROOTPlottableHistogram:
         )
 
 
+class ROOTPlottableProfile(ROOTPlottableHistBase):
+    def __init__(self, thist: Any) -> None:
+        super().__init__(thist)
+
+    @property
+    def kind(self) -> str:
+        return Kind.MEAN
+
+    def values(self) -> np.ndarray:
+        return np.array(  # type: ignore
+            [self.thist.GetBinContent(i) for i in range(self.thist.GetNcells())]
+        ).reshape(self._shape, order="F")[tuple([slice(1, -1)] * len(self._shape))]
+
+    def variances(self) -> np.ndarray:
+        return (  # type: ignore
+            np.array([self.thist.GetBinError(i) for i in range(self.thist.GetNcells())])
+            ** 2
+        ).reshape(self._shape, order="F")[tuple([slice(1, -1)] * len(self._shape))]
+
+    def counts(self) -> np.ndarray:
+        sumw = _roottarray_asnumpy(self.thist, shape=self._shape)[
+            tuple([slice(1, -1)] * len(self._shape))
+        ]
+        if not (self.thist.GetSumw2() and self.thist.GetSumw2N()):
+            return sumw  # type: ignore
+
+        sumw2 = _roottarray_asnumpy(self.thist.GetSumw2(), shape=self._shape)[
+            tuple([slice(1, -1)] * len(self._shape))
+        ]
+        return np.divide(  # type: ignore
+            sumw ** 2,
+            sumw2,
+            out=np.zeros_like(sumw, dtype=np.float64),
+            where=sumw != 0,
+        )
+
+
 if TYPE_CHECKING:
     # Verify that the above class is a valid PlottableHistogram
     _axis = cast(ContinuousROOTAxis, None)
     _axis2: PlottableAxisGeneric[str] = cast(DiscreteROOTAxis, None)
     _ = cast(ROOTPlottableHistogram, None)
+    _ = cast(ROOTPlottableProfile, None)
 
 
 def ensure_plottable_histogram(hist: Any) -> PlottableHistogram:
@@ -324,6 +373,12 @@ def ensure_plottable_histogram(hist: Any) -> PlottableHistogram:
             return NumPyPlottableHistogram(*(np.asarray(h) for h in hist))
 
     elif hasattr(hist, "InheritsFrom") and hist.InheritsFrom("TH1"):
+        if any(
+            hist.InheritsFrom(profCls)
+            for profCls in ("TProfile", "TProfile2D", "TProfile3D")
+        ):
+            return ROOTPlottableProfile(hist)
+
         return ROOTPlottableHistogram(hist)
 
     else:
