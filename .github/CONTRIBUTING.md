@@ -3,6 +3,17 @@ detailed description of best practices for developing Scikit-HEP packages.
 
 [skhep-dev-intro]: https://scikit-hep.org/developer/intro
 
+# Quick run with Nox
+
+If you have nox, this project supports nox. These are the supplied sessions:
+
+```console
+nox -s lint
+nox -s tests
+nox -s docs -- serve
+nox -s build
+```
+
 # Setting up a development environment
 
 You can set up a development environment by running:
