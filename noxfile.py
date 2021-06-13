@@ -17,7 +17,7 @@ def lint(session):
     Run the linter.
     """
     session.install("pre-commit")
-    session.run("pre-commit", "run", "--all-files")
+    session.run("pre-commit", "run", "--all-files", *session.posargs)
 
 
 @nox.session(python=ALL_PYTHONS)
@@ -26,7 +26,7 @@ def tests(session):
     Run the unit and regular tests.
     """
     session.install(".[test]")
-    session.run("pytest")
+    session.run("pytest", *session.posargs)
 
 
 @nox.session
@@ -63,3 +63,14 @@ def build(session):
 
     session.install("build")
     session.run("python", "-m", "build")
+
+
+@nox.session(venv_backend="conda")
+def root_tests(session):
+    """
+    Test against ROOT.
+    """
+
+    session.conda_install("--channel=conda-forge", "ROOT", "pytest", "boost-histogram")
+    session.install(".")
+    session.run("pytest", "tests/test_root.py")
