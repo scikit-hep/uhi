@@ -16,7 +16,7 @@ nox -s build
 
 # Setting up a development environment
 
-You can set up a development environment by running:
+You can set up a manual development environment by running:
 
 ```bash
 poetry install --extras docs
@@ -45,9 +45,14 @@ pytest
 
 # Docs
 
-Run the docs with:
+Run the docs using nox or with:
 
 ```bash
 poetry install --extras docs
 poetry run sphinx-build -M html docs docs/_build
 ```
+
+# Bumping the version
+
+Use `nox -s bump -- <type>` to bump the version. Commit the result and push,
+release on GitHub. Make sure to add some release notes to the GitHub release.

@@ -1,3 +1,4 @@
+import re
 import shutil
 from pathlib import Path
 
@@ -57,10 +58,6 @@ def build(session):
     if build_p.exists():
         shutil.rmtree(build_p)
 
-    dist_p = DIR.joinpath("dist")
-    if dist_p.exists():
-        shutil.rmtree(dist_p)
-
     session.install("build")
     session.run("python", "-m", "build")
 
@@ -74,3 +71,27 @@ def root_tests(session):
     session.conda_install("--channel=conda-forge", "ROOT", "pytest", "boost-histogram")
     session.install(".")
     session.run("pytest", "tests/test_root.py")
+
+
+@nox.session
+def bump(session):
+    """
+    Bump the major/minor/patch version (if nothing given, just shows the version).
+    """
+
+    session.install("poetry")
+    session.run("poetry", "version", *session.posargs)
+    if not session.posargs:
+        return
+
+    ver = session.run("poetry", "version", "--short", silent=True, log=False).strip()
+    with open("src/uhi/__init__.py") as f:
+        txt = f.read()
+    txt = re.sub(r'__version__ = ".*"', f'__version__ = "{ver}"', txt)
+    with open("src/uhi/__init__.py", "w") as f:
+        f.write(txt)
+
+    print(f"git switch -c chore/bump/{ver}")
+    print("git add -u src/uhi/__init__.py pyproject.toml")
+    print(f"git commit -m 'chore: bump version to {ver}'")
+    print("gh pr create --fill")

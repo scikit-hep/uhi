@@ -12,6 +12,7 @@ maintainers = [
 ]
 homepage = "https://github.com/Scikit-HEP/uhi"
 repository = "https://github.com/Scikit-HEP/uhi"
+documentation = "https://uhi.readthedocs.io/en/latest/"
 readme = "README.md"
 license = "BSD-3-Clause"
 
@@ -25,6 +26,9 @@ classifiers = [
 ]
 
 include = [ { path = "tests/**/*", format = "sdist" } ]
+
+[tool.poetry.urls]
+"Changelog" = "https://github.com/scikit-hep/uhi/releases"
 
 
 [tool.poetry.dependencies]

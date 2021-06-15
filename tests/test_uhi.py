@@ -9,4 +9,4 @@ else:
 
 
 def test_version() -> None:
-    assert __version__ == metadata.version("uhi")
+    assert __version__ == metadata.version("uhi")  # type: ignore
