@@ -42,4 +42,4 @@ repos:
   - id: mypy
     files: ^(src|tests)
     args: []
-    additional_dependencies: [numpy, pytest, importlib_metadata]
+    additional_dependencies: [numpy==1.20.*, pytest, importlib_metadata]
