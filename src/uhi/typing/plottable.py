@@ -113,7 +113,7 @@ class PlottableHistogram(Protocol):
     # If this is included, it should return an array with flow bins added,
     # normal ordering.
 
-    def values(self) -> np.ndarray:
+    def values(self) -> "np.typing.NDArray[Any]":
         """
         Returns the accumulated values. The counts for simple histograms, the
         sum of weights for weighted histograms, the mean for profiles, etc.
@@ -122,7 +122,7 @@ class PlottableHistogram(Protocol):
         kind == "MEAN".
         """
 
-    def variances(self) -> Optional[np.ndarray]:
+    def variances(self) -> Optional["np.typing.NDArray[Any]"]:
         """
         Returns the estimated variance of the accumulated values. The sum of squared
         weights for weighted histograms, the variance of samples for profiles, etc.
@@ -137,7 +137,7 @@ class PlottableHistogram(Protocol):
         weighted if the weight variance was tracked by the implementation.
         """
 
-    def counts(self) -> Optional[np.ndarray]:
+    def counts(self) -> Optional["np.typing.NDArray[Any]"]:
         """
         Returns the number of entries in each bin for an unweighted
         histogram or profile and an effective number of entries (defined below)

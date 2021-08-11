@@ -18,7 +18,7 @@ def test_root_th1f_convert() -> None:
     assert all(th.GetBinContent(i + 1) == approx(iv) for i, iv in enumerate(h.values()))
     assert all(
         th.GetBinError(i + 1) == approx(ie)
-        for i, ie in enumerate(np.sqrt(h.variances()))  # type: ignore
+        for i, ie in enumerate(np.sqrt(h.variances()))
     )
 
 
@@ -34,6 +34,6 @@ def test_root_th2f_convert() -> None:
     )
     assert all(
         th.GetBinError(i + 1, j + 1) == approx(ie)
-        for i, row in enumerate(np.sqrt(h.variances()))  # type: ignore
+        for i, row in enumerate(np.sqrt(h.variances()))
         for j, ie in enumerate(row)
     )

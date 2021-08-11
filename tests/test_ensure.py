@@ -22,7 +22,7 @@ def test_from_numpy_2d() -> None:
     np.random.seed(42)
     x = np.random.normal(1, 2, 1000)
     y = np.random.normal(-1, 1, 1000)
-    result = np.histogram2d(x, y)
+    result = np.histogram2d(x, y)  # type: ignore
 
     h = ensure_plottable_histogram(result)
 
@@ -40,7 +40,7 @@ def test_from_numpy_dd() -> None:
     x = np.random.normal(1, 2, 1000)
     y = np.random.normal(-1, 1, 1000)
     z = np.random.normal(3, 3, 1000)
-    result = np.histogramdd((x, y, z))
+    result = np.histogramdd((x, y, z))  # type: ignore
 
     h = ensure_plottable_histogram(result)
 
