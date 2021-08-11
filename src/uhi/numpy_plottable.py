@@ -48,7 +48,7 @@ if TYPE_CHECKING:
 
 
 class NumPyPlottableAxis:
-    def __init__(self, edges: np.ndarray) -> None:
+    def __init__(self, edges: "np.typing.NDArray[Any]") -> None:
         """
         The vals should already be an Nx2 ndarray of edges.
         """
@@ -95,7 +95,9 @@ if TYPE_CHECKING:
     _axis: PlottableAxisGeneric[Tuple[float, float]] = cast(NumPyPlottableAxis, None)
 
 
-def _bin_helper(shape: int, bins: Optional[np.ndarray]) -> NumPyPlottableAxis:
+def _bin_helper(
+    shape: int, bins: Optional["np.typing.NDArray[Any]"]
+) -> NumPyPlottableAxis:
     """
     Returns a axis built from the input bins array, which can be None (0 to N),
     2D lower, upper edges), or 1D (N+1 in length).
@@ -117,9 +119,13 @@ def _bin_helper(shape: int, bins: Optional[np.ndarray]) -> NumPyPlottableAxis:
 class NumPyPlottableHistogram:
     def __init__(
         self,
-        hist: np.ndarray,
-        *bins: Union[np.ndarray, None, Tuple[Union[np.ndarray, None], ...]],
-        variances: Optional[np.ndarray] = None,
+        hist: "np.typing.NDArray[Any]",
+        *bins: Union[
+            "np.typing.NDArray[Any]",
+            None,
+            Tuple[Union["np.typing.NDArray[Any]", None], ...],
+        ],
+        variances: Optional["np.typing.NDArray[Any]"] = None,
         kind: Kind = Kind.COUNT,
     ) -> None:
 
@@ -145,13 +151,13 @@ class NumPyPlottableHistogram:
         axes = ", ".join(repr(s) for s in self.axes)
         return f"{self.__class__.__name__}({self._values!r}, <{axes}>)"
 
-    def values(self) -> np.ndarray:
+    def values(self) -> "np.typing.NDArray[Any]":
         return self._values
 
-    def counts(self) -> np.ndarray:
+    def counts(self) -> "np.typing.NDArray[Any]":
         return self._values
 
-    def variances(self) -> Optional[np.ndarray]:
+    def variances(self) -> Optional["np.typing.NDArray[Any]"]:
         return self._variances
 
 
@@ -162,9 +168,11 @@ if TYPE_CHECKING:
 
 def _roottarray_asnumpy(
     tarr: Any, shape: Optional[Tuple[int, ...]] = None
-) -> np.ndarray:
+) -> "np.typing.NDArray[Any]":
     llv = tarr.GetArray()
-    arr: np.ndarray = np.frombuffer(llv, dtype=llv.typecode, count=tarr.GetSize())
+    arr: "np.typing.NDArray[Any]" = np.frombuffer(  # type: ignore
+        llv, dtype=llv.typecode, count=tarr.GetSize()
+    )
     if shape is not None:
         return np.reshape(arr, shape, order="F")
     else:
@@ -255,12 +263,12 @@ class ROOTPlottableHistogram(ROOTPlottableHistBase):
     def kind(self) -> str:
         return Kind.COUNT
 
-    def values(self) -> np.ndarray:
+    def values(self) -> "np.typing.NDArray[Any]":
         return _roottarray_asnumpy(self.thist, shape=self._shape)[  # type: ignore
             tuple([slice(1, -1)] * len(self._shape))
         ]
 
-    def variances(self) -> np.ndarray:
+    def variances(self) -> "np.typing.NDArray[Any]":
         if self.hasWeights:
             return _roottarray_asnumpy(self.thist.GetSumw2(), shape=self._shape)[  # type: ignore
                 tuple([slice(1, -1)] * len(self._shape))
@@ -268,7 +276,7 @@ class ROOTPlottableHistogram(ROOTPlottableHistBase):
         else:
             return self.values()
 
-    def counts(self) -> np.ndarray:
+    def counts(self) -> "np.typing.NDArray[Any]":
         if not self.hasWeights:
             return self.values()
 
@@ -289,18 +297,18 @@ class ROOTPlottableProfile(ROOTPlottableHistBase):
     def kind(self) -> str:
         return Kind.MEAN
 
-    def values(self) -> np.ndarray:
+    def values(self) -> "np.typing.NDArray[Any]":
         return np.array(  # type: ignore
             [self.thist.GetBinContent(i) for i in range(self.thist.GetNcells())]
         ).reshape(self._shape, order="F")[tuple([slice(1, -1)] * len(self._shape))]
 
-    def variances(self) -> np.ndarray:
+    def variances(self) -> "np.typing.NDArray[Any]":
         return (  # type: ignore
             np.array([self.thist.GetBinError(i) for i in range(self.thist.GetNcells())])
             ** 2
         ).reshape(self._shape, order="F")[tuple([slice(1, -1)] * len(self._shape))]
 
-    def counts(self) -> np.ndarray:
+    def counts(self) -> "np.typing.NDArray[Any]":
         sumw = _roottarray_asnumpy(self.thist, shape=self._shape)[
             tuple([slice(1, -1)] * len(self._shape))
         ]
@@ -334,7 +342,7 @@ def ensure_plottable_histogram(hist: Any) -> PlottableHistogram:
     * .to_numpy() objects
     * .numpy() objects (uproot3/ROOT)
     * A tuple of NumPy style input. If dd style tuple, must contain
-      np.ndarrays. It can contain None's instead of values, including just
+      "np.typing.NDArray[Any]"s. It can contain None's instead of values, including just
       a single None for any number of axes.
     """
     if isinstance(hist, PlottableHistogram):
@@ -343,12 +351,12 @@ def ensure_plottable_histogram(hist: Any) -> PlottableHistogram:
 
     elif hasattr(hist, "to_numpy"):
         # Generic (possibly Uproot 4)
-        _tup1: Tuple[np.ndarray, ...] = hist.to_numpy(flow=False)
+        _tup1: Tuple["np.typing.NDArray[Any]", ...] = hist.to_numpy(flow=False)
         return NumPyPlottableHistogram(*_tup1)
 
     elif hasattr(hist, "numpy"):
         # uproot/TH1 - TODO: could support variances
-        _tup2: Tuple[np.ndarray, ...] = hist.numpy()
+        _tup2: Tuple["np.typing.NDArray[Any]", ...] = hist.numpy()
         return NumPyPlottableHistogram(*_tup2)
 
     elif isinstance(hist, tuple):
