@@ -1,3 +1,7 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry]
 name = "uhi"
 version = "0.3.0"
@@ -17,12 +21,12 @@ readme = "README.md"
 license = "BSD-3-Clause"
 
 classifiers = [
-  "Topic :: Scientific/Engineering",
-  "Intended Audience :: Science/Research",
-  "Intended Audience :: Developers",
-  "Operating System :: OS Independent",
-  "Development Status :: 4 - Beta",
-  "Typing :: Typed",
+    "Topic :: Scientific/Engineering",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Development Status :: 4 - Beta",
+    "Typing :: Typed",
 ]
 
 include = [ { path = "tests/**/*", format = "sdist" } ]
@@ -36,12 +40,12 @@ python = ">=3.6"
 numpy = ">=1.13.3"
 typing_extensions = { version = ">=3.7", python = "<3.8" }
 
-sphinx = {version = "^3.0", optional = true}
+sphinx = {version = "^4.0", optional = true}
 sphinx_book_theme = { version = ">=0.0.40", optional = true }
 sphinx_copybutton = { version = ">=0.3.1", optional = true }
-pytest = { version = ">=5.2", optional = true }
+pytest = { version = ">=6", optional = true }
 importlib_metadata = { version = ">=1.0", optional = true, python = "<3.8" }
-boost-histogram = { version = "~=1.0.0", optional = true }
+boost-histogram = { version = ">=1.0", optional = true }
 
 [tool.poetry.dev-dependencies]
 pytest = ">=5.2"
@@ -52,36 +56,21 @@ boost_histogram = "~=1.0.0"
 docs = ["sphinx", "sphinx_book_theme", "sphinx_copybutton"]
 test = ["pytest", "importlib_metadata", "boost_histogram" ]
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
 
 [tool.pytest.ini_config]
-addopts = "-rs -s -Wd"
-testpaths = [
-    "tests",
-]
+minversion = "6.0"
+addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
+xfail_strict = true
+filterwarnings = ["error"]
+testpaths = ["tests"]
+
 
 [tool.isort]
 profile = "black"
-multi_line_output = 3
+
 
 [tool.mypy]
 files = "src"
 python_version = "3.6"
 warn_unused_configs = "true"
-
-disallow_any_generics = true
-disallow_subclassing_any = true
-disallow_untyped_calls = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-disallow_untyped_decorators = true
-no_implicit_optional = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-warn_return_any = true
-no_implicit_reexport = true
-strict_equality = true
+strict = true
