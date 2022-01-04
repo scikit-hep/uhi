@@ -69,14 +69,14 @@ class NumPyPlottableAxis:
         Get the pair of edges (not discrete) or bin label (discrete).
         """
 
-        return tuple(self.edges[index])  # type: ignore
+        return tuple(self.edges[index])  # type: ignore[return-value]
 
     def __len__(self) -> int:
         """
         Return the number of bins (not counting flow bins, which are ignored
         for this Protocol currently).
         """
-        return self.edges.shape[0]  # type: ignore
+        return self.edges.shape[0]  # type: ignore[no-any-return]
 
     def __eq__(self, other: Any) -> bool:
         """
@@ -133,14 +133,14 @@ class NumPyPlottableHistogram:
         self._variances = variances
 
         if len(bins) == 1 and isinstance(bins[0], tuple):
-            (bins,) = bins  # type: ignore
+            (bins,) = bins  # type: ignore[assignment]
 
         if len(bins) == 0:
             bins = tuple([None] * len(hist.shape))
 
         self.kind = kind
         self.axes: Sequence[PlottableAxis] = [
-            _bin_helper(shape, b) for shape, b in zip(hist.shape, bins)  # type: ignore
+            _bin_helper(shape, b) for shape, b in zip(hist.shape, bins)  # type: ignore[arg-type]
         ]
 
     def __repr__(self) -> str:
@@ -184,7 +184,7 @@ class ROOTAxis:
         self.tAx = tAxis
 
     def __len__(self) -> int:
-        return self.tAx.GetNbins()  # type: ignore
+        return self.tAx.GetNbins()  # type: ignore[no-any-return]
 
     def __getitem__(self, index: int) -> Any:
         pass
@@ -226,7 +226,7 @@ class DiscreteROOTAxis(ROOTAxis):
         return Traits(circular=False, discrete=True)
 
     def __getitem__(self, index: int) -> str:
-        return self.tAx.GetBinLabel(index + 1)  # type: ignore
+        return self.tAx.GetBinLabel(index + 1)  # type: ignore[no-any-return]
 
     def __iter__(self) -> Iterator[str]:
         for i in range(len(self)):
@@ -248,7 +248,7 @@ class ROOTPlottableHistBase:
 
     @property
     def name(self) -> str:
-        return self.thist.GetName()  # type: ignore
+        return self.thist.GetName()  # type: ignore[no-any-return]
 
 
 class ROOTPlottableHistogram(ROOTPlottableHistBase):
@@ -264,13 +264,13 @@ class ROOTPlottableHistogram(ROOTPlottableHistBase):
         return Kind.COUNT
 
     def values(self) -> "np.typing.NDArray[Any]":
-        return _roottarray_asnumpy(self.thist, shape=self._shape)[  # type: ignore
+        return _roottarray_asnumpy(self.thist, shape=self._shape)[  # type: ignore[no-any-return]
             tuple([slice(1, -1)] * len(self._shape))
         ]
 
     def variances(self) -> "np.typing.NDArray[Any]":
         if self.hasWeights:
-            return _roottarray_asnumpy(self.thist.GetSumw2(), shape=self._shape)[  # type: ignore
+            return _roottarray_asnumpy(self.thist.GetSumw2(), shape=self._shape)[  # type: ignore[no-any-return]
                 tuple([slice(1, -1)] * len(self._shape))
             ]
         else:
@@ -281,7 +281,7 @@ class ROOTPlottableHistogram(ROOTPlottableHistBase):
             return self.values()
 
         sumw = self.values()
-        return np.divide(  # type: ignore
+        return np.divide(  # type: ignore[no-any-return]
             sumw ** 2,
             self.variances(),
             out=np.zeros_like(sumw, dtype=np.float64),
@@ -298,12 +298,12 @@ class ROOTPlottableProfile(ROOTPlottableHistBase):
         return Kind.MEAN
 
     def values(self) -> "np.typing.NDArray[Any]":
-        return np.array(  # type: ignore
+        return np.array(  # type: ignore[no-any-return]
             [self.thist.GetBinContent(i) for i in range(self.thist.GetNcells())]
         ).reshape(self._shape, order="F")[tuple([slice(1, -1)] * len(self._shape))]
 
     def variances(self) -> "np.typing.NDArray[Any]":
-        return (  # type: ignore
+        return (  # type: ignore[no-any-return]
             np.array([self.thist.GetBinError(i) for i in range(self.thist.GetNcells())])
             ** 2
         ).reshape(self._shape, order="F")[tuple([slice(1, -1)] * len(self._shape))]
@@ -313,12 +313,12 @@ class ROOTPlottableProfile(ROOTPlottableHistBase):
             tuple([slice(1, -1)] * len(self._shape))
         ]
         if not (self.thist.GetSumw2() and self.thist.GetSumw2N()):
-            return sumw  # type: ignore
+            return sumw  # type: ignore[no-any-return]
 
         sumw2 = _roottarray_asnumpy(self.thist.GetSumw2(), shape=self._shape)[
             tuple([slice(1, -1)] * len(self._shape))
         ]
-        return np.divide(  # type: ignore
+        return np.divide(  # type: ignore[no-any-return]
             sumw ** 2,
             sumw2,
             out=np.zeros_like(sumw, dtype=np.float64),

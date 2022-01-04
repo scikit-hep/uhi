@@ -37,7 +37,7 @@ run --all-files` to check even without installing the hook.
 
 # Testing
 
-Use PyTest to run the unit checks:
+Use pytest to run the unit checks:
 
 ```bash
 pytest
