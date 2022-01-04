@@ -41,5 +41,31 @@ repos:
   hooks:
   - id: mypy
     files: ^(src|tests)
-    args: []
+    args: [--show-error-codes]
     additional_dependencies: [numpy==1.22.*, pytest, importlib_metadata]
+
+- repo: https://github.com/pre-commit/pygrep-hooks
+  rev: v1.9.0
+  hooks:
+  - id: python-check-blanket-noqa
+  - id: python-check-blanket-type-ignore
+  - id: python-no-log-warn
+  - id: python-no-eval
+  - id: python-use-type-annotations
+  - id: rst-backticks
+  - id: rst-directive-colons
+  - id: rst-inline-touching-normal
+
+- repo: https://github.com/codespell-project/codespell
+  rev: v2.1.0
+  hooks:
+  - id: codespell
+    args: ["-L", "hist,thist,ans,nd,gaus"]
+
+- repo: local
+  hooks:
+  - id: disallow-caps
+    name: Disallow improper capitalization
+    language: pygrep
+    entry: PyBind|Numpy|Cmake|CCache|Github|PyTest
+    exclude: .pre-commit-config.yaml

@@ -1,7 +1,7 @@
 .. uhi documentation master file, created by
    sphinx-quickstart on Tue Jan 19 16:19:27 2021.
    You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+   contain the root ``toctree`` directive.
 
 UHI: Unified Histogram Interface
 =================================

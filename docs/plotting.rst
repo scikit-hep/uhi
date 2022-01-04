@@ -24,7 +24,7 @@ Plotters should only depend on the methods and attributes listed below. In short
 
 Axes have:
 
-* ``ax[i]``: A tuple of (lower, upper) bin, or the discrete bin value (integer or sting)
+* ``ax[i]``: A tuple of (lower, upper) bin, or the discrete bin value (integer or string)
 * ``len(ax)``: The number of bins
 * Iteration is supported
 * ``ax.traits.circular``: True if circular

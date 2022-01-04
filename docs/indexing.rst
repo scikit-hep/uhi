@@ -82,7 +82,7 @@ are slices, and follow the rules listed above. This looks like:
     h[{7: slice(0, 2, bh.rebin(4))}]       # slice and rebin axis 7
 
 
-If you don't like manually building slices, you can use the `Slicer()` utility
+If you don't like manually building slices, you can use the ``Slicer()`` utility
 to recover the original slicing syntax inside the dict:
 
 .. code:: python3
@@ -118,8 +118,8 @@ Rejected proposals or proposals for future consideration, maybe ``hist``-only:
 
 .. code:: python3
 
-   h2 = h[1.0j:2.5j + 1] # Adding a j suffix to a number could be used in place of `loc(x)`
-   h2 = h[1.0] # Floats in place of `loc(x)`: too easy to make a mistake
+   h2 = h[1.0j:2.5j + 1] # Adding a j suffix to a number could be used in place of ``loc(x)``
+   h2 = h[1.0] # Floats in place of ``loc(x)``: too easy to make a mistake
 
 Examples
 --------
@@ -255,7 +255,7 @@ Basic implementation example (WIP):
        "When used in the start or stop of a Histogram's slice, x is taken to be the position in data coordinates."
        def __init__(self, value, offset):
            self.value = value
-           self.offset = offest
+           self.offset = offset
 
        # supporting __add__ and __sub__ also recommended
 
