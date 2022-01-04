@@ -170,7 +170,7 @@ def _roottarray_asnumpy(
     tarr: Any, shape: Optional[Tuple[int, ...]] = None
 ) -> "np.typing.NDArray[Any]":
     llv = tarr.GetArray()
-    arr: "np.typing.NDArray[Any]" = np.frombuffer(  # type: ignore
+    arr: "np.typing.NDArray[Any]" = np.frombuffer(
         llv, dtype=llv.typecode, count=tarr.GetSize()
     )
     if shape is not None:
