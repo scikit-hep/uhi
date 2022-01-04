@@ -1,5 +1,4 @@
 import re
-import shutil
 from pathlib import Path
 
 import nox
@@ -54,10 +53,6 @@ def build(session):
     Build an SDist and wheel.
     """
 
-    build_p = DIR.joinpath("build")
-    if build_p.exists():
-        shutil.rmtree(build_p)
-
     session.install("build")
     session.run("python", "-m", "build")
 
@@ -73,25 +68,53 @@ def root_tests(session):
     session.run("pytest", "tests/test_root.py")
 
 
-@nox.session
-def bump(session):
+@nox.session(reuse_venv=True)
+def bump(session: nox.Session) -> None:
     """
     Bump the major/minor/patch version (if nothing given, just shows the version).
     """
 
-    session.install("poetry")
-    session.run("poetry", "version", *session.posargs)
+    session.install("tomli")
+    output = session.run(
+        "python",
+        "-c",
+        "import tomli, pathlib; p = pathlib.Path('pyproject.toml'); print(tomli.loads(p.read_text())['project']['version'])",
+        silent=True,
+    )
+    current_version = output.strip()
+
     if not session.posargs:
+        session.log(f"Current version: {current_version}")
         return
 
-    ver = session.run("poetry", "version", "--short", silent=True, log=False).strip()
-    with open("src/uhi/__init__.py") as f:
-        txt = f.read()
-    txt = re.sub(r'__version__ = ".*"', f'__version__ = "{ver}"', txt)
-    with open("src/uhi/__init__.py", "w") as f:
-        f.write(txt)
+    new_version = session.posargs[0]
+    session.log(f"Bumping from {current_version} to {new_version}")
 
-    print(f"git switch -c chore/bump/{ver}")
+    replace_version(
+        Path("src/uhi/__init__.py"),
+        '__version__ = "{version}"',
+        current_version,
+        new_version,
+    )
+    replace_version(
+        Path("pyproject.toml"), 'version = "{version}"', current_version, new_version
+    )
+
+    print(f"git switch -c chore/bump/{new_version}")
     print("git add -u src/uhi/__init__.py pyproject.toml")
-    print(f"git commit -m 'chore: bump version to {ver}'")
+    print(f"git commit -m 'chore: bump version to {new_version}'")
     print("gh pr create --fill")
+
+
+def replace_version(file: Path, fmt: str, in_version: str, out_version: str) -> None:
+
+    in_fmt = fmt.format(version=in_version)
+    out_fmt = fmt.format(version=out_version)
+
+    with file.open("r") as f:
+        txt = f.read()
+
+    txt = re.sub(in_fmt, out_fmt, txt)
+
+    with file.open("w") as f:
+        f.write(txt)

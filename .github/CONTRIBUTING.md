@@ -19,7 +19,7 @@ nox -s build
 You can set up a manual development environment by running:
 
 ```bash
-poetry install --extras docs
+pdm install
 ```
 
 # Post setup
@@ -48,8 +48,8 @@ pytest
 Run the docs using nox or with:
 
 ```bash
-poetry install --extras docs
-poetry run sphinx-build -M html docs docs/_build
+pdm install --extras docs
+pdm run sphinx-build -M html docs docs/_build
 ```
 
 # Bumping the version
