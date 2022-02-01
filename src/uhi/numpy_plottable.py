@@ -282,7 +282,7 @@ class ROOTPlottableHistogram(ROOTPlottableHistBase):
 
         sumw = self.values()
         return np.divide(  # type: ignore[no-any-return]
-            sumw ** 2,
+            sumw**2,
             self.variances(),
             out=np.zeros_like(sumw, dtype=np.float64),
             where=sumw != 0,
@@ -319,7 +319,7 @@ class ROOTPlottableProfile(ROOTPlottableHistBase):
             tuple([slice(1, -1)] * len(self._shape))
         ]
         return np.divide(  # type: ignore[no-any-return]
-            sumw ** 2,
+            sumw**2,
             sumw2,
             out=np.zeros_like(sumw, dtype=np.float64),
             where=sumw != 0,
