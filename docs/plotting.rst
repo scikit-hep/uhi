@@ -3,7 +3,7 @@
 Plotting
 ========
 
-This is a description of the ``PlottableProtocol``,. Any plotting library that
+This is a description of the ``PlottableProtocol``. Any plotting library that
 accepts an object that follows the ``PlottableProtocol`` can plot object that
 follow this protocol, and libraries that follow this protocol are compatible
 with plotters. The Protocol is runtime checkable, though as usual, that will
