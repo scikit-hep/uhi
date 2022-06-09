@@ -76,7 +76,7 @@ class NumPyPlottableAxis:
         Return the number of bins (not counting flow bins, which are ignored
         for this Protocol currently).
         """
-        return self.edges.shape[0]  # type: ignore[no-any-return]
+        return self.edges.shape[0]
 
     def __eq__(self, other: Any) -> bool:
         """
@@ -281,7 +281,7 @@ class ROOTPlottableHistogram(ROOTPlottableHistBase):
             return self.values()
 
         sumw = self.values()
-        return np.divide(  # type: ignore[no-any-return]
+        return np.divide(
             sumw**2,
             self.variances(),
             out=np.zeros_like(sumw, dtype=np.float64),
@@ -318,7 +318,7 @@ class ROOTPlottableProfile(ROOTPlottableHistBase):
         sumw2 = _roottarray_asnumpy(self.thist.GetSumw2(), shape=self._shape)[
             tuple([slice(1, -1)] * len(self._shape))
         ]
-        return np.divide(  # type: ignore[no-any-return]
+        return np.divide(
             sumw**2,
             sumw2,
             out=np.zeros_like(sumw, dtype=np.float64),
