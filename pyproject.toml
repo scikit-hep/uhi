@@ -1,6 +1,6 @@
 [build-system]
-requires = ["flit>=3.2"]
-build-backend = "flit_core.buildapi"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "uhi"
@@ -55,10 +55,6 @@ test = [
 ]
 
 
-[tool.flit.sdist]
-include = ["tests/*.py"]
-
-
 [tool.pdm.dev-dependencies]
 dev = [
   "pytest>=6",
@@ -88,7 +84,7 @@ strict = true
 
 [tool.flake8]
 extend-ignore = "B950,E501"
-select = "C,E,F,W,T,B,B9,I"
+extend-select = "B9"
 per-file-ignores = """
     tests/*: T
     noxfile.py: T
