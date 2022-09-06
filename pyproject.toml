@@ -81,11 +81,3 @@ python_version = "3.6"
 warn_unused_configs = "true"
 strict = true
 
-
-[tool.flake8]
-extend-ignore = "B950,E501"
-extend-select = "B9"
-per-file-ignores = """
-    tests/*: T
-    noxfile.py: T
-"""
