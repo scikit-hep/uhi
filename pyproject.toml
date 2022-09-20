@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "uhi"
-version = "0.3.1"
+version = "0.3.2"
 description = "Unified Histogram Interface: tools to help library authors work with histograms"
 authors = [
   {name="Henry Schreiner", email="henryschreineriii@gmail.com"},
@@ -32,6 +32,7 @@ classifiers = [
   "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
   "Topic :: Scientific/Engineering",
   "Typing :: Typed",
 ]
