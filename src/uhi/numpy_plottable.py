@@ -264,13 +264,13 @@ class ROOTPlottableHistogram(ROOTPlottableHistBase):
         return Kind.COUNT
 
     def values(self) -> "np.typing.NDArray[Any]":
-        return _roottarray_asnumpy(self.thist, shape=self._shape)[  # type: ignore[no-any-return]
+        return _roottarray_asnumpy(self.thist, shape=self._shape)[
             tuple([slice(1, -1)] * len(self._shape))
         ]
 
     def variances(self) -> "np.typing.NDArray[Any]":
         if self.hasWeights:
-            return _roottarray_asnumpy(self.thist.GetSumw2(), shape=self._shape)[  # type: ignore[no-any-return]
+            return _roottarray_asnumpy(self.thist.GetSumw2(), shape=self._shape)[
                 tuple([slice(1, -1)] * len(self._shape))
             ]
         else:
@@ -298,12 +298,12 @@ class ROOTPlottableProfile(ROOTPlottableHistBase):
         return Kind.MEAN
 
     def values(self) -> "np.typing.NDArray[Any]":
-        return np.array(  # type: ignore[no-any-return]
+        return np.array(
             [self.thist.GetBinContent(i) for i in range(self.thist.GetNcells())]
         ).reshape(self._shape, order="F")[tuple([slice(1, -1)] * len(self._shape))]
 
     def variances(self) -> "np.typing.NDArray[Any]":
-        return (  # type: ignore[no-any-return]
+        return (
             np.array([self.thist.GetBinError(i) for i in range(self.thist.GetNcells())])
             ** 2
         ).reshape(self._shape, order="F")[tuple([slice(1, -1)] * len(self._shape))]
@@ -313,7 +313,7 @@ class ROOTPlottableProfile(ROOTPlottableHistBase):
             tuple([slice(1, -1)] * len(self._shape))
         ]
         if not (self.thist.GetSumw2() and self.thist.GetSumw2N()):
-            return sumw  # type: ignore[no-any-return]
+            return sumw
 
         sumw2 = _roottarray_asnumpy(self.thist.GetSumw2(), shape=self._shape)[
             tuple([slice(1, -1)] * len(self._shape))

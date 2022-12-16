@@ -1,6 +1,6 @@
 [flake8]
-extend-ignore = B950,E501
-extend-select = B9
+extend-ignore = E501
+extend-select = B902, B903, B904
 per-file-ignores =
     tests/*: T
     noxfile.py: T
