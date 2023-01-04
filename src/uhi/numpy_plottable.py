@@ -12,6 +12,7 @@ beyond plotting. Please see a full histogram library like boost-histogram or
 hist.
 """
 
+import abc
 import enum
 from typing import TYPE_CHECKING, Any, Iterator, Optional, Sequence, Tuple, Union, cast
 
@@ -179,13 +180,14 @@ def _roottarray_asnumpy(
         return arr
 
 
-class ROOTAxis:
+class ROOTAxis(abc.ABC):
     def __init__(self, tAxis: Any) -> None:
         self.tAx = tAxis
 
     def __len__(self) -> int:
         return self.tAx.GetNbins()  # type: ignore[no-any-return]
 
+    @abc.abstractmethod
     def __getitem__(self, index: int) -> Any:
         pass
 
@@ -196,6 +198,7 @@ class ROOTAxis:
             aEdges == bEdges for aEdges, bEdges in zip(self, other)
         )
 
+    @abc.abstractmethod
     def __iter__(self) -> Union[Iterator[Tuple[float, float]], Iterator[str]]:
         pass
 
