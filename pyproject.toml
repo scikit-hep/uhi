@@ -1,10 +1,9 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
 name = "uhi"
-version = "0.3.2"
 description = "Unified Histogram Interface: tools to help library authors work with histograms"
 authors = [
   {name="Henry Schreiner", email="henryschreineriii@gmail.com"},
@@ -36,6 +35,7 @@ classifiers = [
   "Topic :: Scientific/Engineering",
   "Typing :: Typed",
 ]
+dynamic = ["version"]
 
 [project.urls]
 Homepage = "https://github.com/Scikit-HEP/uhi"
@@ -55,6 +55,10 @@ test = [
   "boost-histogram>=1.0",
 ]
 
+
+[tool.hatch]
+version.source = "vcs"
+build.hooks.vcs.version-file = "src/uhi/_version.py"
 
 [tool.pdm.dev-dependencies]
 dev = [
