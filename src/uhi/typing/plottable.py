@@ -9,8 +9,11 @@ Consumers: Make your functions accept the PlottableHistogram static type, and
 MyPy will force you to only use items in the Protocol.
 """
 
+from __future__ import annotations
+
 import sys
-from typing import Any, Iterator, Optional, Sequence, Tuple, TypeVar, Union
+from collections.abc import Iterator, Sequence
+from typing import Any, Tuple, TypeVar, Union
 
 # NumPy 1.20+ will work much, much better than previous versions when type checking
 import numpy as np
@@ -113,7 +116,7 @@ class PlottableHistogram(Protocol):
     # If this is included, it should return an array with flow bins added,
     # normal ordering.
 
-    def values(self) -> "np.typing.NDArray[Any]":
+    def values(self) -> np.typing.NDArray[Any]:
         """
         Returns the accumulated values. The counts for simple histograms, the
         sum of weights for weighted histograms, the mean for profiles, etc.
@@ -122,7 +125,7 @@ class PlottableHistogram(Protocol):
         kind == "MEAN".
         """
 
-    def variances(self) -> Optional["np.typing.NDArray[Any]"]:
+    def variances(self) -> np.typing.NDArray[Any] | None:
         """
         Returns the estimated variance of the accumulated values. The sum of squared
         weights for weighted histograms, the variance of samples for profiles, etc.
@@ -137,7 +140,7 @@ class PlottableHistogram(Protocol):
         weighted if the weight variance was tracked by the implementation.
         """
 
-    def counts(self) -> Optional["np.typing.NDArray[Any]"]:
+    def counts(self) -> np.typing.NDArray[Any] | None:
         """
         Returns the number of entries in each bin for an unweighted
         histogram or profile and an effective number of entries (defined below)
