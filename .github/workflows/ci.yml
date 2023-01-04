@@ -23,7 +23,12 @@ jobs:
         runs-on: [ubuntu-latest, macos-latest, windows-latest]
 
         include:
-        - python-version: pypy-3.7
+        - python-version: pypy-3.8
+          runs-on: ubuntu-latest
+        - python-version: "3.6"
+          runs-on: ubuntu-20.04
+        exclude:
+        - python-version: "3.6"
           runs-on: ubuntu-latest
 
     steps:

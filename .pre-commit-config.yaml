@@ -42,7 +42,7 @@ repos:
   - id: mypy
     files: ^(src|tests)
     args: [--show-error-codes]
-    additional_dependencies: [numpy==1.22.*, pytest, importlib_metadata]
+    additional_dependencies: [numpy~=1.23.0, pytest, importlib_metadata]
 
 - repo: https://github.com/pre-commit/pygrep-hooks
   rev: v1.9.0
