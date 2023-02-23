@@ -111,14 +111,12 @@ def _bin_helper(shape: int, bins: np.typing.NDArray[Any] | None) -> NumPyPlottab
         return NumPyPlottableAxis(
             np.array([np.arange(0, shape), np.arange(1, shape + 1)]).T
         )
-    elif bins.ndim == 2:
+    if bins.ndim == 2:
         return NumPyPlottableAxis(bins)
-    elif bins.ndim == 1:
+    if bins.ndim == 1:
         return NumPyPlottableAxis(np.array([bins[:-1], bins[1:]]).T)
-    else:
-        raise ValueError(
-            "Bins not understood, should be 2d array of min/max edges or 1D array of edges or None"
-        )
+    msg = "Bins not understood, should be 2d array of min/max edges or 1D array of edges or None"
+    raise ValueError(msg)
 
 
 class NumPyPlottableHistogram:
@@ -177,8 +175,7 @@ def _roottarray_asnumpy(
     )
     if shape is not None:
         return np.reshape(arr, shape, order="F")
-    else:
-        return arr
+    return arr
 
 
 class ROOTAxis(abc.ABC):
@@ -207,8 +204,7 @@ class ROOTAxis(abc.ABC):
     def create(tAx: Any) -> DiscreteROOTAxis | ContinuousROOTAxis:
         if all(tAx.GetBinLabel(i + 1) for i in range(tAx.GetNbins())):
             return DiscreteROOTAxis(tAx)
-        else:
-            return ContinuousROOTAxis(tAx)
+        return ContinuousROOTAxis(tAx)
 
 
 class ContinuousROOTAxis(ROOTAxis):
@@ -277,8 +273,7 @@ class ROOTPlottableHistogram(ROOTPlottableHistBase):
             return _roottarray_asnumpy(self.thist.GetSumw2(), shape=self._shape)[
                 tuple([slice(1, -1)] * len(self._shape))
             ]
-        else:
-            return self.values()
+        return self.values()
 
     def counts(self) -> np.typing.NDArray[Any]:
         if not self.hasWeights:
@@ -353,21 +348,22 @@ def ensure_plottable_histogram(hist: Any) -> PlottableHistogram:
         # Already satisfies the Protocol
         return hist
 
-    elif hasattr(hist, "to_numpy"):
+    if hasattr(hist, "to_numpy"):
         # Generic (possibly Uproot 4)
         _tup1: tuple[np.typing.NDArray[Any], ...] = hist.to_numpy(flow=False)
         return NumPyPlottableHistogram(*_tup1)
 
-    elif hasattr(hist, "numpy"):
+    if hasattr(hist, "numpy"):
         # uproot/TH1 - TODO: could support variances
         _tup2: tuple[np.typing.NDArray[Any], ...] = hist.numpy()
         return NumPyPlottableHistogram(*_tup2)
 
-    elif isinstance(hist, tuple):
+    if isinstance(hist, tuple):
         # NumPy histogram tuple
         if len(hist) < 2:
-            raise TypeError("Can't be applied to less than 2D tuple")
-        elif (
+            msg = "Can't be applied to less than 2D tuple"
+            raise TypeError(msg)
+        if (
             len(hist) == 2
             and isinstance(hist[1], (list, tuple))
             and all(isinstance(h, np.ndarray) for h in hist[1])
@@ -376,15 +372,14 @@ def ensure_plottable_histogram(hist: Any) -> PlottableHistogram:
             return NumPyPlottableHistogram(
                 np.asarray(hist[0]), *(np.asarray(h) for h in hist[1])
             )
-        elif hist[1] is None:
+        if hist[1] is None:
             return NumPyPlottableHistogram(
                 np.asarray(hist[0]), *(None for _ in np.asarray(hist[0]).shape)
             )
-        else:
-            # Standard tuple
-            return NumPyPlottableHistogram(*(np.asarray(h) for h in hist))
+        # Standard tuple
+        return NumPyPlottableHistogram(*(np.asarray(h) for h in hist))
 
-    elif hasattr(hist, "InheritsFrom") and hist.InheritsFrom("TH1"):
+    if hasattr(hist, "InheritsFrom") and hist.InheritsFrom("TH1"):
         if any(
             hist.InheritsFrom(profCls)
             for profCls in ("TProfile", "TProfile2D", "TProfile3D")
@@ -393,5 +388,5 @@ def ensure_plottable_histogram(hist: Any) -> PlottableHistogram:
 
         return ROOTPlottableHistogram(hist)
 
-    else:
-        raise TypeError(f"Can't be used on this type of object: {hist!r}")
+    msg = f"Can't be used on this type of object: {hist!r}"
+    raise TypeError(msg)
