@@ -131,7 +131,6 @@ class NumPyPlottableHistogram:
         variances: np.typing.NDArray[Any] | None = None,
         kind: Kind = Kind.COUNT,
     ) -> None:
-
         self._values = hist
         self._variances = variances
 

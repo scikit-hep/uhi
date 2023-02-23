@@ -109,7 +109,6 @@ def bump(session: nox.Session) -> None:
 
 
 def replace_version(file: Path, fmt: str, in_version: str, out_version: str) -> None:
-
     in_fmt = fmt.format(version=in_version)
     out_fmt = fmt.format(version=out_version)
 
