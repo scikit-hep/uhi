@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/scikit-hep/uhi/.json",
+  "type": "object",
+  "patternProperties": {
+    ".+": {
+      "type": "object",
+      "required": ["axes", "storage"],
+      "properties": {
+        "title": { "type": "string" },
+        "name": { "type": "string" },
+        "metadata": { "type": "object" },
+        "axes": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "$ref": "#/$defs/regular_axis" },
+              { "$ref": "#/$defs/variable_axis" },
+              { "$ref": "#/$defs/str_category_axis" },
+              { "$ref": "#/$defs/int_category_axis" },
+              { "$ref": "#/$defs/boolean_axis" }
+            ]
+          }
+        },
+        "storage": {
+          "oneOf": [
+            { "$ref": "#/$defs/int_storage" },
+            { "$ref": "#/$defs/double_storage" },
+            { "$ref": "#/$defs/weighted_storage" },
+            { "$ref": "#/$defs/mean_storage" },
+            { "$ref": "#/$defs/weighted_mean_storage" }
+          ]
+        }
+      }
+    }
+  },
+  "$defs": {
+    "regular_axis": {
+      "type": "object",
+      "required": ["type", "lower", "upper", "bins", "underflow", "overflow"],
+      "properties": {
+        "type": { "type": "string", "pattern": "regular" },
+        "lower": { "type": "number" },
+        "upper": { "type": "number" },
+        "bins": { "type": "number" },
+        "underflow": { "type": "boolean" },
+        "overflow": { "type": "boolean" },
+        "circular": { "type": "boolean" },
+        "name": { "type": "string" },
+        "title": { "type": "string" },
+        "metadata": { "type": "object" }
+      }
+    },
+    "variable_axis": {
+      "type": "object",
+      "required": ["type", "edges", "underflow", "overflow"],
+      "properties": {
+        "type": { "type": "string", "pattern": "variable" },
+        "edges": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": { "type": "number" }
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "underflow": { "type": "boolean" },
+        "overflow": { "type": "boolean" },
+        "circular": { "type": "boolean" },
+        "name": { "type": "string" },
+        "title": { "type": "string" },
+        "metadata": { "type": "object" }
+      }
+    },
+    "str_category_axis": {
+      "type": "object",
+      "required": ["type", "categories", "flow"],
+      "properties": {
+        "type": { "type": "string", "pattern": "str_category" },
+        "categories": { "type": "array", "items": { "type": "string" } },
+        "flow": { "type": "boolean" },
+        "name": { "type": "string" },
+        "title": { "type": "string" },
+        "metadata": { "type": "object" }
+      }
+    },
+    "int_category_axis": {
+      "type": "object",
+      "required": ["type", "categories", "flow"],
+      "properties": {
+        "type": { "type": "string", "pattern": "int_category" },
+        "categories": { "type": "array", "items": { "type": "number" } },
+        "flow": { "type": "boolean" },
+        "name": { "type": "string" },
+        "title": { "type": "string" },
+        "metadata": { "type": "object" }
+      }
+    },
+    "boolean_axis": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": { "type": "string", "pattern": "boolean" },
+        "name": { "type": "string" },
+        "title": { "type": "string" },
+        "metadata": { "type": "object" }
+      }
+    },
+    "int_storage": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "pattern": "int" },
+        "data": {
+          "oneOf": [
+            { "type": "string" },
+            { "type": "array", "items": { "type": "number" } }
+          ]
+        }
+      }
+    },
+    "double_storage": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "pattern": "double" },
+        "data": {
+          "oneOf": [
+            { "type": "string" },
+            { "type": "array", "items": { "type": "number" } }
+          ]
+        }
+      }
+    },
+    "weighted_storage": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "pattern": "int" },
+        "data": {
+          "oneOf": [
+            { "type": "string" },
+            {
+              "type": "object",
+              "properties": {
+                "values": { "type": "array", "items": { "type": "number" } },
+                "variances": { "type": "array", "items": { "type": "number" } }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "mean_storage": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "pattern": "int" },
+        "data": {
+          "oneOf": [
+            { "type": "string" },
+            {
+              "type": "object",
+              "properties": {
+                "counts": { "type": "array", "items": { "type": "number" } },
+                "values": { "type": "array", "items": { "type": "number" } },
+                "variances": { "type": "array", "items": { "type": "number" } }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "weighted_mean_storage": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "pattern": "int" },
+        "data": {
+          "oneOf": [
+            { "type": "string" },
+            {
+              "type": "object",
+              "properties": {
+                "sum_of_weights": {
+                  "type": "array",
+                  "items": { "type": "number" }
+                },
+                "sum_of_weights_squared": {
+                  "type": "array",
+                  "items": { "type": "number" }
+                },
+                "values": { "type": "array", "items": { "type": "number" } },
+                "variances": { "type": "array", "items": { "type": "number" } }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -44,6 +44,10 @@ Documentation = "https://uhi.readthedocs.io/en/latest/"
 Changelog = "https://github.com/scikit-hep/uhi/releases"
 
 [project.optional-dependencies]
+schema = [
+  "fastjsonschema",
+  "importlib-resources; python_version<'3.9'",
+]
 docs = [
   "sphinx>=4.0",
   "furo",
