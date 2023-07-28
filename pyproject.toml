@@ -92,6 +92,10 @@ show_error_codes = true
 warn_unreachable = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 
+[[tool.mypy.overrides]]
+module = ["fastjsonschema"]
+ignore_missing_imports = true
+
 [tool.ruff]
 select = [
   "E", "F", "W", # flake8

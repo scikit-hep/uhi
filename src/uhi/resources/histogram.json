@@ -1,14 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/scikit-hep/uhi/.json",
+  "$id": "https://raw.githubusercontent.com/scikit-hep/uhi/henryiii/feat/schema/src/uhi/resources/histogram.json",
   "type": "object",
   "patternProperties": {
     ".+": {
       "type": "object",
       "required": ["axes", "storage"],
       "properties": {
-        "title": { "type": "string" },
-        "name": { "type": "string" },
         "metadata": { "type": "object" },
         "axes": {
           "type": "array",
@@ -47,7 +45,6 @@
         "overflow": { "type": "boolean" },
         "circular": { "type": "boolean" },
         "name": { "type": "string" },
-        "title": { "type": "string" },
         "metadata": { "type": "object" }
       }
     },
@@ -71,7 +68,6 @@
         "overflow": { "type": "boolean" },
         "circular": { "type": "boolean" },
         "name": { "type": "string" },
-        "title": { "type": "string" },
         "metadata": { "type": "object" }
       }
     },
@@ -83,7 +79,6 @@
         "categories": { "type": "array", "items": { "type": "string" } },
         "flow": { "type": "boolean" },
         "name": { "type": "string" },
-        "title": { "type": "string" },
         "metadata": { "type": "object" }
       }
     },
@@ -95,7 +90,6 @@
         "categories": { "type": "array", "items": { "type": "number" } },
         "flow": { "type": "boolean" },
         "name": { "type": "string" },
-        "title": { "type": "string" },
         "metadata": { "type": "object" }
       }
     },
@@ -105,7 +99,6 @@
       "properties": {
         "type": { "type": "string", "pattern": "boolean" },
         "name": { "type": "string" },
-        "title": { "type": "string" },
         "metadata": { "type": "object" }
       }
     },

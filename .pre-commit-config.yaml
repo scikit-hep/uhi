@@ -39,7 +39,6 @@ repos:
         - importlib_metadata
         - importlib_resources
 
-
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
     hooks:

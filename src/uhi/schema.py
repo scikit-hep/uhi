@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import sys
+from pathlib import Path
 
 import fastjsonschema
 
@@ -16,8 +17,9 @@ with histogram_file.open(encoding="utf-8") as f:
     histogram_schema = fastjsonschema.compile(json.load(f))
 
 
-def validate(path: str) -> None:
-    with open(path, encoding="utf-8") as f:
+def validate(path: str | Path) -> None:
+    path = Path(path)
+    with path.open(encoding="utf-8") as f:
         example = json.load(f)
 
     histogram_schema(example)
