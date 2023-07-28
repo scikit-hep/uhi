@@ -28,7 +28,7 @@ def tests(session):
     """
     Run the unit and regular tests.
     """
-    session.install("-e.[test]")
+    session.install("-e.[test,schema]")
     session.run("pytest", *session.posargs)
 
 

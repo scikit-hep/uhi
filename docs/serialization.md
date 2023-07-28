@@ -1,5 +1,8 @@
 # Serialization
 
+
+## Introduction
+
 Histogram serialization has to cover a wide range of formats. As such, we
 describe a form for serialization that covers the metadata structure as
 JSON-like, with a provided JSON-schema. The data (bins and/or variable edges)
@@ -18,6 +21,8 @@ The following formats are being targeted:
 Other formats can be used as well, assuming they support out-of-band data and
 text attributes or files for the metadata.
 
+## Drawbacks
+
 This structure was based heavily on boost-histogram, but it is intended to be
 general, and can be expanded in the future as needed. As such, the following
 limitations are required:
@@ -31,6 +36,8 @@ limitations are required:
   format uses a stable but different representation.
 * Axis `name` is only part of the metadata, and is not standardized. This is
   due to lack of support from boost-histogram.
+
+## Design
 
 The following axes types are supported:
 
@@ -66,6 +73,27 @@ The following storages are supported:
 * `"weighted_mean"`: A collection of four arrays of 64-bit floating point
   values, `"sum_of_weights"`, `"sum_of_weights_squared"`, `"values"`, and
   `"variances"`. Boost-histogram's WeighedMean storage maps to this.
+
+## CLI/API
+
+You can test a JSON file against the schema by running:
+
+```console
+$ python -m uhi.schema some/file.json
+```
+
+Or with code:
+
+```python
+import uhi.schema
+
+uhi.schema.validate("some/file.json")
+```
+
+Eventually this should also be usable for JSON's inside zip, HDF5 attributes,
+and maybe more.
+
+## Full schema
 
 The full schema is below:
 
