@@ -1,5 +1,5 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://raw.githubusercontent.com/scikit-hep/uhi/henryiii/feat/schema/src/uhi/resources/histogram.json",
   "type": "object",
   "patternProperties": {
@@ -29,7 +29,8 @@
             { "$ref": "#/$defs/weighted_mean_storage" }
           ]
         }
-      }
+      },
+      "additionalProperties": false
     }
   },
   "$defs": {
@@ -46,7 +47,8 @@
         "circular": { "type": "boolean" },
         "name": { "type": "string" },
         "metadata": { "type": "object" }
-      }
+      },
+      "additionalProperties": false
     },
     "variable_axis": {
       "type": "object",
@@ -69,7 +71,8 @@
         "circular": { "type": "boolean" },
         "name": { "type": "string" },
         "metadata": { "type": "object" }
-      }
+      },
+      "additionalProperties": false
     },
     "str_category_axis": {
       "type": "object",
@@ -80,7 +83,8 @@
         "flow": { "type": "boolean" },
         "name": { "type": "string" },
         "metadata": { "type": "object" }
-      }
+      },
+      "additionalProperties": false
     },
     "int_category_axis": {
       "type": "object",
@@ -91,7 +95,8 @@
         "flow": { "type": "boolean" },
         "name": { "type": "string" },
         "metadata": { "type": "object" }
-      }
+      },
+      "additionalProperties": false
     },
     "boolean_axis": {
       "type": "object",
@@ -100,7 +105,8 @@
         "type": { "type": "string", "pattern": "boolean" },
         "name": { "type": "string" },
         "metadata": { "type": "object" }
-      }
+      },
+      "additionalProperties": false
     },
     "int_storage": {
       "type": "object",
@@ -112,7 +118,8 @@
             { "type": "array", "items": { "type": "number" } }
           ]
         }
-      }
+      },
+      "additionalProperties": false
     },
     "double_storage": {
       "type": "object",
@@ -124,7 +131,8 @@
             { "type": "array", "items": { "type": "number" } }
           ]
         }
-      }
+      },
+      "additionalProperties": false
     },
     "weighted_storage": {
       "type": "object",
@@ -138,10 +146,12 @@
               "properties": {
                 "values": { "type": "array", "items": { "type": "number" } },
                 "variances": { "type": "array", "items": { "type": "number" } }
-              }
+              },
+              "additionalProperties": false
             }
           ]
-        }
+        },
+        "additionalProperties": false
       }
     },
     "mean_storage": {
@@ -183,11 +193,13 @@
                 },
                 "values": { "type": "array", "items": { "type": "number" } },
                 "variances": { "type": "array", "items": { "type": "number" } }
-              }
+              },
+              "additionalProperties": false
             }
           ]
         }
-      }
+      },
+      "additionalProperties": false
     }
   }
 }

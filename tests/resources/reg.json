@@ -1,6 +1,5 @@
 {
   "one": {
-    "title": "One",
     "metadata": {},
     "axes": [
       {
@@ -26,6 +25,6 @@
         "overflow": true
       }
     ],
-    "storage": { "type": "double", "data": "something" }
+    "storage": { "type": "double", "data": "some/path/depends/on/format" }
   }
 }
