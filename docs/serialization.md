@@ -96,7 +96,7 @@ and maybe more.
 ```{warning}
 
 Currently, this spec describes **how to prepare the metadata** for one of the
-targetted backends. It does not yet cover backend specific details, like how to
+targeted backends. It does not yet cover backend specific details, like how to
 define and use the binary resource locator strings or how to store the data.
 JSON is not a target spec, but just part of the ZIP spec, meaning the files
 that currently "pass" the tool above would be valid inside a `.zip` file
