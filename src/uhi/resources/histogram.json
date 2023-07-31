@@ -47,7 +47,7 @@
       "required": ["type", "lower", "upper", "bins", "underflow", "overflow"],
       "additionalProperties": false,
       "properties": {
-        "type": { "type": "string", "pattern": "regular" },
+        "type": { "type": "string", "const": "regular" },
         "lower": { "type": "number", "description": "Lower edge of the axis." },
         "upper": { "type": "number", "description": "Upper edge of the axis." },
         "bins": {
@@ -79,7 +79,7 @@
       "required": ["type", "edges", "underflow", "overflow"],
       "additionalProperties": false,
       "properties": {
-        "type": { "type": "string", "pattern": "variable" },
+        "type": { "type": "string", "const": "variable" },
         "edges": {
           "oneOf": [
             {
@@ -107,7 +107,7 @@
       "required": ["type", "categories", "flow"],
       "additionalProperties": false,
       "properties": {
-        "type": { "type": "string", "pattern": "str_category" },
+        "type": { "type": "string", "const": "str_category" },
         "categories": {
           "type": "array",
           "items": { "type": "string" },
@@ -129,7 +129,7 @@
       "required": ["type", "categories", "flow"],
       "additionalProperties": false,
       "properties": {
-        "type": { "type": "string", "pattern": "int_category" },
+        "type": { "type": "string", "const": "int_category" },
         "categories": {
           "type": "array",
           "items": { "type": "integer" },
@@ -151,7 +151,7 @@
       "required": ["type"],
       "additionalProperties": false,
       "properties": {
-        "type": { "type": "string", "pattern": "boolean" },
+        "type": { "type": "string", "const": "boolean" },
         "metadata": {
           "type": "object",
           "description": "Arbitrary metadata dictionary."
@@ -164,7 +164,7 @@
       "required": ["type", "data"],
       "additionalProperties": false,
       "properties": {
-        "type": { "type": "string", "pattern": "int" },
+        "type": { "type": "string", "const": "int" },
         "data": {
           "oneOf": [
             {
@@ -182,7 +182,7 @@
       "required": ["type", "data"],
       "additionalProperties": false,
       "properties": {
-        "type": { "type": "string", "pattern": "double" },
+        "type": { "type": "string", "const": "double" },
         "data": {
           "oneOf": [
             {
@@ -200,7 +200,7 @@
       "required": ["type", "data"],
       "additionalProperties": false,
       "properties": {
-        "type": { "type": "string", "pattern": "int" },
+        "type": { "type": "string", "const": "int" },
         "data": {
           "oneOf": [
             {
@@ -226,7 +226,7 @@
       "required": ["type", "data"],
       "additionalProperties": false,
       "properties": {
-        "type": { "type": "string", "pattern": "int" },
+        "type": { "type": "string", "const": "int" },
         "data": {
           "oneOf": [
             {
@@ -253,7 +253,7 @@
       "required": ["type", "data"],
       "additionalProperties": false,
       "properties": {
-        "type": { "type": "string", "pattern": "int" },
+        "type": { "type": "string", "const": "int" },
         "data": {
           "oneOf": [
             {
