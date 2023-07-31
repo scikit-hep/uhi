@@ -76,7 +76,7 @@ The following storages are supported:
 
 ## CLI/API
 
-You can test a JSON file against the schema by running:
+You can currently test a JSON file against the schema by running:
 
 ```console
 $ python -m uhi.schema some/file.json
@@ -92,6 +92,16 @@ uhi.schema.validate("some/file.json")
 
 Eventually this should also be usable for JSON's inside zip, HDF5 attributes,
 and maybe more.
+
+```{warning}
+
+Currently, this spec describes **how to prepare the metadata** for one of the
+targetted backends. It does not yet cover backend specific details, like how to
+define and use the binary resource locator strings or how to store the data.
+JSON is not a target spec, but just part of the ZIP spec, meaning the files
+that currently "pass" the tool above would be valid inside a `.zip` file
+eventually, but are not valid by themselves.
+```
 
 ## Rendered schema
 
