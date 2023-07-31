@@ -93,6 +93,12 @@ uhi.schema.validate("some/file.json")
 Eventually this should also be usable for JSON's inside zip, HDF5 attributes,
 and maybe more.
 
+## Rendered schema
+
+```{jsonschema} ../src/uhi/resources/histogram.json
+```
+
+
 ## Full schema
 
 The full schema is below:
