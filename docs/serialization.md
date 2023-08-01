@@ -21,7 +21,7 @@ The following formats are being targeted:
 Other formats can be used as well, assuming they support out-of-band data and
 text attributes or files for the metadata.
 
-## Drawbacks
+## Caveats
 
 This structure was based heavily on boost-histogram, but it is intended to be
 general, and can be expanded in the future as needed. As such, the following
@@ -32,8 +32,8 @@ limitations are required:
   lost, etc.
 * Metadata must be expressible as JSON. It should also be reasonably sized; some
   formats like HDF5 may limit the size of attributes to 64K.
-* Floating point variations could be introduced in storages, as the storage
-  format uses a stable but different representation.
+* Floating point errors could be incurred on conversion, as the storage format
+  uses a stable but different representation.
 * Axis `name` is only part of the metadata, and is not standardized. This is
   due to lack of support from boost-histogram.
 
@@ -49,15 +49,15 @@ The following axes types are supported:
   is either an in-line list of numbers or a string pointing to an out-of-band data source.
   Also has `underflow`, `overflow`, and `circular` properties. `circular`
   defaults to False if not present.
-* `"int_category"`: A list of integer bins, non-continuous. Has `categories`,
+* `"category_int"`: A list of integer bins, non-continuous. Has `categories`,
   which is an in-line list of integers. Also has `flow`.
-* `"str_category"`: A list of string bins. Has `categories`,
+* `"category_str"`: A list of string bins. Has `categories`,
   which is an in-line list of strings. Also has `flow`.
-* `"bool"`: A true/false axis.
+* `"boolean"`: A true/false axis.
 
 Axes with gaps are currently not supported.
 
-All axes support `metadata`.
+All axes support `metadata`, a string-valued dictionary of arbitrary, JSON-like data.
 
 The following storages are supported:
 

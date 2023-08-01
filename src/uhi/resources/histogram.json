@@ -21,8 +21,8 @@
             "oneOf": [
               { "$ref": "#/$defs/regular_axis" },
               { "$ref": "#/$defs/variable_axis" },
-              { "$ref": "#/$defs/str_category_axis" },
-              { "$ref": "#/$defs/int_category_axis" },
+              { "$ref": "#/$defs/category_str_axis" },
+              { "$ref": "#/$defs/category_int_axis" },
               { "$ref": "#/$defs/boolean_axis" }
             ]
           }
@@ -101,13 +101,13 @@
         }
       }
     },
-    "str_category_axis": {
+    "category_str_axis": {
       "type": "object",
       "description": "A set of string categorical bins.",
       "required": ["type", "categories", "flow"],
       "additionalProperties": false,
       "properties": {
-        "type": { "type": "string", "const": "str_category" },
+        "type": { "type": "string", "const": "category_str" },
         "categories": {
           "type": "array",
           "items": { "type": "string" },
@@ -123,13 +123,13 @@
         }
       }
     },
-    "int_category_axis": {
+    "category_int_axis": {
       "type": "object",
       "description": "A set of integer categorical bins in any order.",
       "required": ["type", "categories", "flow"],
       "additionalProperties": false,
       "properties": {
-        "type": { "type": "string", "const": "int_category" },
+        "type": { "type": "string", "const": "category_int" },
         "categories": {
           "type": "array",
           "items": { "type": "integer" },
