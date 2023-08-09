@@ -57,11 +57,11 @@ class PlottableTraits(Protocol):
         """
 
 
-T = TypeVar("T", covariant=True)
+T_co = TypeVar("T_co", covariant=True)
 
 
 @runtime_checkable
-class PlottableAxisGeneric(Protocol[T]):
+class PlottableAxisGeneric(Protocol[T_co]):
     # name: str - Optional, not part of Protocol
     # label: str - Optional, not part of Protocol
     #
@@ -73,7 +73,7 @@ class PlottableAxisGeneric(Protocol[T]):
     def traits(self) -> PlottableTraits:
         ...
 
-    def __getitem__(self, index: int) -> T:
+    def __getitem__(self, index: int) -> T_co:
         """
         Get the pair of edges (not discrete) or bin label (discrete).
         """
@@ -89,7 +89,7 @@ class PlottableAxisGeneric(Protocol[T]):
         Required to be sequence-like.
         """
 
-    def __iter__(self) -> Iterator[T]:
+    def __iter__(self) -> Iterator[T_co]:
         """
         Useful element of a Sequence to include.
         """
