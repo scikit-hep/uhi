@@ -67,12 +67,13 @@ dev = [
 ]
 
 
-[tool.pytest.ini_config]
+[tool.pytest.ini_options]
 minversion = "6.0"
 addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
 xfail_strict = true
 filterwarnings = ["error"]
 testpaths = ["tests"]
+log_cli_level = "info"
 
 
 [tool.mypy]
@@ -80,11 +81,14 @@ files = "src"
 python_version = "3.8"
 warn_unused_configs = "true"
 strict = true
+show_error_codes = true
+warn_unreachable = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 
 [tool.ruff]
 select = [
   "E", "F", "W", # flake8
-  "B", "B904",   # flake8-bugbear
+  "B",           # flake8-bugbear
   "I",           # isort
   "ARG",         # flake8-unused-arguments
   "C4",          # flake8-comprehensions

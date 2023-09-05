@@ -18,7 +18,7 @@ You can replace location based indexing ``loc(1.23) → 1.23j`` (a "j" suffix on
 
 .. code:: python3
 
-   v = h[2j)]    # Returns the bin containing "2.0"
+   v = h[2j]     # Returns the bin containing "2.0"
    v = h[2j + 1] # Returns the bin above the one containing "2.0"
    h2 = h[2j:]   # Slices starting with the bin containing "2.0"
 

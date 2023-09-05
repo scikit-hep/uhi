@@ -8,9 +8,14 @@ on:
     - master
     - main
     - develop
+  # TODO: release needs to be a separate workflow
   release:
     types:
       - published
+
+concurrency:
+│      group: ${{ github.workflow }}-${{ github.ref }}
+│      cancel-in-progress:
 
 jobs:
   checks:
