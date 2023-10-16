@@ -32,7 +32,7 @@ repos:
     hooks:
     - id: mypy
       files: ^(src|tests)
-      args: [--show-error-codes]
+      args: []
       additional_dependencies:
         - numpy~=1.23.0
         - pytest
