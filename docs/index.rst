@@ -30,6 +30,7 @@ to plot a histogram, including error bars.
    indexing.rst
    indexing+.rst
    plotting.rst
+   changelog.md
 
 
 
