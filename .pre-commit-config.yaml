@@ -34,7 +34,7 @@ repos:
       files: ^(src|tests)
       args: []
       additional_dependencies:
-        - numpy~=1.23.0
+        - numpy~=1.26.0
         - pytest
         - importlib_metadata
         - importlib_resources
@@ -66,3 +66,9 @@ repos:
     hooks:
       - id: prettier
         types_or: [json]
+
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.27.0
+    hooks:
+      - id: check-readthedocs
+      - id: check-github-workflows
