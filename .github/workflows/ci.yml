@@ -5,9 +5,7 @@ on:
   pull_request:
   push:
     branches:
-    - master
     - main
-    - develop
   # TODO: release needs to be a separate workflow
   release:
     types:

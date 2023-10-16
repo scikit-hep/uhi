@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import argparse
 import re
 from pathlib import Path
 
 import nox
 
-ALL_PYTHONS = ["3.6", "3.7", "3.8", "3.9", "3.10"]
+ALL_PYTHONS = ["3.7", "3.8", "3.9", "3.10", "3.11"]
 
 nox.options.sessions = ["lint", "tests"]
 
@@ -27,26 +28,38 @@ def tests(session):
     """
     Run the unit and regular tests.
     """
-    session.install(".[test]")
+    session.install("-e.[test]")
     session.run("pytest", *session.posargs)
 
 
-@nox.session
-def docs(session):
+@nox.session(reuse_venv=True)
+def docs(session: nox.Session) -> None:
     """
-    Build the docs. Pass "serve" to serve.
+    Build the docs. Pass "--serve" to serve.
     """
 
-    session.install(".[docs]")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--serve", action="store_true", help="Serve after building")
+    args, posargs = parser.parse_known_args(session.posargs)
+
+    session.install("-e.[docs]")
     session.chdir("docs")
-    session.run("sphinx-build", "-M", "html", ".", "_build")
 
-    if session.posargs:
-        if "serve" in session.posargs:
-            print("Launching docs at http://localhost:8000/ - use Ctrl-C to quit")
-            session.run("python", "-m", "http.server", "8000", "-d", "_build/html")
-        else:
-            print("Unsupported argument to docs")
+    session.run(
+        "sphinx-build",
+        "-n",  # nitpicky mode
+        "--keep-going",  # show all errors
+        "-T",  # full tracebacks
+        "-b",
+        "html",
+        ".",
+        "_build/html",
+        *posargs,
+    )
+
+    if args.serve:
+        session.log("Launching docs at http://localhost:8000/ - use Ctrl-C to quit")
+        session.run("python", "-m", "http.server", "8000", "-d", "_build/html")
 
 
 @nox.session

@@ -45,8 +45,9 @@ Changelog = "https://github.com/scikit-hep/uhi/releases"
 [project.optional-dependencies]
 docs = [
   "sphinx>=4.0",
-  "sphinx-book-theme>=0.0.40",
+  "furo",
   "sphinx-copybutton>=0.3.1",
+  "myst-parser",
 ]
 test = [
   "pytest>=6",
