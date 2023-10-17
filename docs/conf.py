@@ -56,8 +56,8 @@ html_theme = "furo"
 
 
 # -- Changelog builder -------------------------------------------------------
-
-sphinx_github_changelog_token = os.environ.get("GITHUB_API_TOKEN")
+if "GITHUB_API_TOKEN" in os.environ:
+    sphinx_github_changelog_token = os.environ["GITHUB_API_TOKEN"]
 
 commit = os.environ.get("READTHEDOCS_GIT_COMMIT_HASH", "main")
-code_url = "https://github.com/scientific-python/repo-review/blob"
+code_url = "https://github.com/scikit-hep/uhi/blob"
