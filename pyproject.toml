@@ -49,6 +49,7 @@ docs = [
   "furo",
   "sphinx-copybutton>=0.3.1",
   "myst-parser",
+  "sphinx_github_changelog",
 ]
 test = [
   "pytest>=6",

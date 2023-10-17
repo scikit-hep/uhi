@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+import os
 import sys
 
 if sys.version_info < (3, 8):
@@ -33,6 +34,7 @@ extensions = [
     "myst_parser",
     "sphinx.ext.napoleon",
     "sphinx_copybutton",
+    "sphinx_github_changelog",
 ]
 
 source_suffix = [".rst", ".md"]
@@ -45,8 +47,17 @@ templates_path = ["_templates"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 html_theme = "furo"
+
+
+# -- Changelog builder -------------------------------------------------------
+
+sphinx_github_changelog_token = os.environ.get("GITHUB_API_TOKEN")
+
+commit = os.environ.get("READTHEDOCS_GIT_COMMIT_HASH", "main")
+code_url = "https://github.com/scientific-python/repo-review/blob"
