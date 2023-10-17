@@ -1,0 +1,30 @@
+{
+  "one": {
+    "metadata": {},
+    "axes": [
+      {
+        "type": "regular",
+        "lower": 0,
+        "upper": 5,
+        "bins": 3,
+        "underflow": true,
+        "overflow": true,
+        "circular": false
+      }
+    ],
+    "storage": { "type": "int", "data": [1, 2, 3, 4, 5] }
+  },
+  "two": {
+    "axes": [
+      {
+        "type": "regular",
+        "lower": 0,
+        "upper": 5,
+        "bins": 5,
+        "underflow": true,
+        "overflow": true
+      }
+    ],
+    "storage": { "type": "double", "data": "some/path/depends/on/format" }
+  }
+}

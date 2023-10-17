@@ -1,0 +1,290 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/scikit-hep/uhi/henryiii/feat/schema/src/uhi/resources/histogram.json",
+  "title": "Histogram",
+  "type": "object",
+  "additionalProperties": false,
+  "patternProperties": {
+    ".+": {
+      "type": "object",
+      "required": ["axes", "storage"],
+      "additionalProperties": false,
+      "properties": {
+        "metadata": {
+          "type": "object",
+          "description": "Arbitrary metadata dictionary."
+        },
+        "axes": {
+          "type": "array",
+          "description": "A list of the axes of the histogram.",
+          "items": {
+            "oneOf": [
+              { "$ref": "#/$defs/regular_axis" },
+              { "$ref": "#/$defs/variable_axis" },
+              { "$ref": "#/$defs/category_str_axis" },
+              { "$ref": "#/$defs/category_int_axis" },
+              { "$ref": "#/$defs/boolean_axis" }
+            ]
+          }
+        },
+        "storage": {
+          "description": "The storage of the bins of the histogram.",
+          "oneOf": [
+            { "$ref": "#/$defs/int_storage" },
+            { "$ref": "#/$defs/double_storage" },
+            { "$ref": "#/$defs/weighted_storage" },
+            { "$ref": "#/$defs/mean_storage" },
+            { "$ref": "#/$defs/weighted_mean_storage" }
+          ]
+        }
+      }
+    }
+  },
+  "$defs": {
+    "regular_axis": {
+      "type": "object",
+      "description": "An evenly spaced set of continuous bins.",
+      "required": ["type", "lower", "upper", "bins", "underflow", "overflow"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "type": "string", "const": "regular" },
+        "lower": { "type": "number", "description": "Lower edge of the axis." },
+        "upper": { "type": "number", "description": "Upper edge of the axis." },
+        "bins": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of bins in the axis."
+        },
+        "underflow": {
+          "type": "boolean",
+          "description": "True if there is a bin for underflow."
+        },
+        "overflow": {
+          "type": "boolean",
+          "description": "True if there is a bin for overflow."
+        },
+        "circular": {
+          "type": "boolean",
+          "description": "True if the axis wraps around."
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Arbitrary metadata dictionary."
+        }
+      }
+    },
+    "variable_axis": {
+      "type": "object",
+      "description": "A variably spaced set of continuous bins.",
+      "required": ["type", "edges", "underflow", "overflow"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "type": "string", "const": "variable" },
+        "edges": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": { "type": "number", "minItems": 2, "uniqueItems": true }
+            },
+            {
+              "type": "string",
+              "description": "A path (URI?) to the edges data."
+            }
+          ]
+        },
+        "underflow": { "type": "boolean" },
+        "overflow": { "type": "boolean" },
+        "circular": { "type": "boolean" },
+        "metadata": {
+          "type": "object",
+          "description": "Arbitrary metadata dictionary."
+        }
+      }
+    },
+    "category_str_axis": {
+      "type": "object",
+      "description": "A set of string categorical bins.",
+      "required": ["type", "categories", "flow"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "type": "string", "const": "category_str" },
+        "categories": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "flow": {
+          "type": "boolean",
+          "description": "True if flow bin (at the overflow position) present."
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Arbitrary metadata dictionary."
+        }
+      }
+    },
+    "category_int_axis": {
+      "type": "object",
+      "description": "A set of integer categorical bins in any order.",
+      "required": ["type", "categories", "flow"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "type": "string", "const": "category_int" },
+        "categories": {
+          "type": "array",
+          "items": { "type": "integer" },
+          "uniqueItems": true
+        },
+        "flow": {
+          "type": "boolean",
+          "description": "True if flow bin (at the overflow position) present."
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Arbitrary metadata dictionary."
+        }
+      }
+    },
+    "boolean_axis": {
+      "type": "object",
+      "description": "A simple true/false axis with no flow.",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "type": "string", "const": "boolean" },
+        "metadata": {
+          "type": "object",
+          "description": "Arbitrary metadata dictionary."
+        }
+      }
+    },
+    "int_storage": {
+      "type": "object",
+      "description": "A storage holding integer counts.",
+      "required": ["type", "data"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "type": "string", "const": "int" },
+        "data": {
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "A path (URI?) to the integer bin data."
+            },
+            { "type": "array", "items": { "type": "integer" } }
+          ]
+        }
+      }
+    },
+    "double_storage": {
+      "type": "object",
+      "description": "A storage holding floating point counts.",
+      "required": ["type", "data"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "type": "string", "const": "double" },
+        "data": {
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "A path (URI?) to the floating point bin data."
+            },
+            { "type": "array", "items": { "type": "number" } }
+          ]
+        }
+      }
+    },
+    "weighted_storage": {
+      "type": "object",
+      "description": "A storage holding floating point counts and variances.",
+      "required": ["type", "data"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "type": "string", "const": "int" },
+        "data": {
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "A path (URI?) to the floating point bin data; outer dimension is [value, variance]"
+            },
+            {
+              "type": "object",
+              "required": ["values", "variances"],
+              "additionalProperties": false,
+              "properties": {
+                "values": { "type": "array", "items": { "type": "number" } },
+                "variances": { "type": "array", "items": { "type": "number" } }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "mean_storage": {
+      "type": "object",
+      "description": "A storage holding 'profile'-style floating point counts, values, and variances.",
+      "required": ["type", "data"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "type": "string", "const": "int" },
+        "data": {
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "A path (URI?) to the floating point bin data; outer dimension is [counts, value, variance]"
+            },
+            {
+              "type": "object",
+              "required": ["counts", "values", "variances"],
+              "additionalProperties": false,
+              "properties": {
+                "counts": { "type": "array", "items": { "type": "number" } },
+                "values": { "type": "array", "items": { "type": "number" } },
+                "variances": { "type": "array", "items": { "type": "number" } }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "weighted_mean_storage": {
+      "type": "object",
+      "description": "A storage holding 'profile'-style floating point ∑weights, ∑weights², values, and variances.",
+      "required": ["type", "data"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "type": "string", "const": "int" },
+        "data": {
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "A path (URI?) to the floating point bin data; outer dimension is [∑weights, ∑weights², value, variance]"
+            },
+            {
+              "type": "object",
+              "required": [
+                "sum_of_weights",
+                "sum_of_weights_squared",
+                "values",
+                "variances"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "sum_of_weights": {
+                  "type": "array",
+                  "items": { "type": "number" }
+                },
+                "sum_of_weights_squared": {
+                  "type": "array",
+                  "items": { "type": "number" }
+                },
+                "values": { "type": "array", "items": { "type": "number" } },
+                "variances": { "type": "array", "items": { "type": "number" } }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -39,7 +39,6 @@ repos:
         - importlib_metadata
         - importlib_resources
 
-
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
     hooks:
@@ -72,3 +71,9 @@ repos:
     hooks:
       - id: check-readthedocs
       - id: check-github-workflows
+      - id: check-metaschema
+        files: ^src/uhi/resources/histogram.json$
+      - id: check-jsonschema
+        name: Validate Histogram examples
+        args: [--schemafile, src/uhi/resources/histogram.json]
+        files: ^tests/resources/.*\.json

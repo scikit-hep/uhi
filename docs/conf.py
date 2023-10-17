@@ -32,6 +32,7 @@ version = release = metadata.version("uhi")
 # ones.
 extensions = [
     "myst_parser",
+    "sphinx-jsonschema",
     "sphinx.ext.napoleon",
     "sphinx_copybutton",
     "sphinx_github_changelog",

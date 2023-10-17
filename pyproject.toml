@@ -44,10 +44,15 @@ Documentation = "https://uhi.readthedocs.io/en/latest/"
 Changelog = "https://github.com/scikit-hep/uhi/releases"
 
 [project.optional-dependencies]
+schema = [
+  "fastjsonschema",
+  "importlib-resources; python_version<'3.9'",
+]
 docs = [
   "sphinx>=4.0",
   "furo",
   "sphinx-copybutton>=0.3.1",
+  "sphinx-jsonschema",
   "myst-parser",
   "sphinx_github_changelog",
 ]
@@ -87,6 +92,10 @@ strict = true
 show_error_codes = true
 warn_unreachable = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+
+[[tool.mypy.overrides]]
+module = ["fastjsonschema"]
+ignore_missing_imports = true
 
 [tool.ruff]
 select = [
