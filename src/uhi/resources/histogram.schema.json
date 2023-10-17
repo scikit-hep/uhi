@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://raw.githubusercontent.com/scikit-hep/uhi/henryiii/feat/schema/src/uhi/resources/histogram.json",
+  "$id": "https://raw.githubusercontent.com/scikit-hep/uhi/main/src/uhi/resources/histogram.schema.json",
   "title": "Histogram",
   "type": "object",
   "additionalProperties": false,

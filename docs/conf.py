@@ -48,6 +48,10 @@ templates_path = ["_templates"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
+myst_enable_extensions = [
+    "colon_fence",
+]
+
 
 # -- Options for HTML output -------------------------------------------------
 

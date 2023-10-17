@@ -1,5 +1,11 @@
 # Serialization
 
+:::{warning}
+
+Serialization is in draft currently. Once at least one implementation is ready,
+we will remove this warning and release UHI 0.5.
+
+:::
 
 ## Introduction
 
