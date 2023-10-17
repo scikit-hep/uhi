@@ -11,6 +11,7 @@
 
 [![GitHub Discussion][github-discussions-badge]][github-discussions-link]
 [![Gitter][gitter-badge]][gitter-link]
+[![Zenodo][zenodo-badge]][zenodo-link]
 [![Scikit-HEP][sk-badge]](https://scikit-hep.org/)
 
 
@@ -44,6 +45,8 @@ might be simpler than manually checking for the expected methods.
 [github-discussions-link]:  https://github.com/Scikit-HEP/uhi/discussions
 [gitter-badge]:             https://badges.gitter.im/https://github.com/Scikit-HEP/uhi/community.svg
 [gitter-link]:              https://gitter.im/https://github.com/Scikit-HEP/uhi/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
+[zenodo-badge]:             https://zenodo.org/badge/DOI/10.5281/zenodo.10014713.svg
+[zenodo-link]:              https://doi.org/10.5281/zenodo.10014713
 [pre-commit-badge]:         https://results.pre-commit.ci/badge/github/scikit-hep/uhi/main.svg
 [pre-commit-link]:          https://results.pre-commit.ci/repo/github/309772485
 [pypi-link]:                https://pypi.org/project/uhi/
@@ -56,5 +59,5 @@ might be simpler than manually checking for the expected methods.
 [boost-histogram]:          https://github.com/scikit-hep/boost-histogram
 [hist]:                     https://github.com/scikit-hep/hist
 [mplhep]:                   https://github.com/scikit-hep/mplhep
-[uproot]:                  https://github.com/scikit-hep/uproot4
+[uproot]:                   https://github.com/scikit-hep/uproot4
 [histoprint]:               https://github.com/scikit-hep/histoprint
