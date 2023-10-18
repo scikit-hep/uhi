@@ -75,5 +75,5 @@ repos:
         files: ^src/uhi/resources/histogram.json$
       - id: check-jsonschema
         name: Validate Histogram examples
-        args: [--schemafile, src/uhi/resources/histogram.json]
+        args: [--schemafile, src/uhi/resources/histogram.schema.json]
         files: ^tests/resources/.*\.json

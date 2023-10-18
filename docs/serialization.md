@@ -111,7 +111,7 @@ eventually, but are not valid by themselves.
 
 ## Rendered schema
 
-```{jsonschema} ../src/uhi/resources/histogram.json
+```{jsonschema} ../src/uhi/resources/histogram.schema.json
 ```
 
 
@@ -119,6 +119,6 @@ eventually, but are not valid by themselves.
 
 The full schema is below:
 
-```{literalinclude} ../src/uhi/resources/histogram.json
+```{literalinclude} ../src/uhi/resources/histogram.schema.json
 :language: json
 ```
