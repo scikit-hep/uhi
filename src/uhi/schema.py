@@ -11,7 +11,7 @@ if sys.version_info < (3, 9):
 else:
     from importlib import resources
 
-histogram_file = resources.files("uhi") / "resources/histogram.json"
+histogram_file = resources.files("uhi") / "resources/histogram.schema.json"
 
 with histogram_file.open(encoding="utf-8") as f:
     histogram_schema = fastjsonschema.compile(json.load(f))
