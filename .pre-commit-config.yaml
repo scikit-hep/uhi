@@ -72,7 +72,7 @@ repos:
       - id: check-readthedocs
       - id: check-github-workflows
       - id: check-metaschema
-        files: ^src/uhi/resources/histogram.json$
+        files: ^src/uhi/resources/histogram.schema.json$
       - id: check-jsonschema
         name: Validate Histogram examples
         args: [--schemafile, src/uhi/resources/histogram.schema.json]
