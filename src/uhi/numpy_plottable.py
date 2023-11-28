@@ -74,7 +74,7 @@ class NumPyPlottableAxis:
         Get the pair of edges (not discrete) or bin label (discrete).
         """
 
-        return tuple(self.edges[index])  # type: ignore[return-value]
+        return tuple(self.edges[index])
 
     def __len__(self) -> int:
         """
