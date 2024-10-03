@@ -14,13 +14,6 @@ nox -s docs -- serve
 nox -s build
 ```
 
-# Setting up a development environment
-
-You can set up a manual development environment by running:
-
-```bash
-pdm install
-```
 
 # Post setup
 
@@ -41,15 +34,6 @@ Use pytest to run the unit checks:
 
 ```bash
 pytest
-```
-
-# Docs
-
-Run the docs using nox or with:
-
-```bash
-pdm install --extras docs
-pdm run sphinx-build -M html docs docs/_build
 ```
 
 # Bumping the version

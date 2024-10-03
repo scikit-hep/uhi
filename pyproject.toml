@@ -65,12 +65,6 @@ test = [
 version.source = "vcs"
 build.hooks.vcs.version-file = "src/uhi/_version.py"
 
-[tool.pdm.dev-dependencies]
-dev = [
-  "pytest>=6",
-  "boost-histogram>=1.0",
-]
-
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -93,6 +87,7 @@ enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 [[tool.mypy.overrides]]
 module = ["fastjsonschema"]
 ignore_missing_imports = true
+
 
 [tool.ruff.lint]
 select = [
