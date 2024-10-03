@@ -80,7 +80,6 @@ files = "src"
 python_version = "3.8"
 warn_unused_configs = "true"
 strict = true
-show_error_codes = true
 warn_unreachable = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 
@@ -90,8 +89,7 @@ ignore_missing_imports = true
 
 
 [tool.ruff.lint]
-select = [
-  "E", "F", "W", # flake8
+extend-select = [
   "B",           # flake8-bugbear
   "I",           # isort
   "ARG",         # flake8-unused-arguments
@@ -115,9 +113,8 @@ select = [
   "NPY",         # NumPy specific rules
   "PD",          # pandas-vet
 ]
-extend-ignore = [
+ignore = [
   "PLR",    # Design related pylint codes
-  "E501",   # Line too long
   "PT004",  # Use underscore for non-returning fixture (use usefixture instead)
   "PT013",  # Incorrect import of pytest
   "ISC001", # Conflicts with formatter
