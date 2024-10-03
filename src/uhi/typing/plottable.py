@@ -11,19 +11,11 @@ MyPy will force you to only use items in the Protocol.
 
 from __future__ import annotations
 
-import sys
 from collections.abc import Iterator, Sequence
-from typing import Any, Tuple, TypeVar, Union
+from typing import Any, Protocol, Tuple, TypeVar, Union, runtime_checkable
 
 # NumPy 1.20+ will work much, much better than previous versions when type checking
 import numpy as np
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Protocol, runtime_checkable
-
-else:
-    from typing import Protocol, runtime_checkable
-
 
 protocol_version = (1, 2)
 

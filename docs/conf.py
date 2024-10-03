@@ -6,14 +6,8 @@
 
 from __future__ import annotations
 
+import importlib.metadata
 import os
-import sys
-
-if sys.version_info < (3, 8):
-    import importlib_metadata as metadata
-else:
-    import importlib.metadata as metadata
-
 
 # -- Project information -----------------------------------------------------
 
@@ -22,7 +16,7 @@ copyright = "2021, Henry Schreiner, Hans Dembinski, Jim Pivarski"
 author = "Henry Schreiner, Hans Dembinski, Jim Pivarski"
 
 # The full version, including alpha/beta/rc tags
-version = release = metadata.version("uhi")
+version = release = importlib.metadata.version("uhi")
 
 
 # -- General configuration ---------------------------------------------------

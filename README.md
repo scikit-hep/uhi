@@ -24,7 +24,7 @@ It is not usually a runtime dependency, but only a type checking, testing,
 and/or docs dependency in support of other libraries (such as
 [boost-histogram][] 0.13+, [hist][] 2.1+, [mplhep][] 0.2.15+, [uproot][] 4+,
 and [histoprint][] 2+).  There are a few useful runtime usable components
-(listed below). It requires Python 3.6+. [See what's
+(listed below). Older versions are available for Python 3.6+. [See what's
 new](https://github.com/scikit-hep/uhi/releases).
 
 To assist plotting libraries in accepting Histograms from classic sources, see
