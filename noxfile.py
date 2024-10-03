@@ -1,14 +1,18 @@
 from __future__ import annotations
 
 import argparse
-import re
 from pathlib import Path
 
 import nox
 
-ALL_PYTHONS = ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+nox.needs_version = ">=2024.4.15"
+nox.options.default_venv_backend = "uv|virtualenv"
 
-nox.options.sessions = ["lint", "tests"]
+ALL_PYTHONS = [
+    c.split()[-1]
+    for c in nox.project.load_toml("pyproject.toml")["project"]["classifiers"]
+    if c.startswith("Programming Language :: Python :: 3.")
+]
 
 
 DIR = Path(__file__).parent.resolve()
@@ -32,37 +36,40 @@ def tests(session):
     session.run("pytest", *session.posargs)
 
 
-@nox.session(reuse_venv=True)
+@nox.session(reuse_venv=True, default=False)
 def docs(session: nox.Session) -> None:
     """
-    Build the docs. Pass "--serve" to serve.
+    Build the docs. Use "--non-interactive" to avoid serving. Pass "-b linkcheck" to check links.
     """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--serve", action="store_true", help="Serve after building")
+    parser.add_argument(
+        "-b", dest="builder", default="html", help="Build target (default: html)"
+    )
     args, posargs = parser.parse_known_args(session.posargs)
 
-    session.install("-e.[docs]")
+    serve = args.builder == "html" and session.interactive
+    extra_installs = ["sphinx-autobuild"] if serve else []
+    session.install("-e.[docs]", *extra_installs)
+
     session.chdir("docs")
 
-    session.run(
-        "sphinx-build",
+    shared_args = (
         "-n",  # nitpicky mode
-        "--keep-going",  # show all errors
         "-T",  # full tracebacks
-        "-b",
-        "html",
+        f"-b={args.builder}",
         ".",
-        "_build/html",
+        f"_build/{args.builder}",
         *posargs,
     )
 
-    if args.serve:
-        session.log("Launching docs at http://localhost:8000/ - use Ctrl-C to quit")
-        session.run("python", "-m", "http.server", "8000", "-d", "_build/html")
+    if serve:
+        session.run("sphinx-autobuild", "--open-browser", *shared_args)
+    else:
+        session.run("sphinx-build", "--keep-going", *shared_args)
 
 
-@nox.session
+@nox.session(default=False)
 def build(session):
     """
     Build an SDist and wheel.
@@ -72,7 +79,7 @@ def build(session):
     session.run("python", "-m", "build")
 
 
-@nox.session(venv_backend="conda")
+@nox.session(venv_backend="conda", default=False)
 def root_tests(session):
     """
     Test against ROOT.
@@ -81,54 +88,3 @@ def root_tests(session):
     session.conda_install("--channel=conda-forge", "ROOT", "pytest", "boost-histogram")
     session.install(".")
     session.run("pytest", "tests/test_root.py")
-
-
-@nox.session(reuse_venv=True)
-def bump(session: nox.Session) -> None:
-    """
-    Bump the major/minor/patch version (if nothing given, just shows the version).
-    """
-
-    session.install("tomli")
-    output = session.run(
-        "python",
-        "-c",
-        "import tomli, pathlib; p = pathlib.Path('pyproject.toml'); print(tomli.loads(p.read_text())['project']['version'])",
-        silent=True,
-    )
-    current_version = output.strip()
-
-    if not session.posargs:
-        session.log(f"Current version: {current_version}")
-        return
-
-    new_version = session.posargs[0]
-    session.log(f"Bumping from {current_version} to {new_version}")
-
-    replace_version(
-        Path("src/uhi/__init__.py"),
-        '__version__ = "{version}"',
-        current_version,
-        new_version,
-    )
-    replace_version(
-        Path("pyproject.toml"), 'version = "{version}"', current_version, new_version
-    )
-
-    print(f"git switch -c chore/bump/{new_version}")
-    print("git add -u src/uhi/__init__.py pyproject.toml")
-    print(f"git commit -m 'chore: bump version to {new_version}'")
-    print("gh pr create --fill")
-
-
-def replace_version(file: Path, fmt: str, in_version: str, out_version: str) -> None:
-    in_fmt = fmt.format(version=in_version)
-    out_fmt = fmt.format(version=out_version)
-
-    with file.open("r") as f:
-        txt = f.read()
-
-    txt = re.sub(in_fmt, out_fmt, txt)
-
-    with file.open("w") as f:
-        f.write(txt)
