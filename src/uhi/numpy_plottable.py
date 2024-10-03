@@ -81,7 +81,7 @@ class NumPyPlottableAxis:
         Return the number of bins (not counting flow bins, which are ignored
         for this Protocol currently).
         """
-        return self.edges.shape[0]
+        return self.edges.shape[0]  # type: ignore[no-any-return]
 
     def __eq__(self, other: Any) -> bool:
         """
@@ -140,7 +140,7 @@ class NumPyPlottableHistogram:
 
         self.kind = kind
         self.axes: Sequence[PlottableAxis] = [
-            _bin_helper(shape, b) for shape, b in zip(hist.shape, bins)  # type: ignore[arg-type]
+            _bin_helper(shape, b) for shape, b in zip(hist.shape, bins)
         ]
 
     def __repr__(self) -> str:
