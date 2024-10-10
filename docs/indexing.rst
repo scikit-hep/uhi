@@ -37,9 +37,9 @@ Slicing:
    h2 = h[loc(v):]       # Slices can be in data coordinates, too
    h2 = h[::rebin(2)]    # Modification operations (rebin)
    h2 = h[a:b:rebin(2)]  # Modifications can combine with slices
-   h2 = h[::sum]         # Projection operations # (name may change)
-   h2 = h[a:b:sum]       # Adding endpoints to projection operations
-   h2 = h[0:len:sum]     #   removes under or overflow from the calculation
+   v2 = h[::sum]         # Projection operations # (name may change)
+   v2 = h[a:b:sum]       # Adding endpoints to projection operations
+   v2 = h[0:len:sum]     #   removes under or overflow from the calculation
    h2 = h[v, a:b]        #   A single value v is like v:v+1:sum
    h2 = h[a:b, ...]      # Ellipsis work just like normal numpy
 
