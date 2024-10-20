@@ -58,6 +58,8 @@ docs = [
 test = [
   "pytest>=6",
   "boost-histogram>=1.0",
+  "fastjsonschema",
+  "importlib-resources; python_version<'3.9'",
 ]
 
 
