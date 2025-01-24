@@ -8,7 +8,7 @@ description = "Unified Histogram Interface: tools to help library authors work w
 authors = [
   {name="Henry Schreiner", email="henryschreineriii@gmail.com"},
   {name="Hans Dembinski", email="hans.dembinski@gmail.com"},
-  {name="Jim Pivaski", email="pivarski@princeton.edu"},
+  {name="Jim Pivaski", email="jpivarski@gmail.com"},
 ]
 maintainers = [
   {name="The Scikit-HEP admins", email="scikit-hep-admins@googlegroups.com"},
