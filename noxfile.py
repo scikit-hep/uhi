@@ -1,3 +1,9 @@
+#!/usr/bin/env -S uv run -q
+
+# /// script
+# dependencies = ["nox>=2025.2.9"]
+# ///
+
 from __future__ import annotations
 
 import argparse
@@ -5,15 +11,11 @@ from pathlib import Path
 
 import nox
 
-nox.needs_version = ">=2024.4.15"
+nox.needs_version = ">=2025.2.9"
 nox.options.default_venv_backend = "uv|virtualenv"
 
-ALL_PYTHONS = [
-    c.split()[-1]
-    for c in nox.project.load_toml("pyproject.toml")["project"]["classifiers"]
-    if c.startswith("Programming Language :: Python :: 3.")
-]
-
+PYPROJECT = nox.project.load_toml()
+ALL_PYTHONS = nox.project.python_versions(PYPROJECT)
 
 DIR = Path(__file__).parent.resolve()
 
@@ -32,7 +34,7 @@ def tests(session):
     """
     Run the unit and regular tests.
     """
-    session.install("-e.[test,schema]")
+    session.install("-e.[schema]", *nox.project.dependency_groups(PYPROJECT, "tests"))
     session.run("pytest", *session.posargs)
 
 
@@ -50,7 +52,9 @@ def docs(session: nox.Session) -> None:
 
     serve = args.builder == "html" and session.interactive
     extra_installs = ["sphinx-autobuild"] if serve else []
-    session.install("-e.[docs]", *extra_installs)
+    session.install(
+        "-e.", *extra_installs, *nox.project.dependency_groups(PYPROJECT, "docs")
+    )
 
     session.chdir("docs")
 
@@ -75,8 +79,11 @@ def build(session):
     Build an SDist and wheel.
     """
 
-    session.install("build")
-    session.run("python", "-m", "build")
+    if session.venv_backend == "uv":
+        session.run("uv", "build")
+    else:
+        session.install("build")
+        session.run("python", "-m", "build")
 
 
 @nox.session(venv_backend="conda", default=False)
@@ -86,5 +93,9 @@ def root_tests(session):
     """
 
     session.conda_install("--channel=conda-forge", "ROOT", "pytest", "boost-histogram")
-    session.install(".")
+    session.install("-e.")
     session.run("pytest", "tests/test_root.py")
+
+
+if __name__ == "__main__":
+    nox.run()

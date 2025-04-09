@@ -15,7 +15,8 @@ maintainers = [
 ]
 requires-python = ">=3.8"
 readme = "README.md"
-license = {file="LICENSE"}
+license = "bsd-3-clause"
+license-files =["LICENSE"]
 dependencies = [
   "numpy>=1.13.3",
 ]
@@ -23,7 +24,6 @@ classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
   "Intended Audience :: Science/Research",
-  "License :: OSI Approved :: BSD License",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
@@ -47,6 +47,8 @@ schema = [
   "fastjsonschema",
   "importlib-resources; python_version<'3.9'",
 ]
+
+[dependency-groups]
 docs = [
   "sphinx>=4.0",
   "furo",
@@ -61,6 +63,7 @@ test = [
   "fastjsonschema",
   "importlib-resources; python_version<'3.9'",
 ]
+dev = [{ include-group = "test"}]
 
 
 [tool.hatch]
@@ -74,13 +77,13 @@ addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
 xfail_strict = true
 filterwarnings = ["error"]
 testpaths = ["tests"]
-log_cli_level = "info"
+log_cli_level = "INFO"
 
 
 [tool.mypy]
 files = "src"
 python_version = "3.8"
-warn_unused_configs = "true"
+warn_unused_configs = true
 strict = true
 warn_unreachable = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
@@ -116,10 +119,9 @@ extend-select = [
   "PD",          # pandas-vet
 ]
 ignore = [
-  "PLR",    # Design related pylint codes
-  "PT004",  # Use underscore for non-returning fixture (use usefixture instead)
-  "PT013",  # Incorrect import of pytest
-  "ISC001", # Conflicts with formatter
+  "PLR09",    # Design related pylint codes
+  "PLR2004",  # Magic value in comparison
+  "PT013",    # Incorrect import of pytest
 ]
 flake8-unused-arguments.ignore-variadic-names = true
 isort.required-imports = ["from __future__ import annotations"]
