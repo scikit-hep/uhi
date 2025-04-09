@@ -65,10 +65,10 @@ use for the slice edges is to be explicit on what part you are
 interested for the projection. So an explicit (non-empty) slice here
 will case the relevant flow bin to be excluded.
 
-``loc``, ``project``, and ``rebin`` all live inside the histogramming
-package (like boost-histogram), but are completely general and can be created by a
-user using an explicit API (below). ``underflow`` and ``overflow`` also
-follow a general API.
+``loc`` and ``rebin`` live inside the histogramming package (like
+boost-histogram), but are completely general and can be created by a user using
+an explicit API (below). ``underflow`` and ``overflow`` also follow a general
+API. ``sum`` is just the Python built-in sum function.
 
 One drawback of the syntax listed above is that it is hard to select an action
 to run on an axis or a few axes out of many. For this use case, you can pass a
