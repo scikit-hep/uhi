@@ -10,7 +10,7 @@ If you have nox, this project supports nox. These are the supplied sessions:
 ```console
 nox -s lint
 nox -s tests
-nox -s docs -- serve
+nox -s docs
 nox -s build
 ```
 
@@ -35,8 +35,3 @@ Use pytest to run the unit checks:
 ```bash
 pytest
 ```
-
-# Bumping the version
-
-Use `nox -s bump -- <type>` to bump the version. Commit the result and push,
-release on GitHub. Make sure to add some release notes to the GitHub release.

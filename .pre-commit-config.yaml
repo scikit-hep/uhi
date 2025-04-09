@@ -1,5 +1,6 @@
 ci:
   autoupdate_commit_msg: 'chore: update pre-commit hooks'
+  autoupdate_schedule: 'monthly'
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -72,3 +73,8 @@ repos:
         name: Validate Histogram examples
         args: [--schemafile, src/uhi/resources/histogram.schema.json]
         files: ^tests/resources/.*\.json
+
+  - repo: https://github.com/henryiii/validate-pyproject-schema-store
+    rev: 2025.02.24
+    hooks:
+      - id: validate-pyproject
