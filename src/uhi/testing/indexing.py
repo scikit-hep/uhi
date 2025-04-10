@@ -78,24 +78,32 @@ class Indexing(typing.Generic[T], abc.ABC, unittest.TestCase):
         self.assertEqual(self.h3[-1, -1, -1], 36)
 
     def test_access_loc_1d(self) -> None:
-        self.assertEqual(self.h1[self.tag.loc(.05)], 0)
-        self.assertEqual(self.h1[self.tag.loc(.15)], 2)
-        self.assertEqual(self.h1[self.tag.loc(.95)], 18)
+        self.assertEqual(self.h1[self.tag.loc(0.05)], 0)
+        self.assertEqual(self.h1[self.tag.loc(0.15)], 2)
+        self.assertEqual(self.h1[self.tag.loc(0.95)], 18)
         self.assertEqual(self.h1[self.tag.loc(-1)], 0)
         self.assertEqual(self.h1[self.tag.loc(2)], 1)
 
     def test_access_loc_3d(self) -> None:
-        self.assertEqual(self.h3[self.tag.loc(0.5), self.tag.loc(0.5), self.tag.loc(0.5)], 0)
-        self.assertEqual(self.h3[self.tag.loc(0.5), self.tag.loc(1.5), self.tag.loc(0.5)], 2)
-        self.assertEqual(self.h3[self.tag.loc(0.5), self.tag.loc(4.5), self.tag.loc(9.5)], 35)
-        self.assertEqual(self.h3[self.tag.loc(-1), self.tag.loc(0.5), self.tag.loc(0.5)], 0)
+        self.assertEqual(
+            self.h3[self.tag.loc(0.5), self.tag.loc(0.5), self.tag.loc(0.5)], 0
+        )
+        self.assertEqual(
+            self.h3[self.tag.loc(0.5), self.tag.loc(1.5), self.tag.loc(0.5)], 2
+        )
+        self.assertEqual(
+            self.h3[self.tag.loc(0.5), self.tag.loc(4.5), self.tag.loc(9.5)], 35
+        )
+        self.assertEqual(
+            self.h3[self.tag.loc(-1), self.tag.loc(0.5), self.tag.loc(0.5)], 0
+        )
 
     def test_access_loc_3d_mixed(self) -> None:
         self.assertEqual(self.h3[self.tag.loc(0.5), 0, self.tag.loc(0.5)], 0)
         self.assertEqual(self.h3[0, self.tag.loc(1.5), self.tag.loc(0.5)], 2)
         self.assertEqual(self.h3[self.tag.loc(0.5), self.tag.loc(4.5), 9], 35)
         self.assertEqual(self.h3[1, self.tag.loc(4.5), 9], 36)
-    
+
     def test_access_loc_addition(self) -> None:
         self.assertEqual(self.h1[self.tag.loc(0.05) + 1], 2)
         self.assertEqual(self.h1[self.tag.loc(0.55) + 2], 14)
