@@ -14,7 +14,7 @@ __all__ = [
     "MeanStorage",
     "RegularAxis",
     "VariableAxis",
-    "WeighedData",
+    "WeightedData",
     "WeightedMeanData",
     "WeightedMeanStorage",
     "WeightedStorage",
@@ -89,14 +89,14 @@ class DoubleStorage(TypedDict):
     data: str | Sequence[float]
 
 
-class WeighedData(TypedDict):
+class WeightedData(TypedDict):
     values: Sequence[float]
     variances: Sequence[float]
 
 
 class WeightedStorage(TypedDict):
     type: Literal["weighted"]
-    data: str | WeighedData
+    data: str | WeightedData
 
 
 class MeanData(TypedDict):

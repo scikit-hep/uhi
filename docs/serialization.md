@@ -76,7 +76,7 @@ The following storages are supported:
   this.
 * `"weighted_mean"`: A collection of four arrays of 64-bit floating point
   values, `"sum_of_weights"`, `"sum_of_weights_squared"`, `"values"`, and
-  `"variances"`. Boost-histogram's `WeighedMean` storage maps to this.
+  `"variances"`. Boost-histogram's `WeightedMean` storage maps to this.
 
 ## CLI/API
 
