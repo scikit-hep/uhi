@@ -44,7 +44,15 @@
     "regular_axis": {
       "type": "object",
       "description": "An evenly spaced set of continuous bins.",
-      "required": ["type", "lower", "upper", "bins", "underflow", "overflow", "circular"],
+      "required": [
+        "type",
+        "lower",
+        "upper",
+        "bins",
+        "underflow",
+        "overflow",
+        "circular"
+      ],
       "additionalProperties": false,
       "properties": {
         "type": { "type": "string", "const": "regular" },
