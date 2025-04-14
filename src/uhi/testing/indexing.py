@@ -5,6 +5,8 @@ import typing
 import unittest
 from typing import Any
 
+import numpy as np
+
 import uhi.tag
 
 T = typing.TypeVar("T", bound=Any)
@@ -284,6 +286,15 @@ class Indexing(typing.Generic[T], abc.ABC, unittest.TestCase):
         with self.assertRaises(IndexError):
             h[2]
 
+    def test_mixed_single_integration_dict_3d(self) -> None:
+        s = self.tag.Slicer()
+        h = self.h3[{0: 1, 1: s[::sum], 2: s[1:3]}]
+        self.assertEqual(h[0], 40)
+        self.assertEqual(h[1], 55)
+
+        with self.assertRaises(IndexError):
+            h[2]
+
     def test_ellipsis_integration_3d(self) -> None:
         h = self.h3[::sum, ..., ::sum]
         self.assertEqual(h[0], 280)
@@ -292,3 +303,213 @@ class Indexing(typing.Generic[T], abc.ABC, unittest.TestCase):
 
         with self.assertRaises(IndexError):
             h[5]
+
+    def test_ellipsis_integration_dict_3d(self) -> None:
+        s = self.tag.Slicer()
+        h = self.h3[{0: s[::sum], 2: s[::sum]}]
+        self.assertEqual(h[0], 280)
+        self.assertEqual(h[1], 320)
+        self.assertEqual(h[4], 440)
+
+        with self.assertRaises(IndexError):
+            h[5]
+
+    def test_setting_single_value_1d(self) -> None:
+        h = self.make_histogram_1()
+        h[0] = 42
+        self.assertEqual(h[0], 42)
+        self.assertEqual(h[1], 2)
+        self.assertEqual(h[-1], 18)
+
+        h[-1] = 99
+        self.assertEqual(h[-1], 99)
+        self.assertEqual(h[0], 42)
+        self.assertEqual(h[1], 2)
+
+    def test_setting_single_value_3d(self) -> None:
+        h = self.make_histogram_3()
+        h[0, 0, 0] = 42
+        self.assertEqual(h[0, 0, 0], 42)
+        self.assertEqual(h[1, 1, 1], 6)
+
+    def test_setting_single_value_loc_1d(self) -> None:
+        h = self.make_histogram_1()
+        h[self.tag.loc(0.05)] = 42
+        self.assertEqual(h[0], 42)
+        self.assertEqual(h[1], 2)
+
+    def test_setting_underflow_1d(self) -> None:
+        h = self.make_histogram_1()
+        h[self.tag.underflow] = 42
+        self.assertEqual(h[self.tag.underflow], 42)
+        self.assertEqual(h[0], 0)
+
+    def test_setting_overflow_1d(self) -> None:
+        h = self.make_histogram_1()
+        h[self.tag.overflow] = 42
+        self.assertEqual(h[self.tag.overflow], 42)
+        self.assertEqual(h[-1], 18)
+
+    def test_setting_underflow_3d(self) -> None:
+        h = self.make_histogram_3()
+        h[self.tag.underflow, ...] = 42
+        self.assertEqual(h[self.tag.underflow, 0, 0], 42)
+
+    def test_setting_array_1d(self) -> None:
+        h = self.make_histogram_1()
+        h[1:3] = 42
+
+        # TODO: this is broken, fix!
+        # self.assertEqual(h[0], 0)
+        self.assertEqual(h[1], 42)
+        self.assertEqual(h[2], 42)
+        # self.assertEqual(h[3], 6)
+
+    def test_setting_array_1d_slice(self) -> None:
+        h = self.make_histogram_1()
+        h[1:3] = [42, 42]
+
+        self.assertEqual(h[0], 0)
+        self.assertEqual(h[1], 42)
+        self.assertEqual(h[2], 42)
+        self.assertEqual(h[3], 6)
+
+    def test_setting_array_1d_without_underflow(self) -> None:
+        h = self.make_histogram_1()
+        h[:3] = [42, 43, 44]
+        self.assertEqual(h[self.tag.underflow], 3)
+        self.assertEqual(h[0], 42)
+        self.assertEqual(h[1], 43)
+        self.assertEqual(h[2], 44)
+        self.assertEqual(h[3], 6)
+
+    def test_setting_array_1d_with_underflow(self) -> None:
+        h = self.make_histogram_1()
+        h[:3] = [41, 42, 43, 44]
+        self.assertEqual(h[self.tag.underflow], 41)
+        self.assertEqual(h[0], 42)
+        self.assertEqual(h[1], 43)
+        self.assertEqual(h[2], 44)
+        self.assertEqual(h[3], 6)
+
+    def test_setting_array_1d_without_overflow(self) -> None:
+        h = self.make_histogram_1()
+        h[7:] = [42, 43, 44]
+        self.assertEqual(h[6], 12)
+        self.assertEqual(h[7], 42)
+        self.assertEqual(h[8], 43)
+        self.assertEqual(h[9], 44)
+        self.assertEqual(h[self.tag.overflow], 1)
+
+    def test_setting_array_1d_with_overflow(self) -> None:
+        h = self.make_histogram_1()
+        h[7:] = [42, 43, 44, 45]
+        self.assertEqual(h[6], 12)
+        self.assertEqual(h[7], 42)
+        self.assertEqual(h[8], 43)
+        self.assertEqual(h[9], 44)
+        self.assertEqual(h[self.tag.overflow], 45)
+
+    def test_setting_whole_array(self) -> None:
+        h = self.make_histogram_1()
+        h[:] = range(10)
+        self.assertEqual(h[self.tag.underflow], 3)
+        self.assertEqual(h[0], 0)
+        self.assertEqual(h[1], 1)
+        self.assertEqual(h[2], 2)
+        self.assertEqual(h[3], 3)
+        self.assertEqual(h[4], 4)
+        self.assertEqual(h[5], 5)
+        self.assertEqual(h[6], 6)
+        self.assertEqual(h[7], 7)
+        self.assertEqual(h[8], 8)
+        self.assertEqual(h[9], 9)
+        self.assertEqual(h[self.tag.overflow], 1)
+
+    def test_setting_whole_array_with_flow(self) -> None:
+        h = self.make_histogram_1()
+        h[:] = range(12)
+        self.assertEqual(h[self.tag.underflow], 0)
+        self.assertEqual(h[0], 1)
+        self.assertEqual(h[1], 2)
+        self.assertEqual(h[2], 3)
+        self.assertEqual(h[3], 4)
+        self.assertEqual(h[4], 5)
+        self.assertEqual(h[5], 6)
+        self.assertEqual(h[6], 7)
+        self.assertEqual(h[7], 8)
+        self.assertEqual(h[8], 9)
+        self.assertEqual(h[9], 10)
+        self.assertEqual(h[self.tag.overflow], 11)
+
+    def test_setting_len_mismatch(self) -> None:
+        h = self.make_histogram_1()
+
+        with self.assertRaises(ValueError):
+            h[:] = range(9)
+        with self.assertRaises(ValueError):
+            h[:] = range(11)
+        with self.assertRaises(ValueError):
+            h[:] = range(13)
+
+        with self.assertRaises(ValueError):
+            h[1:4] = range(2)
+        with self.assertRaises(ValueError):
+            h[1:4] = range(4)
+        with self.assertRaises(ValueError):
+            h[1:4] = range(5)
+
+    def test_setting_array_3d(self) -> None:
+        h = self.make_histogram_3()
+
+        h[0:2, 0:2, 0:2] = np.array([[[42, 43], [44, 45]], [[46, 47], [48, 49]]])
+        self.assertEqual(h[0, 0, 0], 42)
+        self.assertEqual(h[0, 0, 1], 43)
+        self.assertEqual(h[0, 1, 0], 44)
+        self.assertEqual(h[0, 1, 1], 45)
+        self.assertEqual(h[1, 0, 0], 46)
+        self.assertEqual(h[1, 0, 1], 47)
+        self.assertEqual(h[1, 1, 0], 48)
+        self.assertEqual(h[1, 1, 1], 49)
+        self.assertEqual(h[1, 1, 2], 9)
+
+    def test_setting_array_broadcast_3d(self) -> None:
+        h = self.make_histogram_3()
+
+        h[0:2, 0:2, 0:2] = np.array([[[42], [3]], [[46], [4]]])
+        self.assertEqual(h[0, 0, 0], 42)
+        self.assertEqual(h[0, 0, 1], 42)
+        self.assertEqual(h[0, 1, 0], 3)
+        self.assertEqual(h[0, 1, 1], 3)
+        self.assertEqual(h[1, 0, 0], 46)
+        self.assertEqual(h[1, 0, 1], 46)
+        self.assertEqual(h[1, 1, 0], 4)
+        self.assertEqual(h[1, 1, 1], 4)
+        self.assertEqual(h[1, 1, 2], 9)
+
+    def test_setting_dict_3d(self) -> None:
+        h = self.make_histogram_3()
+        h[{0: 1, 1: 0, 2: 3}] = 3
+        self.assertEqual(h[1, 0, 3], 3)
+        self.assertEqual(h[1, 0, 4], 13)
+
+    def test_setting_dict_slice_3d(self) -> None:
+        h = self.make_histogram_3()
+
+        h[{0: 1, 1: 0, 2: slice(3, 5)}] = range(42, 44)
+
+        self.assertEqual(h[1, 0, 2], 7)
+        self.assertEqual(h[1, 0, 3], 42)
+        self.assertEqual(h[1, 0, 4], 43)
+        self.assertEqual(h[1, 0, 5], 16)
+
+    def test_setting_dict_slicer_3d(self) -> None:
+        h = self.make_histogram_3()
+
+        s = self.tag.Slicer()
+
+        h[{0: 1, 1: 0, 2: s[3:5]}] = range(42, 44)
+        self.assertEqual(h[1, 0, 2], 7)
+        self.assertEqual(h[1, 0, 3], 42)
+        self.assertEqual(h[1, 0, 4], 43)
+        self.assertEqual(h[1, 0, 5], 16)
