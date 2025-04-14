@@ -11,6 +11,7 @@ class TestAccess(uhi.testing.indexing.Indexing[bh.Histogram]):
     def make_histogram_1() -> bh.Histogram:
         h1 = bh.Histogram(bh.axis.Regular(10, 0, 1))
         h1[:] = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
+        h1[bh.underflow] = 3
         h1[bh.overflow] = 1
         return h1
 

@@ -6,7 +6,7 @@ from typing import Any
 
 from .typing.plottable import PlottableAxis
 
-__all__ = ["Locator", "Overflow", "Slicer", "Underflow", "at", "loc"]
+__all__ = ["Locator", "Overflow", "Slicer", "Underflow", "at", "loc", "rebin"]
 
 
 def __dir__() -> list[str]:
@@ -63,6 +63,11 @@ class Locator:
             s += str(abs(self.offset))
         return s
 
+    if typing.TYPE_CHECKING:
+        # Type checkers think that this is required
+        def __index__(self) -> int:
+            return 42
+
 
 class loc(Locator):
     __slots__ = ("value",)
@@ -109,3 +114,21 @@ class at:
 
     def __call__(self, axis: PlottableAxis) -> int:  # noqa: ARG002
         return self.value
+
+
+class rebin:
+    """
+    When used in the step of a Histogram's slice, rebin(n) combines bins,
+    scaling their widths by a factor of n. If the number of bins is not
+    divisible by n, the remainder is added to the overflow bin.
+    """
+
+    def __init__(self, factor: int) -> None:
+        # Items with .factor are specially treated in boost-histogram,
+        # performing a high performance rebinning
+        self.factor = factor
+
+    if typing.TYPE_CHECKING:
+        # Type checkers think that this is required
+        def __index__(self) -> int:
+            return 42

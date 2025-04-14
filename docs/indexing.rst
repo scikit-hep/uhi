@@ -26,6 +26,8 @@ Access:
    v = h[loc(b) + 1] # Returns the bin above the one containing the value
    v = h[underflow]  # Underflow and overflow can be accessed with special tags
 
+Indexing works like Python, with ``IndexError`` thrown if you are out of range.
+
 Slicing:
 ^^^^^^^^
 
@@ -42,6 +44,7 @@ Slicing:
    v2 = h[0:len:sum]     #   removes under or overflow from the calculation
    h2 = h[v, a:b]        #   A single value v is like v:v+1:sum
    h2 = h[a:b, ...]      # Ellipsis work just like normal numpy
+
 
 Setting
 ^^^^^^^
