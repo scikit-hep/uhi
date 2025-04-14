@@ -44,7 +44,15 @@
     "regular_axis": {
       "type": "object",
       "description": "An evenly spaced set of continuous bins.",
-      "required": ["type", "lower", "upper", "bins", "underflow", "overflow"],
+      "required": [
+        "type",
+        "lower",
+        "upper",
+        "bins",
+        "underflow",
+        "overflow",
+        "circular"
+      ],
       "additionalProperties": false,
       "properties": {
         "type": { "type": "string", "const": "regular" },
@@ -76,7 +84,7 @@
     "variable_axis": {
       "type": "object",
       "description": "A variably spaced set of continuous bins.",
-      "required": ["type", "edges", "underflow", "overflow"],
+      "required": ["type", "edges", "underflow", "overflow", "circular"],
       "additionalProperties": false,
       "properties": {
         "type": { "type": "string", "const": "variable" },
@@ -200,7 +208,7 @@
       "required": ["type", "data"],
       "additionalProperties": false,
       "properties": {
-        "type": { "type": "string", "const": "int" },
+        "type": { "type": "string", "const": "weighted" },
         "data": {
           "oneOf": [
             {
@@ -226,7 +234,7 @@
       "required": ["type", "data"],
       "additionalProperties": false,
       "properties": {
-        "type": { "type": "string", "const": "int" },
+        "type": { "type": "string", "const": "mean" },
         "data": {
           "oneOf": [
             {
@@ -253,7 +261,7 @@
       "required": ["type", "data"],
       "additionalProperties": false,
       "properties": {
-        "type": { "type": "string", "const": "int" },
+        "type": { "type": "string", "const": "weighted_mean" },
         "data": {
           "oneOf": [
             {
