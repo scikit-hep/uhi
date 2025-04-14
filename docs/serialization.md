@@ -3,7 +3,7 @@
 :::{warning}
 
 Serialization is in draft currently. Once at least one implementation is ready,
-we will remove this warning and release UHI 0.5.
+we will remove this warning and release a new version of the UHI helper package.
 
 :::
 
@@ -49,12 +49,10 @@ The following axes types are supported:
 
 * `"regular"`: A regularly spaced set of even bins. Boost-histogram's "integer"
   axes maps to this axis as well. Has `upper`, `lower`, `bins`, `underflow`,
-  `overflow`, and `circular` properties. `circular` defaults to False if not
-  present.
+  `overflow`, and `circular` properties.
 * `"variable"`: A continuous axis defined by bins+1 edges. Has `edges`, which
   is either an in-line list of numbers or a string pointing to an out-of-band data source.
-  Also has `underflow`, `overflow`, and `circular` properties. `circular`
-  defaults to False if not present.
+  Also has `underflow`, `overflow`, and `circular` properties.
 * `"category_int"`: A list of integer bins, non-continuous. Has `categories`,
   which is an in-line list of integers. Also has `flow`.
 * `"category_str"`: A list of string bins. Has `categories`,
@@ -67,18 +65,18 @@ All axes support `metadata`, a string-valued dictionary of arbitrary, JSON-like 
 
 The following storages are supported:
 
-* `"int"`: A collection of integers. Boost-histogram's Int64 and AtomicInt64
-  map to this, and sometimes Unlimited.
+* `"int"`: A collection of integers. Boost-histogram's `Int64` and `AtomicInt64`
+  map to this, and sometimes `Unlimited`.
 * `"double"`: A collection of 64-bit floating point values. Boost-histogram's
-  Double storage maps to this, and sometimes Unlimited.
+  `Double` storage maps to this, and sometimes `Unlimited`.
 * `"weighted"`: A collection of two arrays of 64-bit floating point values,
-  `"value"` and `"variance"`. Boost-histogram's Weight storage maps to this.
+  `"value"` and `"variance"`. Boost-histogram's `Weight` storage maps to this.
 * `"mean"`: A collection of three arrays of 64-bit floating point values,
-  "count", "value", and "variance". Boost-histogram's Mean storage maps to
+  "`count"`, `"value"`, and `"variance"`. Boost-histogram's `Mean` storage maps to
   this.
 * `"weighted_mean"`: A collection of four arrays of 64-bit floating point
   values, `"sum_of_weights"`, `"sum_of_weights_squared"`, `"values"`, and
-  `"variances"`. Boost-histogram's WeighedMean storage maps to this.
+  `"variances"`. Boost-histogram's `WeighedMean` storage maps to this.
 
 ## CLI/API
 
@@ -98,6 +96,9 @@ uhi.schema.validate("some/file.json")
 
 Eventually this should also be usable for JSON's inside zip, HDF5 attributes,
 and maybe more.
+
+For static typing, you can use `uhi.typing.serialization.Histogram` to get a
+`TypedDict` of the schema.
 
 ```{warning}
 

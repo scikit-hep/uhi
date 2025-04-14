@@ -22,7 +22,8 @@
         "upper": 5,
         "bins": 5,
         "underflow": true,
-        "overflow": true
+        "overflow": true,
+        "circular": false
       }
     ],
     "storage": { "type": "double", "data": "some/path/depends/on/format" }
