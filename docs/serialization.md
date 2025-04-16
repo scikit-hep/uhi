@@ -65,9 +65,9 @@ All axes support `metadata`, a string-valued dictionary of arbitrary, JSON-like 
 
 The following storages are supported:
 
-* `"int"`: A collection of integers. Boost-histogram's `Int64` and `AtomicInt64`
+* `"int"`: A collection of integers under `"value"`. Boost-histogram's `Int64` and `AtomicInt64`
   map to this, and sometimes `Unlimited`.
-* `"double"`: A collection of 64-bit floating point values. Boost-histogram's
+* `"double"`: A collection of 64-bit floating point values under `"value"`. Boost-histogram's
   `Double` storage maps to this, and sometimes `Unlimited`.
 * `"weighted"`: A collection of two arrays of 64-bit floating point values,
   `"value"` and `"variance"`. Boost-histogram's `Weight` storage maps to this.

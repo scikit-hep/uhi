@@ -12,7 +12,7 @@
         "circular": false
       }
     ],
-    "storage": { "type": "int", "data": [1, 2, 3, 4, 5] }
+    "storage": { "type": "int", "data": {"values": [1, 2, 3, 4, 5]} }
   },
   "two": {
     "axes": [

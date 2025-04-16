@@ -177,9 +177,16 @@
           "oneOf": [
             {
               "type": "string",
-              "description": "A path (URI?) to the integer bin data."
+              "description": "A path (URI?) to the floating point bin data."
             },
-            { "type": "array", "items": { "type": "integer" } }
+            {
+              "type": "object",
+              "required": ["values"],
+              "additionalProperties": false,
+              "properties": {
+                "values": { "type": "array", "items": { "type": "integer" } }
+              }
+            }
           ]
         }
       }
@@ -197,7 +204,14 @@
               "type": "string",
               "description": "A path (URI?) to the floating point bin data."
             },
-            { "type": "array", "items": { "type": "number" } }
+            {
+              "type": "object",
+              "required": ["values"],
+              "additionalProperties": false,
+              "properties": {
+                "values": { "type": "array", "items": { "type": "number" } }
+              }
+            }
           ]
         }
       }
