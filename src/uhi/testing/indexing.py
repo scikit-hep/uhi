@@ -287,8 +287,7 @@ class Indexing(typing.Generic[T], abc.ABC, unittest.TestCase):
             h[2]
 
     def test_mixed_single_integration_dict_3d(self) -> None:
-        s = self.tag.Slicer()
-        h = self.h3[{0: 1, 1: s[::sum], 2: s[1:3]}]
+        h = self.h3[{0: 1, 1: np.s_[::sum], 2: np.s_[1:3]}]
         self.assertEqual(h[0], 40)
         self.assertEqual(h[1], 55)
 
@@ -305,8 +304,7 @@ class Indexing(typing.Generic[T], abc.ABC, unittest.TestCase):
             h[5]
 
     def test_ellipsis_integration_dict_3d(self) -> None:
-        s = self.tag.Slicer()
-        h = self.h3[{0: s[::sum], 2: s[::sum]}]
+        h = self.h3[{0: np.s_[::sum], 2: np.s_[::sum]}]
         self.assertEqual(h[0], 280)
         self.assertEqual(h[1], 320)
         self.assertEqual(h[4], 440)
@@ -506,9 +504,7 @@ class Indexing(typing.Generic[T], abc.ABC, unittest.TestCase):
     def test_setting_dict_slicer_3d(self) -> None:
         h = self.make_histogram_3()
 
-        s = self.tag.Slicer()
-
-        h[{0: 1, 1: 0, 2: s[3:5]}] = range(42, 44)
+        h[{0: 1, 1: 0, 2: np.s_[3:5]}] = range(42, 44)
         self.assertEqual(h[1, 0, 2], 7)
         self.assertEqual(h[1, 0, 3], 42)
         self.assertEqual(h[1, 0, 4], 43)

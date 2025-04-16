@@ -49,8 +49,6 @@ An optional extension to indexing is expected for histogram implementations that
 
 .. code:: python3
 
-    s = bh.tag.Slicer()
-
-    h[{"a": s[::2j]}]       # rebin axis "a" by two
-    h[{"x": s[0:3.5j]}]     # slice axis "x" from 0 to the data coordinate 3.5
-    h[{"other": s[0:2:4j]}] # slice and rebin axis "other"
+    h[{"a": np.s_[::2j]}]       # rebin axis "a" by two
+    h[{"x": np.s_[0:3.5j]}]     # slice axis "x" from 0 to the data coordinate 3.5
+    h[{"other": np.s_[0:2:4j]}] # slice and rebin axis "other"
