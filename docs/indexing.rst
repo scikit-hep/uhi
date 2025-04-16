@@ -26,6 +26,8 @@ Access:
    v = h[loc(b) + 1] # Returns the bin above the one containing the value
    v = h[underflow]  # Underflow and overflow can be accessed with special tags
 
+Indexing works like Python, with ``IndexError`` thrown if you are out of range.
+
 Slicing:
 ^^^^^^^^
 
@@ -42,6 +44,7 @@ Slicing:
    v2 = h[0:len:sum]     #   removes under or overflow from the calculation
    h2 = h[v, a:b]        #   A single value v is like v:v+1:sum
    h2 = h[a:b, ...]      # Ellipsis work just like normal numpy
+
 
 Setting
 ^^^^^^^
@@ -65,15 +68,16 @@ use for the slice edges is to be explicit on what part you are
 interested for the projection. So an explicit (non-empty) slice here
 will case the relevant flow bin to be excluded.
 
-``loc``, ``project``, and ``rebin`` all live inside the histogramming
-package (like boost-histogram), but are completely general and can be created by a
-user using an explicit API (below). ``underflow`` and ``overflow`` also
-follow a general API.
+``loc`` and ``rebin`` live inside the histogramming package (like
+boost-histogram), but are completely general and can be created by a user using
+an explicit API (below). ``underflow`` and ``overflow`` also follow a general
+API. ``sum`` is just the Python built-in sum function.
 
 One drawback of the syntax listed above is that it is hard to select an action
 to run on an axis or a few axes out of many. For this use case, you can pass a
 dictionary to the index, and that has the syntax ``{axis:action}``. The actions
-are slices, and follow the rules listed above. This looks like:
+are slices, and follow the rules listed above. All axes that are unmentioned are
+left alone, just like ``...`` or explicit ``:`` would do. This looks like:
 
 .. code:: python3
 
@@ -87,7 +91,7 @@ to recover the original slicing syntax inside the dict:
 
 .. code:: python3
 
-    s = bh.tag.Slicer()
+    s = uhi.tag.Slicer()
 
     h[{0: s[::rebin(2)]}]   # rebin axis 0 by two
     h[{1: s[0:loc(3.5)]}]   # slice axis 1 from 0 to the data coordinate 3.5
@@ -226,6 +230,19 @@ Solution:
 
 
 --------------
+
+Extensions
+----------
+
+Boost-histogram currently implements a few extra additions to this that
+are not yet required:
+
+* Passing ``sum`` directly acts as if it was given as the third argument
+  (the action).
+* The ``rebin`` tag can be passed directly, as well.
+
+The inner workings of ``rebin`` are being worked on, and will be updated
+here when they are finalized.
 
 Details
 -------

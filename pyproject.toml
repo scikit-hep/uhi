@@ -81,7 +81,7 @@ log_cli_level = "INFO"
 
 
 [tool.mypy]
-files = "src"
+files = ["src", "tests"]
 python_version = "3.8"
 warn_unused_configs = true
 strict = true
@@ -130,3 +130,4 @@ isort.required-imports = ["from __future__ import annotations"]
 "tests/**" = ["T20"]
 "noxfile.py" = ["T20"]
 "tests/test_ensure.py" = ["NPY002"]
+"src/**" = ["PT"]
