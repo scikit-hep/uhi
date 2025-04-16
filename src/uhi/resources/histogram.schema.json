@@ -10,6 +10,23 @@
       "required": ["axes", "storage"],
       "additionalProperties": false,
       "properties": {
+        "library": {
+          "type": "object",
+          "description": "Information from the library that created the histogram.",
+          "additionalProperties": false,
+          "patternProperties": {
+            ".+": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "version": {
+                  "type": "string",
+                  "description": "Version of the library."
+                }
+              }
+            }
+          }
+        },
         "metadata": { "$ref": "#/$defs/metadata" },
         "axes": {
           "type": "array",
