@@ -6,26 +6,11 @@ from typing import Any
 
 from .typing.plottable import PlottableAxis
 
-__all__ = ["Locator", "Overflow", "Slicer", "Underflow", "at", "loc", "rebin"]
+__all__ = ["Locator", "Overflow", "Underflow", "at", "loc", "rebin"]
 
 
 def __dir__() -> list[str]:
     return __all__
-
-
-class Slicer:
-    """
-    This is a simple class to make slicing inside dictionaries simpler.
-    This is how it should be used:
-
-        s = uhi.tag.Slicer()
-
-        h[{0: s[::bh.rebin(2)]}]   # rebin axis 0 by two
-
-    """
-
-    def __getitem__(self, item: slice) -> slice:
-        return item
 
 
 T = typing.TypeVar("T", bound="Locator")

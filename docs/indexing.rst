@@ -86,17 +86,14 @@ left alone, just like ``...`` or explicit ``:`` would do. This looks like:
     h[{7: slice(0, 2, bh.rebin(4))}]       # slice and rebin axis 7
 
 
-If you don't like manually building slices, you can use the ``Slicer()`` utility
+If you don't like manually building slices, you can use the ``np.s_`` utility
 to recover the original slicing syntax inside the dict:
 
 .. code:: python3
 
-    s = uhi.tag.Slicer()
-
-    h[{0: s[::rebin(2)]}]   # rebin axis 0 by two
-    h[{1: s[0:loc(3.5)]}]   # slice axis 1 from 0 to the data coordinate 3.5
-    h[{7: s[0:2:rebin(4)]}] # slice and rebin axis 7
-
+    h[{0: np.s_[::rebin(2)]}]   # rebin axis 0 by two
+    h[{1: np.s_[0:loc(3.5)]}]   # slice axis 1 from 0 to the data coordinate 3.5
+    h[{7: np.s_[0:2:rebin(4)]}] # slice and rebin axis 7
 
 
 Invalid syntax:
@@ -211,8 +208,7 @@ shortcut to quickly generate slices is provided, as well:
    ans = h[{1: slice(None,bh.loc(2.4),bh.sum)}]
 
    # Identical:
-   s = bh.tag.Slicer()
-   ans = h[{1: s[:bh.loc(2.4):bh.sum]}]
+   ans = h[{1: np.s_[:bh.loc(2.4):bh.sum]}]
 
 Example 4:
 ^^^^^^^^^^
