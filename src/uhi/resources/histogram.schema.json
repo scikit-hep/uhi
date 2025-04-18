@@ -10,10 +10,24 @@
       "required": ["axes", "storage"],
       "additionalProperties": false,
       "properties": {
-        "metadata": {
+        "writer_info": {
           "type": "object",
-          "description": "Arbitrary metadata dictionary."
+          "description": "Information from the library that created the histogram.",
+          "additionalProperties": false,
+          "patternProperties": {
+            ".+": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "version": {
+                  "type": "string",
+                  "description": "Version of the library."
+                }
+              }
+            }
+          }
         },
+        "metadata": { "$ref": "#/$defs/metadata" },
         "axes": {
           "type": "array",
           "description": "A list of the axes of the histogram.",
@@ -53,6 +67,21 @@
         }
       ]
     },
+    "metadata": {
+      "type": "object",
+      "description": "Arbitrary metadata dictionary."
+    },
+    "writer_info": {
+      "type": "object",
+      "description": "Information from the library that created the histogram.",
+      "additionalProperties": false,
+      "patternProperties": {
+        ".+": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
     "regular_axis": {
       "type": "object",
       "description": "An evenly spaced set of continuous bins.",
@@ -87,10 +116,8 @@
           "type": "boolean",
           "description": "True if the axis wraps around."
         },
-        "metadata": {
-          "type": "object",
-          "description": "Arbitrary metadata dictionary."
-        }
+        "metadata": { "$ref": "#/$defs/metadata" },
+        "writer_info": { "$ref": "#/$defs/writer_info" }
       }
     },
     "variable_axis": {
@@ -115,10 +142,8 @@
         "underflow": { "type": "boolean" },
         "overflow": { "type": "boolean" },
         "circular": { "type": "boolean" },
-        "metadata": {
-          "type": "object",
-          "description": "Arbitrary metadata dictionary."
-        }
+        "metadata": { "$ref": "#/$defs/metadata" },
+        "writer_info": { "$ref": "#/$defs/writer_info" }
       }
     },
     "category_str_axis": {
@@ -137,10 +162,8 @@
           "type": "boolean",
           "description": "True if flow bin (at the overflow position) present."
         },
-        "metadata": {
-          "type": "object",
-          "description": "Arbitrary metadata dictionary."
-        }
+        "metadata": { "$ref": "#/$defs/metadata" },
+        "writer_info": { "$ref": "#/$defs/writer_info" }
       }
     },
     "category_int_axis": {
@@ -159,10 +182,8 @@
           "type": "boolean",
           "description": "True if flow bin (at the overflow position) present."
         },
-        "metadata": {
-          "type": "object",
-          "description": "Arbitrary metadata dictionary."
-        }
+        "metadata": { "$ref": "#/$defs/metadata" },
+        "writer_info": { "$ref": "#/$defs/writer_info" }
       }
     },
     "boolean_axis": {
@@ -172,10 +193,8 @@
       "additionalProperties": false,
       "properties": {
         "type": { "type": "string", "const": "boolean" },
-        "metadata": {
-          "type": "object",
-          "description": "Arbitrary metadata dictionary."
-        }
+        "metadata": { "$ref": "#/$defs/metadata" },
+        "writer_info": { "$ref": "#/$defs/writer_info" }
       }
     },
     "int_storage": {
