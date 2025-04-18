@@ -10,12 +10,9 @@ __all__ = [
     "DoubleStorage",
     "Histogram",
     "IntStorage",
-    "MeanData",
     "MeanStorage",
     "RegularAxis",
     "VariableAxis",
-    "WeightedData",
-    "WeightedMeanData",
     "WeightedMeanStorage",
     "WeightedStorage",
 ]
@@ -81,45 +78,33 @@ class BooleanAxis(_RequiredBooleanAxis, total=False):
 
 class IntStorage(TypedDict):
     type: Literal["int"]
-    data: str | Sequence[int]
+    values: Sequence[int] | str
 
 
 class DoubleStorage(TypedDict):
     type: Literal["double"]
-    data: str | Sequence[float]
-
-
-class WeightedData(TypedDict):
-    values: Sequence[float]
-    variances: Sequence[float]
+    values: Sequence[float] | str
 
 
 class WeightedStorage(TypedDict):
     type: Literal["weighted"]
-    data: str | WeightedData
-
-
-class MeanData(TypedDict):
-    counts: Sequence[float]
-    values: Sequence[float]
-    variances: Sequence[float]
+    values: Sequence[float] | str
+    variances: Sequence[float] | str
 
 
 class MeanStorage(TypedDict):
     type: Literal["mean"]
-    data: str | MeanData
-
-
-class WeightedMeanData(TypedDict):
-    sum_of_weights: Sequence[float]
-    sum_of_weights_squared: Sequence[float]
-    values: Sequence[float]
-    variances: Sequence[float]
+    counts: Sequence[float] | str
+    values: Sequence[float] | str
+    variances: Sequence[float] | str
 
 
 class WeightedMeanStorage(TypedDict):
     type: Literal["weighted_mean"]
-    data: str | WeightedMeanData
+    sum_of_weights: Sequence[float] | str
+    sum_of_weights_squared: Sequence[float] | str
+    values: Sequence[float] | str
+    variances: Sequence[float] | str
 
 
 class _RequiredHistogram(TypedDict):
