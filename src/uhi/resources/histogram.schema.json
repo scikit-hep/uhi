@@ -41,6 +41,18 @@
     }
   },
   "$defs": {
+    "data_array": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "A path (URI?) to the floating point bin data; outer dimension is [∑weights, ∑weights², value, variance]"
+        },
+        {
+          "type": "array",
+          "items": { "type": "number" }
+        }
+      ]
+    },
     "regular_axis": {
       "type": "object",
       "description": "An evenly spaced set of continuous bins.",
@@ -169,129 +181,63 @@
     "int_storage": {
       "type": "object",
       "description": "A storage holding integer counts.",
-      "required": ["type", "data"],
+      "required": ["type", "values"],
       "additionalProperties": false,
       "properties": {
         "type": { "type": "string", "const": "int" },
-        "data": {
-          "oneOf": [
-            {
-              "type": "string",
-              "description": "A path (URI?) to the integer bin data."
-            },
-            { "type": "array", "items": { "type": "integer" } }
-          ]
-        }
+        "values": { "$ref": "#/$defs/data_array" }
       }
     },
     "double_storage": {
       "type": "object",
       "description": "A storage holding floating point counts.",
-      "required": ["type", "data"],
+      "required": ["type", "values"],
       "additionalProperties": false,
       "properties": {
         "type": { "type": "string", "const": "double" },
-        "data": {
-          "oneOf": [
-            {
-              "type": "string",
-              "description": "A path (URI?) to the floating point bin data."
-            },
-            { "type": "array", "items": { "type": "number" } }
-          ]
-        }
+        "values": { "$ref": "#/$defs/data_array" }
       }
     },
     "weighted_storage": {
       "type": "object",
       "description": "A storage holding floating point counts and variances.",
-      "required": ["type", "data"],
+      "required": ["type", "values", "variances"],
       "additionalProperties": false,
       "properties": {
         "type": { "type": "string", "const": "weighted" },
-        "data": {
-          "oneOf": [
-            {
-              "type": "string",
-              "description": "A path (URI?) to the floating point bin data; outer dimension is [value, variance]"
-            },
-            {
-              "type": "object",
-              "required": ["values", "variances"],
-              "additionalProperties": false,
-              "properties": {
-                "values": { "type": "array", "items": { "type": "number" } },
-                "variances": { "type": "array", "items": { "type": "number" } }
-              }
-            }
-          ]
-        }
+        "values": { "$ref": "#/$defs/data_array" },
+        "variances": { "$ref": "#/$defs/data_array" }
       }
     },
     "mean_storage": {
       "type": "object",
       "description": "A storage holding 'profile'-style floating point counts, values, and variances.",
-      "required": ["type", "data"],
+      "required": ["type", "counts", "values", "variances"],
       "additionalProperties": false,
       "properties": {
         "type": { "type": "string", "const": "mean" },
-        "data": {
-          "oneOf": [
-            {
-              "type": "string",
-              "description": "A path (URI?) to the floating point bin data; outer dimension is [counts, value, variance]"
-            },
-            {
-              "type": "object",
-              "required": ["counts", "values", "variances"],
-              "additionalProperties": false,
-              "properties": {
-                "counts": { "type": "array", "items": { "type": "number" } },
-                "values": { "type": "array", "items": { "type": "number" } },
-                "variances": { "type": "array", "items": { "type": "number" } }
-              }
-            }
-          ]
-        }
+        "counts": { "$ref": "#/$defs/data_array" },
+        "values": { "$ref": "#/$defs/data_array" },
+        "variances": { "$ref": "#/$defs/data_array" }
       }
     },
     "weighted_mean_storage": {
       "type": "object",
       "description": "A storage holding 'profile'-style floating point ∑weights, ∑weights², values, and variances.",
-      "required": ["type", "data"],
+      "required": [
+        "type",
+        "sum_of_weights",
+        "sum_of_weights_squared",
+        "values",
+        "variances"
+      ],
       "additionalProperties": false,
       "properties": {
         "type": { "type": "string", "const": "weighted_mean" },
-        "data": {
-          "oneOf": [
-            {
-              "type": "string",
-              "description": "A path (URI?) to the floating point bin data; outer dimension is [∑weights, ∑weights², value, variance]"
-            },
-            {
-              "type": "object",
-              "required": [
-                "sum_of_weights",
-                "sum_of_weights_squared",
-                "values",
-                "variances"
-              ],
-              "additionalProperties": false,
-              "properties": {
-                "sum_of_weights": {
-                  "type": "array",
-                  "items": { "type": "number" }
-                },
-                "sum_of_weights_squared": {
-                  "type": "array",
-                  "items": { "type": "number" }
-                },
-                "values": { "type": "array", "items": { "type": "number" } },
-                "variances": { "type": "array", "items": { "type": "number" } }
-              }
-            }
-          ]
-        }
+        "sum_of_weights": { "$ref": "#/$defs/data_array" },
+        "sum_of_weights_squared": { "$ref": "#/$defs/data_array" },
+        "values": { "$ref": "#/$defs/data_array" },
+        "variances": { "$ref": "#/$defs/data_array" }
       }
     }
   }
