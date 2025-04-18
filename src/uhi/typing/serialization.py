@@ -36,6 +36,7 @@ class _RequiredRegularAxis(TypedDict):
 
 class RegularAxis(_RequiredRegularAxis, total=False):
     metadata: dict[str, SupportedMetadata]
+    writer_info: dict[str, SupportedMetadata]
 
 
 class _RequiredVariableAxis(TypedDict):
@@ -48,6 +49,7 @@ class _RequiredVariableAxis(TypedDict):
 
 class VariableAxis(_RequiredVariableAxis, total=False):
     metadata: dict[str, SupportedMetadata]
+    writer_info: dict[str, SupportedMetadata]
 
 
 class _RequiredCategoryStrAxis(TypedDict):
@@ -58,6 +60,7 @@ class _RequiredCategoryStrAxis(TypedDict):
 
 class CategoryStrAxis(_RequiredCategoryStrAxis, total=False):
     metadata: dict[str, SupportedMetadata]
+    writer_info: dict[str, SupportedMetadata]
 
 
 class _RequiredCategoryIntAxis(TypedDict):
@@ -68,6 +71,7 @@ class _RequiredCategoryIntAxis(TypedDict):
 
 class CategoryIntAxis(_RequiredCategoryIntAxis, total=False):
     metadata: dict[str, SupportedMetadata]
+    writer_info: dict[str, SupportedMetadata]
 
 
 class _RequiredBooleanAxis(TypedDict):
@@ -76,6 +80,7 @@ class _RequiredBooleanAxis(TypedDict):
 
 class BooleanAxis(_RequiredBooleanAxis, total=False):
     metadata: dict[str, SupportedMetadata]
+    writer_info: dict[str, SupportedMetadata]
 
 
 class IntStorage(TypedDict):
@@ -120,3 +125,4 @@ class _RequiredHistogram(TypedDict):
 
 class Histogram(_RequiredHistogram, total=False):
     metadata: dict[str, SupportedMetadata]
+    writer_info: dict[str, SupportedMetadata]

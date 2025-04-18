@@ -80,14 +80,14 @@ The following storages are supported:
   values, `"sum_of_weights"`, `"sum_of_weights_squared"`, `"values"`, and
   `"variances"`. Boost-histogram's `WeightedMean` storage maps to this.
 
-A library can fill the optional `"writer_info"` field with a key specific to the
-library containing library specific metadata. There is one defined key,
-`"version"`, which contains the version of the library that created the
-histogram. Libraries should include this key when creating a histogram. It is
-not required for reading histograms.  Histogram libraries can put custom
-metadata here that they can use to record province information or help with
-same-library round trips. For example, a histogram created with boost-histogram
-might contain:
+A library can fill the optional `"writer_info"` field with a key specific to
+the library containing library specific metadata anywhere a metadata field is
+allowed. There is one defined key at the Histogram level, `"version"`, which
+contains the version of the library that created the histogram. Libraries
+should include this key when creating a histogram. It is not required for
+reading histograms.  Histogram libraries can put custom metadata here that they
+can use to record province information or help with same-library round trips.
+For example, a histogram created with boost-histogram might contain:
 
 ```json
 {
