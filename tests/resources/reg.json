@@ -15,7 +15,7 @@
     "storage": { "type": "int", "values": [1, 2, 3, 4, 5] }
   },
   "two": {
-    "library": {
+    "writer_info": {
       "uhi": {
         "version": "1.0.0",
         "other_info": "Something"
