@@ -10,7 +10,7 @@
       "required": ["axes", "storage"],
       "additionalProperties": false,
       "properties": {
-        "library": {
+        "writer_info": {
           "type": "object",
           "description": "Information from the library that created the histogram.",
           "additionalProperties": false,
