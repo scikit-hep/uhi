@@ -1,6 +1,6 @@
 {
   "one": {
-    "metadata": {},
+    "metadata": { "one": true, "two": 2, "three": "three" },
     "axes": [
       {
         "type": "regular",

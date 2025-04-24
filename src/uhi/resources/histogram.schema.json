@@ -10,10 +10,7 @@
       "required": ["axes", "storage"],
       "additionalProperties": false,
       "properties": {
-        "metadata": {
-          "type": "object",
-          "description": "Arbitrary metadata dictionary."
-        },
+        "metadata": { "$ref": "#/$defs/metadata" },
         "axes": {
           "type": "array",
           "description": "A list of the axes of the histogram.",
@@ -41,6 +38,20 @@
     }
   },
   "$defs": {
+    "metadata": {
+      "type": "object",
+      "description": "Arbitrary metadata dictionary.",
+      "additionalProperties": false,
+      "patternProperties": {
+        ".*": {
+          "oneOf": [
+            { "type": "string" },
+            { "type": "number" },
+            { "type": "boolean" }
+          ]
+        }
+      }
+    },
     "data_array": {
       "oneOf": [
         {
@@ -87,10 +98,7 @@
           "type": "boolean",
           "description": "True if the axis wraps around."
         },
-        "metadata": {
-          "type": "object",
-          "description": "Arbitrary metadata dictionary."
-        }
+        "metadata": { "$ref": "#/$defs/metadata" }
       }
     },
     "variable_axis": {
@@ -115,10 +123,7 @@
         "underflow": { "type": "boolean" },
         "overflow": { "type": "boolean" },
         "circular": { "type": "boolean" },
-        "metadata": {
-          "type": "object",
-          "description": "Arbitrary metadata dictionary."
-        }
+        "metadata": { "$ref": "#/$defs/metadata" }
       }
     },
     "category_str_axis": {
@@ -137,10 +142,7 @@
           "type": "boolean",
           "description": "True if flow bin (at the overflow position) present."
         },
-        "metadata": {
-          "type": "object",
-          "description": "Arbitrary metadata dictionary."
-        }
+        "metadata": { "$ref": "#/$defs/metadata" }
       }
     },
     "category_int_axis": {
@@ -159,10 +161,7 @@
           "type": "boolean",
           "description": "True if flow bin (at the overflow position) present."
         },
-        "metadata": {
-          "type": "object",
-          "description": "Arbitrary metadata dictionary."
-        }
+        "metadata": { "$ref": "#/$defs/metadata" }
       }
     },
     "boolean_axis": {
@@ -172,10 +171,7 @@
       "additionalProperties": false,
       "properties": {
         "type": { "type": "string", "const": "boolean" },
-        "metadata": {
-          "type": "object",
-          "description": "Arbitrary metadata dictionary."
-        }
+        "metadata": { "$ref": "#/$defs/metadata" }
       }
     },
     "int_storage": {
