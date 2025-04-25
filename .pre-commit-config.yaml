@@ -73,7 +73,7 @@ repos:
       - id: check-jsonschema
         name: Validate Histogram examples
         args: [--schemafile, src/uhi/resources/histogram.schema.json]
-        files: ^tests/resources/.*\.json
+        files: ^tests/resources/valid/.*\.json
 
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
     rev: 2025.02.24

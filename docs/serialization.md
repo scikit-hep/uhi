@@ -93,7 +93,10 @@ Or with code:
 ```python
 import uhi.schema
 
-uhi.schema.validate("some/file.json")
+with filename.open(encoding="utf-8") as f:
+    data = json.load(f)
+
+uhi.schema.validate(data)
 ```
 
 Eventually this should also be usable for JSON's inside zip, HDF5 attributes,
