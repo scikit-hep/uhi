@@ -56,7 +56,7 @@
       "oneOf": [
         {
           "type": "string",
-          "description": "A path (URI?) to the floating point bin data; outer dimension is [∑weights, ∑weights², value, variance]"
+          "description": "A path (similar to URI) to the floating point bin data"
         },
         {
           "type": "array",

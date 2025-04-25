@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import Any, Literal, TypedDict
+from typing import Literal, TypedDict, Union
 
 __all__ = [
     "BooleanAxis",
@@ -16,6 +16,8 @@ __all__ = [
     "WeightedMeanStorage",
     "WeightedStorage",
 ]
+
+SupportedMetadata = Union[float, str, bool]
 
 
 def __dir__() -> list[str]:
@@ -33,7 +35,7 @@ class _RequiredRegularAxis(TypedDict):
 
 
 class RegularAxis(_RequiredRegularAxis, total=False):
-    metadata: dict[str, Any]
+    metadata: dict[str, SupportedMetadata]
 
 
 class _RequiredVariableAxis(TypedDict):
@@ -45,7 +47,7 @@ class _RequiredVariableAxis(TypedDict):
 
 
 class VariableAxis(_RequiredVariableAxis, total=False):
-    metadata: dict[str, Any]
+    metadata: dict[str, SupportedMetadata]
 
 
 class _RequiredCategoryStrAxis(TypedDict):
@@ -55,7 +57,7 @@ class _RequiredCategoryStrAxis(TypedDict):
 
 
 class CategoryStrAxis(_RequiredCategoryStrAxis, total=False):
-    metadata: dict[str, Any]
+    metadata: dict[str, SupportedMetadata]
 
 
 class _RequiredCategoryIntAxis(TypedDict):
@@ -65,7 +67,7 @@ class _RequiredCategoryIntAxis(TypedDict):
 
 
 class CategoryIntAxis(_RequiredCategoryIntAxis, total=False):
-    metadata: dict[str, Any]
+    metadata: dict[str, SupportedMetadata]
 
 
 class _RequiredBooleanAxis(TypedDict):
@@ -73,7 +75,7 @@ class _RequiredBooleanAxis(TypedDict):
 
 
 class BooleanAxis(_RequiredBooleanAxis, total=False):
-    metadata: dict[str, Any]
+    metadata: dict[str, SupportedMetadata]
 
 
 class IntStorage(TypedDict):
@@ -117,4 +119,4 @@ class _RequiredHistogram(TypedDict):
 
 
 class Histogram(_RequiredHistogram, total=False):
-    metadata: dict[str, Any]
+    metadata: dict[str, SupportedMetadata]
