@@ -47,6 +47,9 @@ schema = [
   "fastjsonschema",
   "importlib-resources; python_version<'3.9'",
 ]
+hdf5 = [
+  "h5py",
+]
 
 [dependency-groups]
 docs = [
@@ -62,6 +65,7 @@ test = [
   "boost-histogram>=1.0",
   "fastjsonschema",
   "importlib-resources; python_version<'3.9'",
+  "h5py; platform_python_implementation == 'cpython'",
 ]
 dev = [{ include-group = "test"}]
 
@@ -89,7 +93,7 @@ warn_unreachable = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 
 [[tool.mypy.overrides]]
-module = ["fastjsonschema"]
+module = ["fastjsonschema", "h5py"]
 ignore_missing_imports = true
 
 
