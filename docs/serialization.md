@@ -61,7 +61,9 @@ The following axes types are supported:
 
 Axes with gaps are currently not supported.
 
-All axes support `metadata`, a string-valued dictionary of arbitrary, JSON-like data.
+All axes support `metadata`, a string-valued dictionary of arbitrary data.
+Currently, strings, numbers, and booleans are supported. Other values here are
+not currently supported.
 
 The following storages are supported:
 
