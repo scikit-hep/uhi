@@ -1,0 +1,7 @@
+{
+  "one": {
+    "metadata": { "one": { "two": 2 } },
+    "axes": [],
+    "storage": { "type": "int", "values": [1] }
+  }
+}

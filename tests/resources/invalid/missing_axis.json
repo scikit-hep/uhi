@@ -1,0 +1,5 @@
+{
+  "one": {
+    "storage": { "type": "int", "values": [1] }
+  }
+}
