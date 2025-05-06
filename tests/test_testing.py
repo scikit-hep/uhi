@@ -6,7 +6,7 @@ import numpy as np
 import uhi.testing.indexing
 
 
-class TestAccess(uhi.testing.indexing.Indexing[bh.Histogram]):
+class TestAccess1D(uhi.testing.indexing.Indexing1D[bh.Histogram]):
     @staticmethod
     def make_histogram_1() -> bh.Histogram:
         h1 = bh.Histogram(bh.axis.Regular(10, 0, 1))
@@ -15,6 +15,8 @@ class TestAccess(uhi.testing.indexing.Indexing[bh.Histogram]):
         h1[bh.overflow] = 1
         return h1
 
+
+class TestAccess3D(uhi.testing.indexing.Indexing3D[bh.Histogram]):
     @staticmethod
     def make_histogram_3() -> bh.Histogram:
         h3 = bh.Histogram(
@@ -27,5 +29,9 @@ class TestAccess(uhi.testing.indexing.Indexing[bh.Histogram]):
         return h3
 
 
-class TestAccessBHTag(TestAccess):
+class TestAccessBHTag1D(TestAccess1D):
+    tag = bh.tag
+
+
+class TestAccessBHTag3D(TestAccess3D):
     tag = bh.tag
