@@ -8,7 +8,7 @@ import uhi.testing.indexing
 
 class TestAccess1D(uhi.testing.indexing.Indexing1D[bh.Histogram]):
     @staticmethod
-    def make_histogram_1() -> bh.Histogram:
+    def make_histogram() -> bh.Histogram:
         h1 = bh.Histogram(bh.axis.Regular(10, 0, 1))
         h1[:] = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
         h1[bh.underflow] = 3
@@ -18,7 +18,7 @@ class TestAccess1D(uhi.testing.indexing.Indexing1D[bh.Histogram]):
 
 class TestAccess3D(uhi.testing.indexing.Indexing3D[bh.Histogram]):
     @staticmethod
-    def make_histogram_3() -> bh.Histogram:
+    def make_histogram() -> bh.Histogram:
         h3 = bh.Histogram(
             bh.axis.Regular(2, 0, 2),
             bh.axis.Regular(5, 0, 5),
