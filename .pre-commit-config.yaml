@@ -18,7 +18,7 @@ repos:
     - id: trailing-whitespace
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.11.4"
+    rev: "v0.11.8"
     hooks:
       - id: ruff
         args: ["--fix", "--show-fixes"]
@@ -64,7 +64,7 @@ repos:
         types_or: [json]
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.32.1
+    rev: 0.33.0
     hooks:
       - id: check-readthedocs
       - id: check-github-workflows
@@ -76,6 +76,6 @@ repos:
         files: ^tests/resources/valid/.*\.json
 
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: 2025.02.24
+    rev: 2025.04.28
     hooks:
       - id: validate-pyproject
