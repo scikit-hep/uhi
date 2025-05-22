@@ -10,6 +10,23 @@
       "required": ["axes", "storage"],
       "additionalProperties": false,
       "properties": {
+        "writer_info": {
+          "type": "object",
+          "description": "Information from the library that created the histogram.",
+          "additionalProperties": false,
+          "patternProperties": {
+            ".+": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "version": {
+                  "type": "string",
+                  "description": "Version of the library."
+                }
+              }
+            }
+          }
+        },
         "metadata": { "$ref": "#/$defs/metadata" },
         "axes": {
           "type": "array",
@@ -38,18 +55,27 @@
     }
   },
   "$defs": {
+    "supported_metadata": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "number" },
+        { "type": "boolean" }
+      ]
+    },
     "metadata": {
       "type": "object",
       "description": "Arbitrary metadata dictionary.",
       "additionalProperties": false,
       "patternProperties": {
-        ".*": {
-          "oneOf": [
-            { "type": "string" },
-            { "type": "number" },
-            { "type": "boolean" }
-          ]
-        }
+        ".+": { "$ref": "#/$defs/supported_metadata" }
+      }
+    },
+    "writer_info": {
+      "type": "object",
+      "description": "Information from the library that created the histogram.",
+      "additionalProperties": false,
+      "patternProperties": {
+        ".+": { "$ref": "#/$defs/supported_metadata" }
       }
     },
     "data_array": {
@@ -98,7 +124,8 @@
           "type": "boolean",
           "description": "True if the axis wraps around."
         },
-        "metadata": { "$ref": "#/$defs/metadata" }
+        "metadata": { "$ref": "#/$defs/metadata" },
+        "writer_info": { "$ref": "#/$defs/writer_info" }
       }
     },
     "variable_axis": {
@@ -123,7 +150,8 @@
         "underflow": { "type": "boolean" },
         "overflow": { "type": "boolean" },
         "circular": { "type": "boolean" },
-        "metadata": { "$ref": "#/$defs/metadata" }
+        "metadata": { "$ref": "#/$defs/metadata" },
+        "writer_info": { "$ref": "#/$defs/writer_info" }
       }
     },
     "category_str_axis": {
@@ -142,7 +170,8 @@
           "type": "boolean",
           "description": "True if flow bin (at the overflow position) present."
         },
-        "metadata": { "$ref": "#/$defs/metadata" }
+        "metadata": { "$ref": "#/$defs/metadata" },
+        "writer_info": { "$ref": "#/$defs/writer_info" }
       }
     },
     "category_int_axis": {
@@ -161,7 +190,8 @@
           "type": "boolean",
           "description": "True if flow bin (at the overflow position) present."
         },
-        "metadata": { "$ref": "#/$defs/metadata" }
+        "metadata": { "$ref": "#/$defs/metadata" },
+        "writer_info": { "$ref": "#/$defs/writer_info" }
       }
     },
     "boolean_axis": {
@@ -171,7 +201,8 @@
       "additionalProperties": false,
       "properties": {
         "type": { "type": "string", "const": "boolean" },
-        "metadata": { "$ref": "#/$defs/metadata" }
+        "metadata": { "$ref": "#/$defs/metadata" },
+        "writer_info": { "$ref": "#/$defs/writer_info" }
       }
     },
     "int_storage": {
