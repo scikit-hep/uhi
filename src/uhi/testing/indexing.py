@@ -24,9 +24,24 @@ def __dir__() -> list[str]:
     return __all__
 
 
-class Indexing(typing.Generic[T], abc.ABC, unittest.TestCase):
+class Indexing(abc.ABC, unittest.TestCase):
     """
     This super class provides the basic structure for indexing tests.
+    """
+
+    def get_value(self, bin: Any) -> Any:
+        return bin
+
+    def assertEqualBinValue(self, bin: Any, value: Any) -> None:
+        self.assertEqual(self.get_value(bin), value)
+
+
+class Indexing1D(typing.Generic[T], Indexing):
+    """
+    This test requires a histogram to be created first.
+
+    h is a 1D histogram with 10 bins from 0 to 1. Each bin has 2 more than the
+    one before, starting with 0. The overflow bin has 1. The underflow bin has 3.
     """
 
     h: T
@@ -38,24 +53,8 @@ class Indexing(typing.Generic[T], abc.ABC, unittest.TestCase):
         pass
 
     @classmethod
-    def get_value(bin):
-        return bin
-
-    def assertEqualBinValue(self, bin, value) -> None:
-        self.assertEqual(self.get_value(bin), value)
-
-    @classmethod
     def setUpClass(cls) -> None:
         cls.h = cls.make_histogram()
-
-
-class Indexing1D(abc.ABC, Indexing[T]):
-    """
-    This test requires a histogram to be created first.
-
-    h is a 1D histogram with 10 bins from 0 to 1. Each bin has 2 more than the
-    one before, starting with 0. The overflow bin has 1. The underflow bin has 3.
-    """
 
     def test_access_integer(self) -> None:
         for i in range(10):
@@ -337,7 +336,7 @@ class Indexing1D(abc.ABC, Indexing[T]):
             h[1:4] = range(5)
 
 
-class Indexing2D(abc.ABC, Indexing[T]):
+class Indexing2D(typing.Generic[T], Indexing):
     """
     This test requires histograms to be created first.
 
@@ -345,6 +344,17 @@ class Indexing2D(abc.ABC, Indexing[T]):
     are the bin indices.
     """
 
+    h: T
+    tag = uhi.tag
+
+    @staticmethod
+    @abc.abstractmethod
+    def make_histogram() -> T:
+        pass
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.h = cls.make_histogram()
 
     def test_access_integer(self) -> None:
         for i in range(2):
@@ -490,13 +500,25 @@ class Indexing2D(abc.ABC, Indexing[T]):
         self.assertEqualBinValue(h[1, 4], 43)
 
 
-class Indexing3D(abc.ABC, Indexing[T]):
+class Indexing3D(typing.Generic[T], Indexing):
     """
     This test requires histograms to be created first.
 
     h is a 3D histogram with [2,5,10] bins. The contents are x+2y+3z, where x,
     y, and z are the bin indices.
     """
+
+    h: T
+    tag = uhi.tag
+
+    @staticmethod
+    @abc.abstractmethod
+    def make_histogram() -> T:
+        pass
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.h = cls.make_histogram()
 
     def test_access_integer(self) -> None:
         for i in range(2):
