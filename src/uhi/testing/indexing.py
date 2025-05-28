@@ -37,18 +37,27 @@ class Indexing(abc.ABC, unittest.TestCase):
 
     def value_to_bin(self, value: Any) -> Any:
         """
-        Inverse of bin_to_value, for downstream classes with complex bins
+        Inverse of bin_to_value, for downstream classes with complex bins.
         """
         return value
 
     def values_to_bins(self, values: Any) -> Any:
         """
-        Inverse of get_value, for downstream classes with complex bins
+        Loops over values and converts them to bins using value_to_bin.
         """
         return [self.value_to_bin(v) for v in values]
 
+    def sum_to_value(self, bin: Any) -> Any:
+        """
+        Allow downstream classes to handle more summed bin objects. E.g. it can be a projection from a Histo2D to Histo1D.
+        """
+        return bin
+
     def assertEqualBinValue(self, bin: Any, value: Any) -> None:
         self.assertEqual(self.bin_to_value(bin), value)
+
+    def assertEqualSum(self, bin: Any, value: Any) -> None:
+        self.assertEqual(self.sum_to_value(bin), value)
 
 
 class Indexing1D(typing.Generic[T], Indexing):
@@ -197,23 +206,23 @@ class Indexing1D(typing.Generic[T], Indexing):
     def test_full_integration(self) -> None:
         # boost-histogram allows the `::` to be skipped.
         v = self.h[::sum]
-        self.assertEqual(v, 94)
+        self.assertEqualSum(v, 94)
 
     def test_non_flow_integration(self) -> None:
         v = self.h[0:len:sum]  # type: ignore[misc]
-        self.assertEqual(v, 90)
+        self.assertEqualSum(v, 90)
 
     def test_ranged_integration(self) -> None:
         v = self.h[2:5:sum]
-        self.assertEqual(v, 18)
+        self.assertEqualSum(v, 18)
 
     def test_open_lower_integration(self) -> None:
         v = self.h[:4:sum]
-        self.assertEqual(v, 15)
+        self.assertEqualSum(v, 15)
 
     def test_open_upper_integration(self) -> None:
         v = self.h[4::sum]
-        self.assertEqual(v, 79)
+        self.assertEqualSum(v, 79)
 
     def test_setting_single_value(self) -> None:
         h = self.make_histogram()
