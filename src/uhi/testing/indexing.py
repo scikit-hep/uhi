@@ -460,19 +460,21 @@ class Indexing2D(typing.Generic[T], Indexing):
 
     def test_setting_single_value(self) -> None:
         h = self.make_histogram()
-        h[0, 0] = 42
+        h[0, 0] = self.value_to_bin(42)
         self.assertEqual(h[0, 0], 42)
         self.assertEqual(h[1, 1], 3)
 
     def test_setting_underflow(self) -> None:
         h = self.make_histogram()
-        h[self.tag.underflow, ...] = 42
+        h[self.tag.underflow, ...] = self.value_to_bin(42)
         self.assertEqual(h[self.tag.underflow, 0], 42)
 
     def test_setting_array(self) -> None:
         h = self.make_histogram()
 
-        h[0:2, 0:2] = np.array([[42, 43], [44, 45]])
+        h[0:2, 0:2] = np.array(
+            [self.values_to_bins([42, 43]), self.values_to_bins([44, 45])]
+        )
         self.assertEqualBinValue(h[0, 0], 42)
         self.assertEqualBinValue(h[0, 1], 43)
         self.assertEqualBinValue(h[1, 0], 44)
@@ -482,7 +484,7 @@ class Indexing2D(typing.Generic[T], Indexing):
     def test_setting_array_broadcast(self) -> None:
         h = self.make_histogram()
 
-        h[0:2, 0:2] = np.array([[42], [3]])
+        h[0:2, 0:2] = np.array([self.values_to_bins([42]), self.values_to_bins([3])])
         self.assertEqualBinValue(h[0, 0], 42)
         self.assertEqualBinValue(h[0, 1], 42)
         self.assertEqualBinValue(h[1, 0], 3)
@@ -491,14 +493,14 @@ class Indexing2D(typing.Generic[T], Indexing):
 
     def test_setting_dict(self) -> None:
         h = self.make_histogram()
-        h[{0: 1, 1: 0}] = 42
+        h[{0: 1, 1: 0}] = self.value_to_bin(42)
         self.assertEqualBinValue(h[1, 0], 42)
         self.assertEqualBinValue(h[0, 1], 2)
 
     def test_setting_dict_slice(self) -> None:
         h = self.make_histogram()
 
-        h[{0: 1, 1: slice(2, 4)}] = range(42, 44)
+        h[{0: 1, 1: slice(2, 4)}] = self.values_to_bins(range(42, 44))
 
         self.assertEqualBinValue(h[1, 1], 3)
         self.assertEqualBinValue(h[1, 2], 42)
@@ -508,7 +510,7 @@ class Indexing2D(typing.Generic[T], Indexing):
     def test_setting_dict_slicer(self) -> None:
         h = self.make_histogram()
 
-        h[{0: 1, 1: np.s_[3:5]}] = range(42, 44)
+        h[{0: 1, 1: np.s_[3:5]}] = self.values_to_bins(range(42, 44))
         self.assertEqualBinValue(h[1, 2], 5)
         self.assertEqualBinValue(h[1, 3], 42)
         self.assertEqualBinValue(h[1, 4], 43)
@@ -662,7 +664,12 @@ class Indexing3D(typing.Generic[T], Indexing):
     def test_setting_array(self) -> None:
         h = self.make_histogram()
 
-        h[0:2, 0:2, 0:2] = np.array([[[42, 43], [44, 45]], [[46, 47], [48, 49]]])
+        h[0:2, 0:2, 0:2] = np.array(
+            [
+                [self.values_to_bins([42, 43]), self.values_to_bins([44, 45])],
+                [self.values_to_bins([46, 47]), self.values_to_bins([48, 49])],
+            ]
+        )
         self.assertEqualBinValue(h[0, 0, 0], 42)
         self.assertEqualBinValue(h[0, 0, 1], 43)
         self.assertEqualBinValue(h[0, 1, 0], 44)
@@ -676,7 +683,12 @@ class Indexing3D(typing.Generic[T], Indexing):
     def test_setting_array_broadcast(self) -> None:
         h = self.make_histogram()
 
-        h[0:2, 0:2, 0:2] = np.array([[[42], [3]], [[46], [4]]])
+        h[0:2, 0:2, 0:2] = np.array(
+            [
+                [self.values_to_bins([42]), self.values_to_bins([3])],
+                [self.values_to_bins([46]), self.values_to_bins([4])],
+            ]
+        )
         self.assertEqualBinValue(h[0, 0, 0], 42)
         self.assertEqualBinValue(h[0, 0, 1], 42)
         self.assertEqualBinValue(h[0, 1, 0], 3)
@@ -689,14 +701,14 @@ class Indexing3D(typing.Generic[T], Indexing):
 
     def test_setting_dict(self) -> None:
         h = self.make_histogram()
-        h[{0: 1, 1: 0, 2: 3}] = 3
+        h[{0: 1, 1: 0, 2: 3}] = self.value_to_bin(3)
         self.assertEqualBinValue(h[1, 0, 3], 3)
         self.assertEqualBinValue(h[1, 0, 4], 13)
 
     def test_setting_dict_slice(self) -> None:
         h = self.make_histogram()
 
-        h[{0: 1, 1: 0, 2: slice(3, 5)}] = range(42, 44)
+        h[{0: 1, 1: 0, 2: slice(3, 5)}] = self.values_to_bins(range(42, 44))
 
         self.assertEqualBinValue(h[1, 0, 2], 7)
         self.assertEqualBinValue(h[1, 0, 3], 42)
@@ -706,7 +718,7 @@ class Indexing3D(typing.Generic[T], Indexing):
     def test_setting_dict_slicer(self) -> None:
         h = self.make_histogram()
 
-        h[{0: 1, 1: 0, 2: np.s_[3:5]}] = range(42, 44)
+        h[{0: 1, 1: 0, 2: np.s_[3:5]}] = self.values_to_bins(range(42, 44))
         self.assertEqualBinValue(h[1, 0, 2], 7)
         self.assertEqualBinValue(h[1, 0, 3], 42)
         self.assertEqualBinValue(h[1, 0, 4], 43)
