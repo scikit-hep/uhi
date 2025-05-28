@@ -29,11 +29,26 @@ class Indexing(abc.ABC, unittest.TestCase):
     This super class provides the basic structure for indexing tests.
     """
 
-    def get_value(self, bin: Any) -> Any:
+    def bin_to_value(self, bin: Any) -> Any:
+        """
+        Allow downstream classes to handle more complex bin objects.
+        """
         return bin
 
+    def value_to_bin(self, value: Any) -> Any:
+        """
+        Inverse of bin_to_value, for downstream classes with complex bins
+        """
+        return value
+
+    def values_to_bins(self, values: Any) -> Any:
+        """
+        Inverse of get_value, for downstream classes with complex bins
+        """
+        return [self.value_to_bin(v) for v in values]
+
     def assertEqualBinValue(self, bin: Any, value: Any) -> None:
-        self.assertEqual(self.get_value(bin), value)
+        self.assertEqual(self.bin_to_value(bin), value)
 
 
 class Indexing1D(typing.Generic[T], Indexing):
@@ -168,7 +183,6 @@ class Indexing1D(typing.Generic[T], Indexing):
         h = self.h[1 : 5 : self.tag.rebin(2)]
         self.assertEqualBinValue(h[0], 6)
         self.assertEqualBinValue(h[1], 14)
-
         with self.assertRaises(IndexError):
             h[2]
 
@@ -203,37 +217,37 @@ class Indexing1D(typing.Generic[T], Indexing):
 
     def test_setting_single_value(self) -> None:
         h = self.make_histogram()
-        h[0] = 42
+        h[0] = self.value_to_bin(42)
         self.assertEqualBinValue(h[0], 42)
         self.assertEqualBinValue(h[1], 2)
         self.assertEqualBinValue(h[-1], 18)
 
-        h[-1] = 99
+        h[-1] = self.value_to_bin(99)
         self.assertEqualBinValue(h[-1], 99)
         self.assertEqualBinValue(h[0], 42)
         self.assertEqualBinValue(h[1], 2)
 
     def test_setting_single_value_loc(self) -> None:
         h = self.make_histogram()
-        h[self.tag.loc(0.05)] = 42
+        h[self.tag.loc(0.05)] = self.value_to_bin(42)
         self.assertEqualBinValue(h[0], 42)
         self.assertEqualBinValue(h[1], 2)
 
     def test_setting_underflow(self) -> None:
         h = self.make_histogram()
-        h[self.tag.underflow] = 42
+        h[self.tag.underflow] = self.value_to_bin(42)
         self.assertEqualBinValue(h[self.tag.underflow], 42)
         self.assertEqualBinValue(h[0], 0)
 
     def test_setting_overflow(self) -> None:
         h = self.make_histogram()
-        h[self.tag.overflow] = 42
+        h[self.tag.overflow] = self.value_to_bin(42)
         self.assertEqualBinValue(h[self.tag.overflow], 42)
         self.assertEqualBinValue(h[-1], 18)
 
     def test_setting_array(self) -> None:
         h = self.make_histogram()
-        h[1:3] = 42
+        h[1:3] = self.value_to_bin(42)
 
         # TODO: this is broken, fix!
         # self.assertEqual(h[0], 0)
@@ -243,7 +257,7 @@ class Indexing1D(typing.Generic[T], Indexing):
 
     def test_setting_array_slice(self) -> None:
         h = self.make_histogram()
-        h[1:3] = [42, 42]
+        h[1:3] = self.values_to_bins([42, 42])
 
         self.assertEqualBinValue(h[0], 0)
         self.assertEqualBinValue(h[1], 42)
@@ -252,7 +266,7 @@ class Indexing1D(typing.Generic[T], Indexing):
 
     def test_setting_array_without_underflow(self) -> None:
         h = self.make_histogram()
-        h[:3] = [42, 43, 44]
+        h[:3] = self.values_to_bins([42, 43, 44])
         self.assertEqualBinValue(h[self.tag.underflow], 3)
         self.assertEqualBinValue(h[0], 42)
         self.assertEqualBinValue(h[1], 43)
@@ -261,7 +275,7 @@ class Indexing1D(typing.Generic[T], Indexing):
 
     def test_setting_array_with_underflow(self) -> None:
         h = self.make_histogram()
-        h[:3] = [41, 42, 43, 44]
+        h[:3] = self.values_to_bins([41, 42, 43, 44])
         self.assertEqualBinValue(h[self.tag.underflow], 41)
         self.assertEqualBinValue(h[0], 42)
         self.assertEqualBinValue(h[1], 43)
@@ -270,7 +284,7 @@ class Indexing1D(typing.Generic[T], Indexing):
 
     def test_setting_array_without_overflow(self) -> None:
         h = self.make_histogram()
-        h[7:] = [42, 43, 44]
+        h[7:] = self.values_to_bins([42, 43, 44])
         self.assertEqualBinValue(h[6], 12)
         self.assertEqualBinValue(h[7], 42)
         self.assertEqualBinValue(h[8], 43)
@@ -279,7 +293,7 @@ class Indexing1D(typing.Generic[T], Indexing):
 
     def test_setting_array_with_overflow(self) -> None:
         h = self.make_histogram()
-        h[7:] = [42, 43, 44, 45]
+        h[7:] = self.values_to_bins([42, 43, 44, 45])
         self.assertEqualBinValue(h[6], 12)
         self.assertEqualBinValue(h[7], 42)
         self.assertEqualBinValue(h[8], 43)
@@ -288,7 +302,7 @@ class Indexing1D(typing.Generic[T], Indexing):
 
     def test_setting_whole_array(self) -> None:
         h = self.make_histogram()
-        h[:] = range(10)
+        h[:] = self.values_to_bins(range(10))
         self.assertEqualBinValue(h[self.tag.underflow], 3)
         self.assertEqualBinValue(h[0], 0)
         self.assertEqualBinValue(h[1], 1)
@@ -304,7 +318,7 @@ class Indexing1D(typing.Generic[T], Indexing):
 
     def test_setting_whole_array_with_flow(self) -> None:
         h = self.make_histogram()
-        h[:] = range(12)
+        h[:] = self.values_to_bins(range(12))
         self.assertEqualBinValue(h[self.tag.underflow], 0)
         self.assertEqualBinValue(h[0], 1)
         self.assertEqualBinValue(h[1], 2)
@@ -322,18 +336,18 @@ class Indexing1D(typing.Generic[T], Indexing):
         h = self.make_histogram()
 
         with self.assertRaises(ValueError):
-            h[:] = range(9)
+            h[:] = self.values_to_bins(range(9))
         with self.assertRaises(ValueError):
-            h[:] = range(11)
+            h[:] = self.values_to_bins(range(11))
         with self.assertRaises(ValueError):
-            h[:] = range(13)
+            h[:] = self.values_to_bins(range(13))
 
         with self.assertRaises(ValueError):
-            h[1:4] = range(2)
+            h[1:4] = self.values_to_bins(range(2))
         with self.assertRaises(ValueError):
-            h[1:4] = range(4)
+            h[1:4] = self.values_to_bins(range(4))
         with self.assertRaises(ValueError):
-            h[1:4] = range(5)
+            h[1:4] = self.values_to_bins(range(5))
 
 
 class Indexing2D(typing.Generic[T], Indexing):
