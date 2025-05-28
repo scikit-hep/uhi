@@ -383,19 +383,21 @@ class Indexing2D(typing.Generic[T], Indexing):
         for i in range(2):
             for j in range(5):
                 with self.subTest(i=i, j=j):
-                    self.assertEqual(self.h[i, j], i + 2 * j)
+                    self.assertEqualBinValue(self.h[i, j], i + 2 * j)
 
         with self.assertRaises(IndexError):
             self.h[2, 0]
         with self.assertRaises(IndexError):
             self.h[0, 5]
 
-        self.assertEqual(self.h[-1, -1], 9)
+        self.assertEqualBinValue(self.h[-1, -1], 9)
 
     def test_access_loc(self) -> None:
         self.assertEqualBinValue(self.h[self.tag.loc(0.5), self.tag.loc(0.5)], 0)
         self.assertEqualBinValue(self.h[self.tag.loc(0.5), self.tag.loc(1.5)], 2)
         self.assertEqualBinValue(self.h[self.tag.loc(0.5), self.tag.loc(4.5)], 8)
+
+    def test_access_loc_underflow(self) -> None:
         self.assertEqualBinValue(self.h[self.tag.loc(-1), self.tag.loc(0.5)], 0)
 
     def test_access_loc_mixed(self) -> None:
@@ -432,37 +434,37 @@ class Indexing2D(typing.Generic[T], Indexing):
 
     def test_full_integration(self) -> None:
         v = self.h[::sum, ::sum]
-        self.assertEqual(v, 45)
+        self.assertEqualSum(v, 45)
 
     def test_mixed_integration(self) -> None:
         h = self.h[:2:sum, 1:3]
-        self.assertEqual(h[0], 5)
-        self.assertEqual(h[1], 9)
+        self.assertEqualSum(h[0], 5)
+        self.assertEqualSum(h[1], 9)
 
         with self.assertRaises(IndexError):
             h[2]
 
     def test_mixed_single_integration(self) -> None:
         v = self.h[1, ::sum]
-        self.assertEqual(v, 25)
+        self.assertEqualSum(v, 25)
 
     def test_mixed_single_integration_dict(self) -> None:
         v = self.h[{0: 1, 1: np.s_[::sum]}]
-        self.assertEqual(v, 25)
+        self.assertEqualSum(v, 25)
 
     def test_ellipsis_integration(self) -> None:
         h = self.h[..., ::sum]
-        self.assertEqual(h[0], 20)
-        self.assertEqual(h[1], 25)
+        self.assertEqualSum(h[0], 20)
+        self.assertEqualSum(h[1], 25)
 
         with self.assertRaises(IndexError):
             h[2]
 
     def test_ellipsis_integration_dict(self) -> None:
         h = self.h[{0: np.s_[::sum]}]
-        self.assertEqual(h[0], 1)
-        self.assertEqual(h[1], 5)
-        self.assertEqual(h[4], 17)
+        self.assertEqualSum(h[0], 1)
+        self.assertEqualSum(h[1], 5)
+        self.assertEqualSum(h[4], 17)
 
         with self.assertRaises(IndexError):
             h[5]
@@ -470,13 +472,13 @@ class Indexing2D(typing.Generic[T], Indexing):
     def test_setting_single_value(self) -> None:
         h = self.make_histogram()
         h[0, 0] = self.value_to_bin(42)
-        self.assertEqual(h[0, 0], 42)
-        self.assertEqual(h[1, 1], 3)
+        self.assertEqualBinValue(h[0, 0], 42)
+        self.assertEqualBinValue(h[1, 1], 3)
 
     def test_setting_underflow(self) -> None:
         h = self.make_histogram()
         h[self.tag.underflow, ...] = self.value_to_bin(42)
-        self.assertEqual(h[self.tag.underflow, 0], 42)
+        self.assertEqualBinValue(h[self.tag.underflow, 0], 42)
 
     def test_setting_array(self) -> None:
         h = self.make_histogram()
@@ -559,7 +561,7 @@ class Indexing3D(typing.Generic[T], Indexing):
         with self.assertRaises(IndexError):
             self.h[0, 0, 10]
 
-        self.assertEqual(self.h[-1, -1, -1], 36)
+        self.assertEqualBinValue(self.h[-1, -1, -1], 36)
 
     def test_access_loc(self) -> None:
         self.assertEqualBinValue(
@@ -615,46 +617,46 @@ class Indexing3D(typing.Generic[T], Indexing):
 
     def test_full_integration(self) -> None:
         v = self.h[::sum, ::sum, ::sum]
-        self.assertEqual(v, 1800)
+        self.assertEqualSum(v, 1800)
 
     def test_mixed_integration(self) -> None:
         h = self.h[::sum, :2:sum, 1:3]
-        self.assertEqual(h[0], 18)
-        self.assertEqual(h[1], 30)
+        self.assertEqualSum(h[0], 18)
+        self.assertEqualSum(h[1], 30)
 
         with self.assertRaises(IndexError):
             h[2]
 
     def test_mixed_single_integration(self) -> None:
         h = self.h[1, ::sum, 1:3]
-        self.assertEqual(h[0], 40)
-        self.assertEqual(h[1], 55)
+        self.assertEqualSum(h[0], 40)
+        self.assertEqualSum(h[1], 55)
 
         with self.assertRaises(IndexError):
             h[2]
 
     def test_mixed_single_integration_dict(self) -> None:
         h = self.h[{0: 1, 1: np.s_[::sum], 2: np.s_[1:3]}]
-        self.assertEqual(h[0], 40)
-        self.assertEqual(h[1], 55)
+        self.assertEqualSum(h[0], 40)
+        self.assertEqualSum(h[1], 55)
 
         with self.assertRaises(IndexError):
             h[2]
 
     def test_ellipsis_integration(self) -> None:
         h = self.h[::sum, ..., ::sum]
-        self.assertEqual(h[0], 280)
-        self.assertEqual(h[1], 320)
-        self.assertEqual(h[4], 440)
+        self.assertEqualSum(h[0], 280)
+        self.assertEqualSum(h[1], 320)
+        self.assertEqualSum(h[4], 440)
 
         with self.assertRaises(IndexError):
             h[5]
 
     def test_ellipsis_integration_dict(self) -> None:
         h = self.h[{0: np.s_[::sum], 2: np.s_[::sum]}]
-        self.assertEqual(h[0], 280)
-        self.assertEqual(h[1], 320)
-        self.assertEqual(h[4], 440)
+        self.assertEqualSum(h[0], 280)
+        self.assertEqualSum(h[1], 320)
+        self.assertEqualSum(h[4], 440)
 
         with self.assertRaises(IndexError):
             h[5]
