@@ -25,6 +25,9 @@ def __dir__() -> list[str]:
 
 
 class Indexing(typing.Generic[T], abc.ABC, unittest.TestCase):
+    """
+    This super class provides the basic structure for indexing tests.
+    """
 
     h: T
     tag = uhi.tag
