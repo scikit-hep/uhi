@@ -13,6 +13,7 @@
 [![Gitter][gitter-badge]][gitter-link]
 [![Zenodo][zenodo-badge]][zenodo-link]
 [![Scikit-HEP][sk-badge]](https://scikit-hep.org/)
+[![SPEC 4 — Using and Creating Nightly Wheels][spec4-badge]][spec4-link]
 
 
 This is a package meant primarily for [documenting][rtd-link] histogram
@@ -55,6 +56,8 @@ might be simpler than manually checking for the expected methods.
 [rtd-badge]:                https://readthedocs.org/projects/uhi/badge/?version=latest
 [rtd-link]:                 https://uhi.readthedocs.io/en/latest/?badge=latest
 [sk-badge]:                 https://scikit-hep.org/assets/images/Scikit--HEP-Project-blue.svg
+[spec4-badge]:              https://img.shields.io/badge/SPEC-4-green?labelColor=%23004811&color=%235CA038
+[spec4-link]:               https://scientific-python.org/specs/spec-0004/
 
 [boost-histogram]:          https://github.com/scikit-hep/boost-histogram
 [hist]:                     https://github.com/scikit-hep/hist
