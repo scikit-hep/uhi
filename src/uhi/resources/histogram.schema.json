@@ -78,6 +78,13 @@
         ".+": { "$ref": "#/$defs/supported_metadata" }
       }
     },
+    "ndarray": {
+      "type": "array",
+      "items": {
+        "oneOf": [{ "type": "number" }, { "$ref": "#/$defs/ndarray" }]
+      },
+      "description": "A ND (nested) array of numbers."
+    },
     "data_array": {
       "oneOf": [
         {
@@ -85,8 +92,7 @@
           "description": "A path (similar to URI) to the floating point bin data"
         },
         {
-          "type": "array",
-          "items": { "type": "number" }
+          "$ref": "#/$defs/ndarray"
         }
       ]
     },

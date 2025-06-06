@@ -32,6 +32,6 @@
         "circular": false
       }
     ],
-    "storage": { "type": "double", "values": "some/path/depends/on/format" }
+    "storage": { "type": "double", "values": [1, 2, 3, 4, 5, 6, 7] }
   }
 }
