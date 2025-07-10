@@ -41,7 +41,7 @@ def test_valid_json(filename: Path, tmp_path: Path) -> None:
         # Check that the JSON representation is the same
         data = json.dumps(hist, default=uhi.io.json.default, sort_keys=True)
         redata = json.dumps(rehist, default=uhi.io.json.default, sort_keys=True)
-        
+
         assert redata.replace(" ", "").replace("\n", "") == data.replace(
             " ", ""
         ).replace("\n", "")

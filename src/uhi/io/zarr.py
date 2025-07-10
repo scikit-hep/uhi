@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
-import zarr
 import numpy as np
-import numcodecs
+import zarr
 
 from ..typing.serialization import AnyAxis, AnyHistogram, AnyStorage, Histogram
 from . import ARRAY_KEYS
@@ -47,7 +46,9 @@ def write(grp: zarr.Group, /, histogram: AnyHistogram) -> None:
             for k, v in ax_metadata.items():
                 ax_metadata_grp.attrs[k] = v
         if ax_edges is not None:
-            arr = ax_group.create_array("edges", shape=ax_edges.shape, dtype=ax_edges.dtype)
+            arr = ax_group.create_array(
+                "edges", shape=ax_edges.shape, dtype=ax_edges.dtype
+            )
             arr[:] = ax_edges
         if ax_cats is not None:
             # zarr v3 doesn't support str dtype yet, so we attach it to attrs (which should be ok in general)
