@@ -23,7 +23,7 @@ def __dir__() -> list[str]:
 
 @functools.lru_cache(maxsize=None)
 def _histogram_schema() -> Callable[[dict[str, Any]], None]:
-    import fastjsonschema
+    import fastjsonschema  # noqa: PLC0415
 
     with histogram_file.open(encoding="utf-8") as f:
         return fastjsonschema.compile(json.load(f))  # type: ignore[no-any-return]
@@ -37,7 +37,7 @@ def validate(data: dict[str, Any]) -> None:
 
 def main(*files: str) -> None:
     """Validate histogram files."""
-    import fastjsonschema
+    import fastjsonschema  # noqa: PLC0415
 
     retval = 0
 

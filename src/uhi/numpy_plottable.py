@@ -95,6 +95,8 @@ class NumPyPlottableAxis:
         """
         return iter(self[t] for t in range(len(self)))
 
+    __hash__ = None  # type: ignore[assignment]
+
 
 if TYPE_CHECKING:
     _axis: PlottableAxisGeneric[tuple[float, float]] = typing.cast(
@@ -205,6 +207,8 @@ class ROOTAxis(abc.ABC):
         if all(tAx.GetBinLabel(i + 1) for i in range(tAx.GetNbins())):
             return DiscreteROOTAxis(tAx)
         return ContinuousROOTAxis(tAx)
+
+    __hash__ = None  # type: ignore[assignment]
 
 
 class ContinuousROOTAxis(ROOTAxis):
