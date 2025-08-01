@@ -53,7 +53,7 @@ T_co = TypeVar("T_co", covariant=True)
 
 
 @runtime_checkable
-class PlottableAxisGeneric(Protocol[T_co]):
+class PlottableAxisGeneric(Protocol[T_co]):  # noqa: PLW1641
     # name: str - Optional, not part of Protocol
     # label: str - Optional, not part of Protocol
     #
