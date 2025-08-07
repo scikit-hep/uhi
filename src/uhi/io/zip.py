@@ -1,13 +1,15 @@
 from __future__ import annotations
 
+import functools
 import json
 import zipfile
 from typing import Any
 
 import numpy as np
 
-from ..typing.serialization import AnyHistogram, Histogram
+from ..typing.serialization import AnyHistogram, Histogram, ToUHIHistogram
 from . import ARRAY_KEYS
+from ._common import _check_uhi_schema_version, _convert_input
 
 __all__ = ["read", "write"]
 
@@ -20,11 +22,12 @@ def write(
     zip_file: zipfile.ZipFile,
     /,
     name: str,
-    histogram: AnyHistogram,
+    histogram: AnyHistogram | ToUHIHistogram,
 ) -> None:
     """
     Write a histogram to a zip file.
     """
+    histogram = _convert_input(histogram)
     # Write out numpy arrays to files in the zipfile
     for storage_key in ARRAY_KEYS & histogram["storage"].keys():
         path = f"{name}_storage_{storage_key}.npy"
@@ -43,16 +46,22 @@ def write(
     zip_file.writestr(f"{name}.json", hist_json)
 
 
+def _object_hook(
+    dct: dict[str, Any], /, *, zip_file: zipfile.ZipFile
+) -> dict[str, Any]:
+    for item in ARRAY_KEYS & dct.keys():
+        if isinstance(dct[item], str):
+            dct[item] = np.load(zip_file.open(dct[item]))
+    return dct
+
+
 def read(zip_file: zipfile.ZipFile, /, name: str) -> Histogram:
     """
     Read histograms from a zip file.
     """
 
-    def object_hook(dct: dict[str, Any], /) -> dict[str, Any]:
-        for item in ARRAY_KEYS & dct.keys():
-            if isinstance(dct[item], str):
-                dct[item] = np.load(zip_file.open(dct[item]))
-        return dct
-
+    object_hook = functools.partial(_object_hook, zip_file=zip_file)
     with zip_file.open(f"{name}.json") as f:
-        return json.load(f, object_hook=object_hook)  # type: ignore[no-any-return]
+        output: Histogram = json.load(f, object_hook=object_hook)
+        _check_uhi_schema_version(output["uhi_schema"])
+        return output

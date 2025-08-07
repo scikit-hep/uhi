@@ -6,11 +6,14 @@ Two types of dictionaries are defined here:
    the merger of all possible types.
 2. ``Axis``, ``Storage``, and ``histogram`` are used for outputs. These have precise entries
    defined for each Literal type.
+
+There's also a Protocol, `ToUHIHistogram`, for anything that supports conversion.
 """
 
 from __future__ import annotations
 
-from typing import Literal, TypedDict, Union
+import typing
+from typing import Literal, Protocol, TypedDict, Union
 
 from numpy.typing import ArrayLike
 
@@ -28,6 +31,7 @@ __all__ = [
     "MeanStorage",
     "RegularAxis",
     "Storage",
+    "ToUHIHistogram",
     "VariableAxis",
     "WeightedMeanStorage",
     "WeightedStorage",
@@ -52,12 +56,12 @@ class _RequiredRegularAxis(TypedDict):
 
 class RegularAxis(_RequiredRegularAxis, total=False):
     metadata: dict[str, SupportedMetadata]
-    writer_info: dict[str, SupportedMetadata]
+    writer_info: dict[str, dict[str, SupportedMetadata]]
 
 
 class _RequiredVariableAxis(TypedDict):
     type: Literal["variable"]
-    edges: ArrayLike | str
+    edges: ArrayLike
     underflow: bool
     overflow: bool
     circular: bool
@@ -65,7 +69,7 @@ class _RequiredVariableAxis(TypedDict):
 
 class VariableAxis(_RequiredVariableAxis, total=False):
     metadata: dict[str, SupportedMetadata]
-    writer_info: dict[str, SupportedMetadata]
+    writer_info: dict[str, dict[str, SupportedMetadata]]
 
 
 class _RequiredCategoryStrAxis(TypedDict):
@@ -76,7 +80,7 @@ class _RequiredCategoryStrAxis(TypedDict):
 
 class CategoryStrAxis(_RequiredCategoryStrAxis, total=False):
     metadata: dict[str, SupportedMetadata]
-    writer_info: dict[str, SupportedMetadata]
+    writer_info: dict[str, dict[str, SupportedMetadata]]
 
 
 class _RequiredCategoryIntAxis(TypedDict):
@@ -87,7 +91,7 @@ class _RequiredCategoryIntAxis(TypedDict):
 
 class CategoryIntAxis(_RequiredCategoryIntAxis, total=False):
     metadata: dict[str, SupportedMetadata]
-    writer_info: dict[str, SupportedMetadata]
+    writer_info: dict[str, dict[str, SupportedMetadata]]
 
 
 class _RequiredBooleanAxis(TypedDict):
@@ -96,38 +100,38 @@ class _RequiredBooleanAxis(TypedDict):
 
 class BooleanAxis(_RequiredBooleanAxis, total=False):
     metadata: dict[str, SupportedMetadata]
-    writer_info: dict[str, SupportedMetadata]
+    writer_info: dict[str, dict[str, SupportedMetadata]]
 
 
 class IntStorage(TypedDict):
     type: Literal["int"]
-    values: ArrayLike | str
+    values: ArrayLike
 
 
 class DoubleStorage(TypedDict):
     type: Literal["double"]
-    values: ArrayLike | str
+    values: ArrayLike
 
 
 class WeightedStorage(TypedDict):
     type: Literal["weighted"]
-    values: ArrayLike | str
-    variances: ArrayLike | str
+    values: ArrayLike
+    variances: ArrayLike
 
 
 class MeanStorage(TypedDict):
     type: Literal["mean"]
-    counts: ArrayLike | str
-    values: ArrayLike | str
-    variances: ArrayLike | str
+    counts: ArrayLike
+    values: ArrayLike
+    variances: ArrayLike
 
 
 class WeightedMeanStorage(TypedDict):
     type: Literal["weighted_mean"]
-    sum_of_weights: ArrayLike | str
-    sum_of_weights_squared: ArrayLike | str
-    values: ArrayLike | str
-    variances: ArrayLike | str
+    sum_of_weights: ArrayLike
+    sum_of_weights_squared: ArrayLike
+    values: ArrayLike
+    variances: ArrayLike
 
 
 Storage = Union[
@@ -142,11 +146,11 @@ class _RequiredAnyStorage(TypedDict):
 
 
 class AnyStorage(_RequiredAnyStorage, total=False):
-    values: ArrayLike | str
-    variances: ArrayLike | str
-    sum_of_weights: ArrayLike | str
-    sum_of_weights_squared: ArrayLike | str
-    counts: ArrayLike | str
+    values: ArrayLike
+    variances: ArrayLike
+    sum_of_weights: ArrayLike
+    sum_of_weights_squared: ArrayLike
+    counts: ArrayLike
 
 
 class _RequiredAnyAxis(TypedDict):
@@ -155,10 +159,11 @@ class _RequiredAnyAxis(TypedDict):
 
 class AnyAxis(_RequiredAnyAxis, total=False):
     metadata: dict[str, SupportedMetadata]
+    writer_info: dict[str, dict[str, SupportedMetadata]]
     lower: float
     upper: float
     bins: int
-    edges: ArrayLike | str
+    edges: ArrayLike
     categories: list[str] | list[int]
     underflow: bool
     overflow: bool
@@ -167,20 +172,27 @@ class AnyAxis(_RequiredAnyAxis, total=False):
 
 
 class _RequiredHistogram(TypedDict):
+    uhi_schema: int
     axes: list[Axis]
     storage: Storage
 
 
 class Histogram(_RequiredHistogram, total=False):
     metadata: dict[str, SupportedMetadata]
-    writer_info: dict[str, SupportedMetadata]
+    writer_info: dict[str, dict[str, SupportedMetadata]]
 
 
 class _RequiredAnyHistogram(TypedDict):
+    uhi_schema: int
     axes: list[AnyAxis]
     storage: AnyStorage
 
 
 class AnyHistogram(_RequiredAnyHistogram, total=False):
     metadata: dict[str, SupportedMetadata]
-    writer_info: dict[str, SupportedMetadata]
+    writer_info: dict[str, dict[str, SupportedMetadata]]
+
+
+@typing.runtime_checkable
+class ToUHIHistogram(Protocol):
+    def _to_uhi_(self) -> Histogram: ...

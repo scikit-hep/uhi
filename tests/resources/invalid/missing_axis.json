@@ -1,5 +1,6 @@
 {
   "one": {
+    "uhi_schema": 1,
     "storage": { "type": "int", "values": [1] }
   }
 }

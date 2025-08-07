@@ -1,5 +1,6 @@
 {
   "main": {
+    "uhi_schema": 1,
     "axes": [
       {
         "type": "variable",

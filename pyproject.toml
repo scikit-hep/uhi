@@ -86,7 +86,7 @@ log_cli_level = "INFO"
 
 [tool.mypy]
 files = ["src", "tests"]
-python_version = "3.8"
+python_version = "3.9"
 warn_unused_configs = true
 strict = true
 warn_unreachable = true
