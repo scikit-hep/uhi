@@ -4,13 +4,9 @@ import functools
 import json
 import sys
 from collections.abc import Callable
+from importlib import resources
 from pathlib import Path
 from typing import Any
-
-if sys.version_info < (3, 9):
-    import importlib_resources as resources
-else:
-    from importlib import resources
 
 histogram_file = resources.files("uhi") / "resources/histogram.schema.json"
 
@@ -21,7 +17,7 @@ def __dir__() -> list[str]:
     return __all__
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def _histogram_schema() -> Callable[[dict[str, Any]], None]:
     import fastjsonschema  # noqa: PLC0415
 
