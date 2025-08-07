@@ -35,11 +35,13 @@ def test_valid_json(filename: Path, tmp_path: Path) -> None:
         rehist = rehists[name]
 
         # Check that the JSON representation is the same
-        redata = json.dumps(hist, default=uhi.io.json.default, sort_keys=True)
-        data = json.dumps(rehist, default=uhi.io.json.default, sort_keys=True)
-        assert redata.replace(" ", "").replace("\n", "") == data.replace(
-            " ", ""
-        ).replace("\n", "")
+        data = json.dumps(hist, default=uhi.io.json.default, sort_keys=True)
+        redata = json.dumps(rehist, default=uhi.io.json.default, sort_keys=True)
+
+        redata = redata.replace(" ", "").replace("\n", "")
+        data = data.replace(" ", "").replace("\n", "")
+
+        assert redata == data
 
 
 def test_reg_load(tmp_path: Path) -> None:
