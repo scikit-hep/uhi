@@ -63,7 +63,9 @@ Axes with gaps are currently not supported.
 
 All axes support `metadata`, a string-valued dictionary of arbitrary data.
 Currently, strings, numbers, and booleans are supported. Other values here are
-not currently supported.
+not currently supported. Libraries are encouraged to provide a way to indicate
+unserializable metadata; our recommendation is to avoid adding any metadata
+that starts with a `@` to the metadata dictionary.
 
 The following storages are supported:
 
