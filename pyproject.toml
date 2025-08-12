@@ -9,6 +9,7 @@ authors = [
   {name="Henry Schreiner", email="henryschreineriii@gmail.com"},
   {name="Hans Dembinski", email="hans.dembinski@gmail.com"},
   {name="Jim Pivaski", email="jpivarski@gmail.com"},
+  {name="Silia Taider", email="siliataider@gmail.com"},
 ]
 maintainers = [
   {name="The Scikit-HEP admins", email="scikit-hep-admins@googlegroups.com"},
