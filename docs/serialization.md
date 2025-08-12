@@ -61,7 +61,8 @@ All axes support `metadata`, a string-valued dictionary of arbitrary data.
 Currently, strings, numbers, and booleans are supported. Other values here are
 not currently supported. Libraries are encouraged to provide a way to indicate
 unserializable metadata; our recommendation is to avoid adding any metadata
-that starts with a `@` to the metadata dictionary.
+that starts with a `@` to the metadata dictionary. Libraries should not
+include keys with `None` values, as some formats might not support null values.
 
 The following storages are supported:
 
