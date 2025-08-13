@@ -19,7 +19,7 @@ readme = "README.md"
 license = "bsd-3-clause"
 license-files =["LICENSE"]
 dependencies = [
-  "numpy>=1.13.3",
+  "numpy>=1.19.3",
 ]
 classifiers = [
   "Development Status :: 4 - Beta",
