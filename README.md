@@ -46,8 +46,8 @@ might be simpler than manually checking for the expected methods.
 [github-discussions-link]:  https://github.com/Scikit-HEP/uhi/discussions
 [gitter-badge]:             https://badges.gitter.im/https://github.com/Scikit-HEP/uhi/community.svg
 [gitter-link]:              https://gitter.im/https://github.com/Scikit-HEP/uhi/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
-[zenodo-badge]:             https://zenodo.org/badge/DOI/10.5281/zenodo.10014713.svg
-[zenodo-link]:              https://doi.org/10.5281/zenodo.10014713
+[zenodo-badge]:             https://zenodo.org/badge/DOI/10.5281/zenodo.13883674.svg
+[zenodo-link]:              https://doi.org/10.5281/zenodo.13883674
 [pre-commit-badge]:         https://results.pre-commit.ci/badge/github/scikit-hep/uhi/main.svg
 [pre-commit-link]:          https://results.pre-commit.ci/repo/github/309772485
 [pypi-link]:                https://pypi.org/project/uhi/
