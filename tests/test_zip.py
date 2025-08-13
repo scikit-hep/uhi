@@ -1,14 +1,19 @@
 from __future__ import annotations
 
+import importlib.metadata
 import copy
 import json
 import zipfile
 from pathlib import Path
 
+import packaging.version
 import pytest
 
 import uhi.io.json
 import uhi.io.zip
+
+BHVERSION = packaging.version.Version(importlib.metadata.version("boost_histogram"))
+HISTVERSION = packaging.version.Version(importlib.metadata.version("hist"))
 
 DIR = Path(__file__).parent.resolve()
 
@@ -98,3 +103,47 @@ def test_reg_load(tmp_path: Path) -> None:
 
     assert two["storage"]["type"] == "double"
     assert two["storage"]["values"] == pytest.approx([1, 2, 3, 4, 5, 6, 7])
+
+
+@pytest.mark.skipif(
+    packaging.version.Version("1.6.1") > BHVERSION,
+    reason="Requires boost-histogram 1.6+",
+)
+def test_convert_bh(tmp_path: Path) -> None:
+    import boost_histogram as bh
+
+    h = bh.Histogram(
+        bh.axis.Regular(3, 13, 10, __dict__={"name": "x"}), storage=bh.storage.Weight()
+    )
+    tmp_file = tmp_path / "test.zip"
+    with zipfile.ZipFile(tmp_file, "w") as zip_file:
+        uhi.io.zip.write(zip_file, "histogram", h)
+    with zipfile.ZipFile(tmp_file, "r") as zip_file:
+        rehist = uhi.io.zip.read(zip_file, "histogram")
+    h2 = bh.Histogram(rehist)
+
+    assert h == h2
+
+
+@pytest.mark.skipif(
+    packaging.version.Version("1.6.1") > BHVERSION
+    or packaging.version.Version("2.9.0") > HISTVERSION,
+    reason="Requires boost-histogram 1.6+ / Hist 2.9+",
+)
+def test_convert_hist(tmp_path: Path) -> None:
+    import hist
+
+    h = hist.Hist(
+        hist.axis.Regular(10, 0, 1, name="a", label="A"),
+        hist.axis.Integer(7, 13, overflow=False, name="b", label="B"),
+        storage=hist.storage.Weight(),
+        name="h",
+        label="H",
+    )
+    tmp_file = tmp_path / "test.zip"
+    with zipfile.ZipFile(tmp_file, "w") as zip_file:
+        uhi.io.zip.write(zip_file, "histogram", h)
+    with zipfile.ZipFile(tmp_file, "r") as zip_file:
+        rehist = uhi.io.zip.read(zip_file, "histogram")
+    h2 = hist.Hist(rehist)
+    assert h == h2
