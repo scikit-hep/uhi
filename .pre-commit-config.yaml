@@ -35,6 +35,7 @@ repos:
         - pytest
         - importlib_resources
         - boost-histogram
+        - hist
 
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0

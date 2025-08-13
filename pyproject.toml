@@ -63,8 +63,10 @@ docs = [
 ]
 test = [
   "pytest>=6",
-  "boost-histogram>=1.0",
+  "boost-histogram>=1.4",
+  "hist>=2.6",
   "fastjsonschema",
+  "packaging",
   "h5py; platform_python_implementation == 'cpython'",
 ]
 dev = [{ include-group = "test"}]
@@ -131,7 +133,7 @@ flake8-unused-arguments.ignore-variadic-names = true
 isort.required-imports = ["from __future__ import annotations"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["T20"]
+"tests/**" = ["T20", "PLC0415"]
 "noxfile.py" = ["T20"]
 "tests/test_ensure.py" = ["NPY002"]
 "src/**" = ["PT"]
