@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "Please cite the following works when using this software."
+type: software
+title: "uhi"
+abstract: "UHI is a library that helps connect other Histogramming libraries."
+authors:
+- family-names: "Schreiner"
+  given-names: "Henry"
+  orcid: "https://orcid.org/0000-0002-7833-783X"
+  affiliation: "Princeton University"
+- given-names: Hans
+  family-names: Dembinski
+  email: hans.dembinski@gmail.com
+  affiliation: TU Dortmund
+  orcid: 'https://orcid.org/0000-0003-3337-3850'
+- family-names: "Pivarski"
+  given-names: "Jim"
+  affiliation: "Princeton University"
+  orcid: "https://orcid.org/0000-0002-6649-343X"
+  email: "jpivarski@gmail.com"
+- family-names: "Taider"
+  given-names: "Silia"
+  email: "siliataider@gmail.com"
+doi: https://doi.org/10.5281/zenodo.13883674
+repository-code: "https://github.com/scikit-hep/uhi"
+url: "https://uhi.readthedocs.io/"
+keywords:
+  - python
+  - histogram
+  - scikit-hep
+license: "BSD-3-Clause"
