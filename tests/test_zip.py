@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import importlib.metadata
 import copy
+import importlib.metadata
 import json
 import zipfile
 from pathlib import Path
