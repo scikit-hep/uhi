@@ -8,6 +8,7 @@ from typing import Any
 import numpy as np
 
 import uhi.tag
+from uhi.typing.serialization import Histogram
 
 T = typing.TypeVar("T", bound=Any)
 
@@ -66,14 +67,38 @@ class Indexing1D(typing.Generic[T], Indexing):
 
     h is a 1D histogram with 10 bins from 0 to 1. Each bin has 2 more than the
     one before, starting with 0. The overflow bin has 1. The underflow bin has 3.
+    You can access the UHI serialized version with `.uhi`.
     """
 
     h: T
     tag = uhi.tag
 
     @staticmethod
+    def get_uhi() -> Histogram:
+        return {
+            "uhi_schema": 1,
+            "axes": [
+                {
+                    "type": "regular",
+                    "lower": 0.0,
+                    "upper": 1.0,
+                    "bins": 10,
+                    "underflow": True,
+                    "overflow": True,
+                    "circular": False,
+                }
+            ],
+            "storage": {
+                "type": "double",
+                "values": np.array(
+                    [3.0, 0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 1.0]
+                ),
+            },
+        }
+
+    @classmethod
     @abc.abstractmethod
-    def make_histogram() -> T:
+    def make_histogram(cls) -> T:
         pass
 
     @classmethod
@@ -371,6 +396,38 @@ class Indexing2D(typing.Generic[T], Indexing):
     tag = uhi.tag
 
     @staticmethod
+    def get_uhi() -> Histogram:
+        x, y = np.mgrid[0:2, 0:5]
+        data = np.pad(x + 2 * y, 1, mode="constant")
+        return {
+            "uhi_schema": 1,
+            "axes": [
+                {
+                    "type": "regular",
+                    "lower": 0.0,
+                    "upper": 2.0,
+                    "bins": 2,
+                    "underflow": True,
+                    "overflow": True,
+                    "circular": False,
+                },
+                {
+                    "type": "regular",
+                    "lower": 0.0,
+                    "upper": 5.0,
+                    "bins": 5,
+                    "underflow": True,
+                    "overflow": True,
+                    "circular": False,
+                },
+            ],
+            "storage": {
+                "type": "double",
+                "values": data,
+            },
+        }
+
+    @staticmethod
     @abc.abstractmethod
     def make_histogram() -> T:
         pass
@@ -539,8 +596,54 @@ class Indexing3D(typing.Generic[T], Indexing):
     tag = uhi.tag
 
     @staticmethod
+    def get_uhi() -> Histogram:
+        x, y, z = np.mgrid[0:2, 0:5, 0:10]
+        data = np.pad(x + 2 * y + 3 * z, 1, mode="constant")
+        return {
+            "uhi_schema": 1,
+            "writer_info": {"boost-histogram": {"version": "1.6.1"}},
+            "axes": [
+                {
+                    "type": "regular",
+                    "lower": 0.0,
+                    "upper": 2.0,
+                    "bins": 2,
+                    "underflow": True,
+                    "overflow": True,
+                    "circular": False,
+                    "metadata": {},
+                },
+                {
+                    "type": "regular",
+                    "lower": 0.0,
+                    "upper": 5.0,
+                    "bins": 5,
+                    "underflow": True,
+                    "overflow": True,
+                    "circular": False,
+                    "metadata": {},
+                },
+                {
+                    "type": "regular",
+                    "lower": 0.0,
+                    "upper": 10.0,
+                    "bins": 10,
+                    "underflow": True,
+                    "overflow": True,
+                    "circular": False,
+                    "metadata": {},
+                },
+            ],
+            "storage": {
+                "type": "double",
+                "values": data,
+            },
+            "metadata": {"_variance_known": True},
+        }
+
+    @classmethod
     @abc.abstractmethod
-    def make_histogram() -> T:
+    def make_histogram(cls) -> T:
         pass
 
     @classmethod
