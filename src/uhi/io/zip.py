@@ -7,7 +7,7 @@ from typing import Any
 
 import numpy as np
 
-from ..typing.serialization import AnyHistogram, ToUHIHistogram
+from ..typing.serialization import AnyHistogramIR, ToUHIHistogram
 from . import ARRAY_KEYS
 from ._common import _check_uhi_schema_version, _convert_input
 
@@ -22,7 +22,7 @@ def write(
     zip_file: zipfile.ZipFile,
     /,
     name: str,
-    histogram: AnyHistogram | ToUHIHistogram,
+    histogram: AnyHistogramIR | ToUHIHistogram,
 ) -> None:
     """
     Write a histogram to a zip file.
