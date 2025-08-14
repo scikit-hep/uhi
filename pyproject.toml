@@ -20,6 +20,7 @@ license = "bsd-3-clause"
 license-files =["LICENSE"]
 dependencies = [
   "numpy>=1.19.3",
+  "typing_extensions>=4; python_version<'3.11'",
 ]
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -131,6 +132,7 @@ ignore = [
 ]
 flake8-unused-arguments.ignore-variadic-names = true
 isort.required-imports = ["from __future__ import annotations"]
+typing-modules = ["uhi._compat.typing"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["T20", "PLC0415"]

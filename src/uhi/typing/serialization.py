@@ -17,6 +17,8 @@ from typing import Any, Literal, Protocol, TypedDict, Union
 
 from numpy.typing import ArrayLike
 
+from uhi._compat.typing import NotRequired, Required
+
 __all__ = [
     "AnyAxis",
     "AnyHistogram",
@@ -44,7 +46,7 @@ def __dir__() -> list[str]:
     return __all__
 
 
-class _RequiredRegularAxis(TypedDict):
+class RegularAxis(TypedDict):
     type: Literal["regular"]
     lower: float
     upper: float
@@ -52,55 +54,40 @@ class _RequiredRegularAxis(TypedDict):
     underflow: bool
     overflow: bool
     circular: bool
+    metadata: NotRequired[dict[str, SupportedMetadata]]
+    writer_info: NotRequired[dict[str, dict[str, SupportedMetadata]]]
 
 
-class RegularAxis(_RequiredRegularAxis, total=False):
-    metadata: dict[str, SupportedMetadata]
-    writer_info: dict[str, dict[str, SupportedMetadata]]
-
-
-class _RequiredVariableAxis(TypedDict):
+class VariableAxis(TypedDict):
     type: Literal["variable"]
     edges: ArrayLike
     underflow: bool
     overflow: bool
     circular: bool
+    metadata: NotRequired[dict[str, SupportedMetadata]]
+    writer_info: NotRequired[dict[str, dict[str, SupportedMetadata]]]
 
 
-class VariableAxis(_RequiredVariableAxis, total=False):
-    metadata: dict[str, SupportedMetadata]
-    writer_info: dict[str, dict[str, SupportedMetadata]]
-
-
-class _RequiredCategoryStrAxis(TypedDict):
+class CategoryStrAxis(TypedDict):
     type: Literal["category_str"]
     categories: list[str]
     flow: bool
+    metadata: NotRequired[dict[str, SupportedMetadata]]
+    writer_info: NotRequired[dict[str, dict[str, SupportedMetadata]]]
 
 
-class CategoryStrAxis(_RequiredCategoryStrAxis, total=False):
-    metadata: dict[str, SupportedMetadata]
-    writer_info: dict[str, dict[str, SupportedMetadata]]
-
-
-class _RequiredCategoryIntAxis(TypedDict):
+class CategoryIntAxis(TypedDict):
     type: Literal["category_int"]
     categories: list[int]
     flow: bool
+    metadata: NotRequired[dict[str, SupportedMetadata]]
+    writer_info: NotRequired[dict[str, dict[str, SupportedMetadata]]]
 
 
-class CategoryIntAxis(_RequiredCategoryIntAxis, total=False):
-    metadata: dict[str, SupportedMetadata]
-    writer_info: dict[str, dict[str, SupportedMetadata]]
-
-
-class _RequiredBooleanAxis(TypedDict):
+class BooleanAxis(TypedDict):
     type: Literal["boolean"]
-
-
-class BooleanAxis(_RequiredBooleanAxis, total=False):
-    metadata: dict[str, SupportedMetadata]
-    writer_info: dict[str, dict[str, SupportedMetadata]]
+    metadata: NotRequired[dict[str, SupportedMetadata]]
+    writer_info: NotRequired[dict[str, dict[str, SupportedMetadata]]]
 
 
 class IntStorage(TypedDict):
@@ -141,11 +128,8 @@ Storage = Union[
 Axis = Union[RegularAxis, VariableAxis, CategoryStrAxis, CategoryIntAxis, BooleanAxis]
 
 
-class _RequiredAnyStorage(TypedDict):
-    type: Literal["int", "double", "weighted", "mean", "weighted_mean"]
-
-
-class AnyStorage(_RequiredAnyStorage, total=False):
+class AnyStorage(TypedDict, total=False):
+    type: Required[Literal["int", "double", "weighted", "mean", "weighted_mean"]]
     values: ArrayLike
     variances: ArrayLike
     sum_of_weights: ArrayLike
@@ -153,11 +137,10 @@ class AnyStorage(_RequiredAnyStorage, total=False):
     counts: ArrayLike
 
 
-class _RequiredAnyAxis(TypedDict):
-    type: Literal["regular", "variable", "category_str", "category_int", "boolean"]
-
-
-class AnyAxis(_RequiredAnyAxis, total=False):
+class AnyAxis(TypedDict, total=False):
+    type: Required[
+        Literal["regular", "variable", "category_str", "category_int", "boolean"]
+    ]
     metadata: dict[str, SupportedMetadata]
     writer_info: dict[str, dict[str, SupportedMetadata]]
     lower: float
@@ -171,26 +154,20 @@ class AnyAxis(_RequiredAnyAxis, total=False):
     circular: bool
 
 
-class _RequiredHistogram(TypedDict):
+class Histogram(TypedDict):
     uhi_schema: int
     axes: list[Axis]
     storage: Storage
+    metadata: NotRequired[dict[str, SupportedMetadata]]
+    writer_info: NotRequired[dict[str, dict[str, SupportedMetadata]]]
 
 
-class Histogram(_RequiredHistogram, total=False):
-    metadata: dict[str, SupportedMetadata]
-    writer_info: dict[str, dict[str, SupportedMetadata]]
-
-
-class _RequiredAnyHistogram(TypedDict):
+class AnyHistogram(TypedDict):
     uhi_schema: int
     axes: list[AnyAxis]
     storage: AnyStorage
-
-
-class AnyHistogram(_RequiredAnyHistogram, total=False):
-    metadata: dict[str, SupportedMetadata]
-    writer_info: dict[str, dict[str, SupportedMetadata]]
+    metadata: NotRequired[dict[str, SupportedMetadata]]
+    writer_info: NotRequired[dict[str, dict[str, SupportedMetadata]]]
 
 
 @typing.runtime_checkable
