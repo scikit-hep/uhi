@@ -20,6 +20,7 @@ license = "bsd-3-clause"
 license-files =["LICENSE"]
 dependencies = [
   "numpy>=1.19.3",
+  "typing_extensions>=4; python_version<'3.11'",
 ]
 classifiers = [
   "Development Status :: 4 - Beta",
