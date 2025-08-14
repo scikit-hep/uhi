@@ -24,23 +24,23 @@ else:
     from typing import NotRequired, Required
 
 __all__ = [
-    "AnyAxis",
-    "AnyHistogram",
-    "AnyStorage",
-    "Axis",
-    "BooleanAxis",
-    "CategoryIntAxis",
-    "CategoryStrAxis",
-    "DoubleStorage",
-    "Histogram",
-    "IntStorage",
-    "MeanStorage",
-    "RegularAxis",
-    "Storage",
+    "AnyAxisIR",
+    "AnyHistogramIR",
+    "AnyStorageIR",
+    "AxisIR",
+    "BooleanAxisIR",
+    "CategoryIntAxisIR",
+    "CategoryStrAxisIR",
+    "DoubleStorageIR",
+    "HistogramIR",
+    "IntStorageIR",
+    "MeanStorageIR",
+    "RegularAxisIR",
+    "StorageIR",
     "ToUHIHistogram",
-    "VariableAxis",
-    "WeightedMeanStorage",
-    "WeightedStorage",
+    "VariableAxisIR",
+    "WeightedMeanStorageIR",
+    "WeightedStorageIR",
 ]
 
 SupportedMetadata = Union[float, str, bool]
@@ -50,7 +50,7 @@ def __dir__() -> list[str]:
     return __all__
 
 
-class RegularAxis(TypedDict):
+class RegularAxisIR(TypedDict):
     type: Literal["regular"]
     lower: float
     upper: float
@@ -62,7 +62,7 @@ class RegularAxis(TypedDict):
     writer_info: NotRequired[dict[str, dict[str, SupportedMetadata]]]
 
 
-class VariableAxis(TypedDict):
+class VariableAxisIR(TypedDict):
     type: Literal["variable"]
     edges: ArrayLike
     underflow: bool
@@ -72,7 +72,7 @@ class VariableAxis(TypedDict):
     writer_info: NotRequired[dict[str, dict[str, SupportedMetadata]]]
 
 
-class CategoryStrAxis(TypedDict):
+class CategoryStrAxisIR(TypedDict):
     type: Literal["category_str"]
     categories: list[str]
     flow: bool
@@ -80,7 +80,7 @@ class CategoryStrAxis(TypedDict):
     writer_info: NotRequired[dict[str, dict[str, SupportedMetadata]]]
 
 
-class CategoryIntAxis(TypedDict):
+class CategoryIntAxisIR(TypedDict):
     type: Literal["category_int"]
     categories: list[int]
     flow: bool
@@ -88,36 +88,36 @@ class CategoryIntAxis(TypedDict):
     writer_info: NotRequired[dict[str, dict[str, SupportedMetadata]]]
 
 
-class BooleanAxis(TypedDict):
+class BooleanAxisIR(TypedDict):
     type: Literal["boolean"]
     metadata: NotRequired[dict[str, SupportedMetadata]]
     writer_info: NotRequired[dict[str, dict[str, SupportedMetadata]]]
 
 
-class IntStorage(TypedDict):
+class IntStorageIR(TypedDict):
     type: Literal["int"]
     values: ArrayLike
 
 
-class DoubleStorage(TypedDict):
+class DoubleStorageIR(TypedDict):
     type: Literal["double"]
     values: ArrayLike
 
 
-class WeightedStorage(TypedDict):
+class WeightedStorageIR(TypedDict):
     type: Literal["weighted"]
     values: ArrayLike
     variances: ArrayLike
 
 
-class MeanStorage(TypedDict):
+class MeanStorageIR(TypedDict):
     type: Literal["mean"]
     counts: ArrayLike
     values: ArrayLike
     variances: ArrayLike
 
 
-class WeightedMeanStorage(TypedDict):
+class WeightedMeanStorageIR(TypedDict):
     type: Literal["weighted_mean"]
     sum_of_weights: ArrayLike
     sum_of_weights_squared: ArrayLike
@@ -125,14 +125,20 @@ class WeightedMeanStorage(TypedDict):
     variances: ArrayLike
 
 
-Storage = Union[
-    IntStorage, DoubleStorage, WeightedStorage, MeanStorage, WeightedMeanStorage
+StorageIR = Union[
+    IntStorageIR,
+    DoubleStorageIR,
+    WeightedStorageIR,
+    MeanStorageIR,
+    WeightedMeanStorageIR,
 ]
 
-Axis = Union[RegularAxis, VariableAxis, CategoryStrAxis, CategoryIntAxis, BooleanAxis]
+AxisIR = Union[
+    RegularAxisIR, VariableAxisIR, CategoryStrAxisIR, CategoryIntAxisIR, BooleanAxisIR
+]
 
 
-class AnyStorage(TypedDict, total=False):
+class AnyStorageIR(TypedDict, total=False):
     type: Required[Literal["int", "double", "weighted", "mean", "weighted_mean"]]
     values: ArrayLike
     variances: ArrayLike
@@ -141,7 +147,7 @@ class AnyStorage(TypedDict, total=False):
     counts: ArrayLike
 
 
-class AnyAxis(TypedDict, total=False):
+class AnyAxisIR(TypedDict, total=False):
     type: Required[
         Literal["regular", "variable", "category_str", "category_int", "boolean"]
     ]
@@ -158,18 +164,18 @@ class AnyAxis(TypedDict, total=False):
     circular: bool
 
 
-class Histogram(TypedDict):
+class HistogramIR(TypedDict):
     uhi_schema: int
-    axes: list[Axis]
-    storage: Storage
+    axes: list[AxisIR]
+    storage: StorageIR
     metadata: NotRequired[dict[str, SupportedMetadata]]
     writer_info: NotRequired[dict[str, dict[str, SupportedMetadata]]]
 
 
-class AnyHistogram(TypedDict):
+class AnyHistogramIR(TypedDict):
     uhi_schema: int
-    axes: list[AnyAxis]
-    storage: AnyStorage
+    axes: list[AnyAxisIR]
+    storage: AnyStorageIR
     metadata: NotRequired[dict[str, SupportedMetadata]]
     writer_info: NotRequired[dict[str, dict[str, SupportedMetadata]]]
 

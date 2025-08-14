@@ -232,10 +232,11 @@ ROOT files are not yet implemented.
 
 ## Schema
 
-A typing helper `Histogram` is provided in `uhi.typing.serialization` as a
-`TypedDict`. The schema, provided in `resources` as `histogram.schema.json`,
-also allows strings for data members, since some formats (like ZIP) put data
-into an optimized location and specify a reference to them.
+A typing helper for the intermediate representation, `HistogramIR`, is provided
+in `uhi.typing.serialization` as a `TypedDict`. The schema, provided in
+`resources` as `histogram.schema.json`, also allows strings for data members,
+since some formats (like ZIP) put data into an optimized location and specify a
+reference to them.
 
 ### Rendered schema
 

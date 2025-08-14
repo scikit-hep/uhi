@@ -7,10 +7,10 @@ import h5py
 import numpy as np
 
 from ..typing.serialization import (
-    AnyAxis,
-    AnyHistogram,
-    AnyStorage,
-    Histogram,
+    AnyAxisIR,
+    AnyHistogramIR,
+    AnyStorageIR,
+    HistogramIR,
     SupportedMetadata,
     ToUHIHistogram,
 )
@@ -44,7 +44,7 @@ def _handle_metadata_writer_info(
                 inner_wi_grp.attrs[k] = v
 
 
-def write(grp: h5py.Group, /, histogram: AnyHistogram | ToUHIHistogram) -> None:
+def write(grp: h5py.Group, /, histogram: AnyHistogramIR | ToUHIHistogram) -> None:
     """
     Write a histogram to an HDF5 group.
     """
@@ -111,7 +111,7 @@ def _convert_item(name: str, item: Any, /) -> Any:
 
 
 def _read_metadata_writer_info(
-    output: AnyHistogram | AnyAxis, group: h5py.Group | h5py.Dataset | h5py.Datatype
+    output: AnyHistogramIR | AnyAxisIR, group: h5py.Group | h5py.Dataset | h5py.Datatype
 ) -> None:
     if "metadata" in group:
         output["metadata"] = _convert_item("metadata", group["metadata"].attrs)
@@ -122,14 +122,14 @@ def _read_metadata_writer_info(
         }
 
 
-def _convert_axes(group: h5py.Group | h5py.Dataset | h5py.Datatype) -> AnyAxis:
+def _convert_axes(group: h5py.Group | h5py.Dataset | h5py.Datatype) -> AnyAxisIR:
     """
     Convert an HDF5 axis reference to a dictionary.
     """
     assert isinstance(group, h5py.Group)
 
     axis = typing.cast(
-        AnyAxis, {k: _convert_item(k, v) for k, v in group.attrs.items()}
+        AnyAxisIR, {k: _convert_item(k, v) for k, v in group.attrs.items()}
     )
     if "edges" in group:
         edges = group["edges"]
@@ -145,7 +145,7 @@ def _convert_axes(group: h5py.Group | h5py.Dataset | h5py.Datatype) -> AnyAxis:
     return axis
 
 
-def read(grp: h5py.Group, /) -> Histogram:
+def read(grp: h5py.Group, /) -> HistogramIR:
     """
     Read a histogram from an HDF5 group.
     """
@@ -161,11 +161,11 @@ def read(grp: h5py.Group, /) -> Histogram:
 
     storage_grp = grp["storage"]
     assert isinstance(storage_grp, h5py.Group)
-    storage = AnyStorage(type=storage_grp.attrs["type"])
+    storage = AnyStorageIR(type=storage_grp.attrs["type"])
     for key in storage_grp:
         storage[key] = np.asarray(storage_grp[key])  # type: ignore[literal-required]
 
-    histogram_dict = AnyHistogram(uhi_schema=uhi_schema, axes=axes, storage=storage)
+    histogram_dict = AnyHistogramIR(uhi_schema=uhi_schema, axes=axes, storage=storage)
     _read_metadata_writer_info(histogram_dict, grp)
 
     return histogram_dict  # type: ignore[return-value]

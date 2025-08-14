@@ -8,7 +8,7 @@ from typing import Any
 import numpy as np
 
 import uhi.tag
-from uhi.typing.serialization import Histogram
+from uhi.typing.serialization import HistogramIR
 
 T = typing.TypeVar("T", bound=Any)
 
@@ -74,7 +74,7 @@ class Indexing1D(typing.Generic[T], Indexing):
     tag = uhi.tag
 
     @staticmethod
-    def get_uhi() -> Histogram:
+    def get_uhi() -> HistogramIR:
         return {
             "uhi_schema": 1,
             "axes": [
@@ -396,7 +396,7 @@ class Indexing2D(typing.Generic[T], Indexing):
     tag = uhi.tag
 
     @staticmethod
-    def get_uhi() -> Histogram:
+    def get_uhi() -> HistogramIR:
         x, y = np.mgrid[0:2, 0:5]
         data = np.pad(x + 2 * y, 1, mode="constant")
         return {
@@ -596,7 +596,7 @@ class Indexing3D(typing.Generic[T], Indexing):
     tag = uhi.tag
 
     @staticmethod
-    def get_uhi() -> Histogram:
+    def get_uhi() -> HistogramIR:
         x, y, z = np.mgrid[0:2, 0:5, 0:10]
         data = np.pad(x + 2 * y + 3 * z, 1, mode="constant")
         return {

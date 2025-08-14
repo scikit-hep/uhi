@@ -6,7 +6,7 @@ from __future__ import annotations
 
 __all__ = ["_check_uhi_schema_version", "_convert_input"]
 
-from ..typing.serialization import AnyHistogram, ToUHIHistogram
+from ..typing.serialization import AnyHistogramIR, ToUHIHistogram
 
 
 def _check_uhi_schema_version(uhi_schema: int, /) -> None:
@@ -15,7 +15,7 @@ def _check_uhi_schema_version(uhi_schema: int, /) -> None:
         raise TypeError(msg)
 
 
-def _convert_input(hist: AnyHistogram | ToUHIHistogram, /) -> AnyHistogram:
+def _convert_input(hist: AnyHistogramIR | ToUHIHistogram, /) -> AnyHistogramIR:
     any_hist = hist._to_uhi_() if isinstance(hist, ToUHIHistogram) else hist
     _check_uhi_schema_version(any_hist["uhi_schema"])
     return any_hist  # type: ignore[return-value]
