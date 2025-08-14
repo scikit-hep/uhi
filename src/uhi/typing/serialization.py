@@ -12,12 +12,16 @@ There's also a Protocol, `ToUHIHistogram`, for anything that supports conversion
 
 from __future__ import annotations
 
+import sys
 import typing
 from typing import Any, Literal, Protocol, TypedDict, Union
 
 from numpy.typing import ArrayLike
 
-from uhi._compat.typing import NotRequired, Required
+if sys.version_info < (3, 11):
+    from typing_extensions import NotRequired, Required
+else:
+    from typing import NotRequired, Required
 
 __all__ = [
     "AnyAxis",
