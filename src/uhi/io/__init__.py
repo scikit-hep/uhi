@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 from typing import Any, TypeVar
 
-__all__ = ["ARRAY_KEYS", "LIST_KEYS"]
+__all__ = ["ARRAY_KEYS", "LIST_KEYS", "remove_writer_info"]
 
 ARRAY_KEYS = frozenset(
     [
