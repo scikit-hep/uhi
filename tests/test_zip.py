@@ -17,12 +17,9 @@ HISTVERSION = packaging.version.Version(importlib.metadata.version("hist"))
 
 DIR = Path(__file__).parent.resolve()
 
-VALID_FILES = DIR.glob("resources/valid/*.json")
 
-
-@pytest.mark.parametrize("filename", VALID_FILES, ids=lambda p: p.name)
-def test_valid_json(filename: Path, tmp_path: Path) -> None:
-    data = filename.read_text(encoding="utf-8")
+def test_valid_json(valid: Path, tmp_path: Path) -> None:
+    data = valid.read_text(encoding="utf-8")
     hists = json.loads(data, object_hook=uhi.io.json.object_hook)
 
     tmp_file = tmp_path / "test.zip"
