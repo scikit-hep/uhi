@@ -13,7 +13,7 @@ There's also a Protocol, `ToUHIHistogram`, for anything that supports conversion
 from __future__ import annotations
 
 import typing
-from typing import Literal, Protocol, TypedDict, Union
+from typing import Any, Literal, Protocol, TypedDict, Union
 
 from numpy.typing import ArrayLike
 
@@ -195,4 +195,4 @@ class AnyHistogram(_RequiredAnyHistogram, total=False):
 
 @typing.runtime_checkable
 class ToUHIHistogram(Protocol):
-    def _to_uhi_(self) -> Histogram: ...
+    def _to_uhi_(self) -> dict[str, Any]: ...

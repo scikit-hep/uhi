@@ -7,7 +7,7 @@ from typing import Any
 
 import numpy as np
 
-from ..typing.serialization import AnyHistogram, Histogram, ToUHIHistogram
+from ..typing.serialization import AnyHistogram, ToUHIHistogram
 from . import ARRAY_KEYS
 from ._common import _check_uhi_schema_version, _convert_input
 
@@ -55,13 +55,13 @@ def _object_hook(
     return dct
 
 
-def read(zip_file: zipfile.ZipFile, /, name: str) -> Histogram:
+def read(zip_file: zipfile.ZipFile, /, name: str) -> dict[str, Any]:
     """
     Read histograms from a zip file.
     """
 
     object_hook = functools.partial(_object_hook, zip_file=zip_file)
     with zip_file.open(f"{name}.json") as f:
-        output: Histogram = json.load(f, object_hook=object_hook)
+        output: dict[str, Any] = json.load(f, object_hook=object_hook)
         _check_uhi_schema_version(output["uhi_schema"])
         return output
