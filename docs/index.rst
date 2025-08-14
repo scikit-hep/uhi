@@ -31,6 +31,7 @@ to plot a histogram, including error bars.
    indexing+.rst
    plotting.rst
    serialization.md
+   testing.md
    changelog.md
 
 
