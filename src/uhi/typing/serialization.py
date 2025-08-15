@@ -97,17 +97,20 @@ class BooleanAxisIR(TypedDict):
 class IntStorageIR(TypedDict):
     type: Literal["int"]
     values: ArrayLike
+    index: NotRequired[ArrayLike]
 
 
 class DoubleStorageIR(TypedDict):
     type: Literal["double"]
     values: ArrayLike
+    index: NotRequired[ArrayLike]
 
 
 class WeightedStorageIR(TypedDict):
     type: Literal["weighted"]
     values: ArrayLike
     variances: ArrayLike
+    index: NotRequired[ArrayLike]
 
 
 class MeanStorageIR(TypedDict):
@@ -115,6 +118,7 @@ class MeanStorageIR(TypedDict):
     counts: ArrayLike
     values: ArrayLike
     variances: ArrayLike
+    index: NotRequired[ArrayLike]
 
 
 class WeightedMeanStorageIR(TypedDict):
@@ -123,6 +127,7 @@ class WeightedMeanStorageIR(TypedDict):
     sum_of_weights_squared: ArrayLike
     values: ArrayLike
     variances: ArrayLike
+    index: NotRequired[ArrayLike]
 
 
 StorageIR = Union[
@@ -140,6 +145,7 @@ AxisIR = Union[
 
 class AnyStorageIR(TypedDict, total=False):
     type: Required[Literal["int", "double", "weighted", "mean", "weighted_mean"]]
+    index: ArrayLike
     values: ArrayLike
     variances: ArrayLike
     sum_of_weights: ArrayLike

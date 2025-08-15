@@ -17,3 +17,8 @@ def valid(request: pytest.FixtureRequest) -> Path:
 @pytest.fixture(params=INVALID_FILES, ids=lambda p: p.name)
 def invalid(request: pytest.FixtureRequest) -> Path:
     return request.param  # type: ignore[no-any-return]
+
+
+@pytest.fixture(params=[False, True], ids=["dense", "sparse"])
+def sparse(request: pytest.FixtureRequest) -> bool:
+    return request.param  # type: ignore[no-any-return]
