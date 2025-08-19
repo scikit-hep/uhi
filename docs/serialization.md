@@ -113,17 +113,21 @@ first dimension has the same number of entries as the number of axes, and the
 second dimension has the same number of entries as the number of filled bins.
 There should not be any duplicate entries. The values start at 0 for the
 underflow bin (if there is one), and are in the same order as the axes. The
-data in this case are 1D arrays, one for each bin. For example, if just the `0,
-1` bin was filled with a `5`, then this would be a valid sparse histogram:
+data in this case are 1D arrays, one for each bin. For example, take the
+following sparse histogram with three filled bins:
 
 ```json
 {
     "storage": {
-        "index": [[0],[1]],
-        "values": [5],
+        "index": [[0, 1, 2],[3, 3, 4]],
+        "values": [5, 6, 7],
     }
 }
 ```
+
+The `0, 3` bin is filled with 5, the `1, 3` bin is filled with 6, and the `2,
+4` bin is filled with 7. If the first axes has `"underflow"` enabled, that
+first bin is an underflow bin.
 
 If a histogram library doesn't support sparse histograms, you can convert a
 sparse histogram to a dense one. UHI provides helpers `uhi.io.to_sparse` and
