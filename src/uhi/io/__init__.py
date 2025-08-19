@@ -95,7 +95,7 @@ def to_sparse(hist: H, /) -> H:
     # Build mask of nonzero bins across *all* present keys
     mask = np.zeros(shape, dtype=bool)
     for arr in arrays.values():
-        mask |= arr != 0
+    mask = np.any([arr != 0 for arr in arrays.values()], axis=0)
 
     # Get the flat indices (or unravel them)
     nonzero_indices = np.nonzero(mask)
@@ -106,7 +106,7 @@ def to_sparse(hist: H, /) -> H:
     # Build sparse storage dict
     sparse_storage = {"type": storage_type, "index": index}
     for k, arr in arrays.items():
-        sparse_storage[k] = arr[mask].ravel()
+        sparse_storage[k] = arr[mask]
 
     # Return new histogram dict with modified storage
     sparse_hist = copy.copy(hist)

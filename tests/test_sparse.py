@@ -60,7 +60,10 @@ def test_to_from_sparse_roundtrip() -> None:
 def test_all_valid(valid: Path) -> None:
     data = valid.read_text(encoding="utf-8")
     hists = json.loads(data, object_hook=uhi.io.json.object_hook)
-    hists = {k: from_sparse(v) for k, v in hists.items()}
+    hists = {
+        k: from_sparse(v) if "index" in v.get("storage", {}) else v
+        for k, v in hists.items()
+    }
     shists = {k: to_sparse(v) for k, v in hists.items()}
     for h in shists.values():
         if h["axes"]:
