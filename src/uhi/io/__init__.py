@@ -82,19 +82,14 @@ def to_sparse(hist: H, /) -> H:
     storage = hist["storage"]
     storage_type = storage["type"]
 
+    # Ignore histograms that have 0 dimensions or are already sparse
     if "index" in storage or not hist["axes"]:
         return hist
 
     # Get the arrays inside storage, ignoring "type"
     arrays = {k: np.asarray(v) for k, v in storage.items() if k != "type"}
 
-    # Figure out the shared shape
-    values = np.asarray(arrays["values"])
-    shape = values.shape
-
     # Build mask of nonzero bins across *all* present keys
-    mask = np.zeros(shape, dtype=bool)
-    for arr in arrays.values():
     mask = np.any([arr != 0 for arr in arrays.values()], axis=0)
 
     # Get the flat indices (or unravel them)

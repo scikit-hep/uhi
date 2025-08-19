@@ -125,8 +125,8 @@ following sparse histogram with three filled bins:
 }
 ```
 
-The `0, 3` bin is filled with 5, the `1, 3` bin is filled with 6, and the `2,
-4` bin is filled with 7. If the first axes has `"underflow"` enabled, that
+The `0, 3` bin is filled with 5, the `1, 3` bin is filled with 6, and the
+`2, 4` bin is filled with 7. If the first axes has `"underflow"` enabled, that
 first bin is an underflow bin.
 
 If a histogram library doesn't support sparse histograms, you can convert a

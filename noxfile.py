@@ -34,7 +34,7 @@ def tests(session):
     """
     Run the unit and regular tests.
     """
-    session.install("-e.[schema]", *nox.project.dependency_groups(PYPROJECT, "tests"))
+    session.install("-e.[schema]", *nox.project.dependency_groups(PYPROJECT, "test"))
     session.run("pytest", *session.posargs)
 
 
