@@ -11,6 +11,7 @@ import pytest
 
 import uhi.io.json
 import uhi.io.zip
+from uhi.io import to_sparse
 
 BHVERSION = packaging.version.Version(importlib.metadata.version("boost_histogram"))
 HISTVERSION = packaging.version.Version(importlib.metadata.version("hist"))
@@ -18,9 +19,11 @@ HISTVERSION = packaging.version.Version(importlib.metadata.version("hist"))
 DIR = Path(__file__).parent.resolve()
 
 
-def test_valid_json(valid: Path, tmp_path: Path) -> None:
+def test_valid_json(valid: Path, tmp_path: Path, sparse: bool) -> None:
     data = valid.read_text(encoding="utf-8")
     hists = json.loads(data, object_hook=uhi.io.json.object_hook)
+    if sparse:
+        hists = {name: to_sparse(hist) for name, hist in hists.items()}
 
     tmp_file = tmp_path / "test.zip"
     with zipfile.ZipFile(tmp_file, "w") as zip_file:

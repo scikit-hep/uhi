@@ -8,6 +8,7 @@ import packaging.version
 import pytest
 
 import uhi.io.json
+from uhi.io import to_sparse
 
 h5py = pytest.importorskip("h5py", reason="h5py is not installed")
 uhi_io_hdf5 = pytest.importorskip("uhi.io.hdf5")
@@ -18,9 +19,11 @@ HISTVERSION = packaging.version.Version(importlib.metadata.version("hist"))
 DIR = Path(__file__).parent.resolve()
 
 
-def test_valid_json(valid: Path, tmp_path: Path) -> None:
+def test_valid_json(valid: Path, tmp_path: Path, sparse: bool) -> None:
     data = valid.read_text(encoding="utf-8")
     hists = json.loads(data, object_hook=uhi.io.json.object_hook)
+    if sparse:
+        hists = {name: to_sparse(hist) for name, hist in hists.items()}
 
     tmp_file = tmp_path / "test.h5"
     with h5py.File(tmp_file, "w") as h5_file:

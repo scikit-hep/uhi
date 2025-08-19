@@ -91,6 +91,26 @@
         }
       ]
     },
+    "sparse_array": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "A path (similar to URI) to the index data"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "description": "Bin indexes, 0 is the underflow if present"
+            },
+            "description": "A 2D array of integers."
+          },
+          "description": "The 2D index array, outer dimension is axis number, inner matches the 1D data."
+        }
+      ]
+    },
     "regular_axis": {
       "type": "object",
       "description": "An evenly spaced set of continuous bins.",
@@ -213,6 +233,7 @@
       "additionalProperties": false,
       "properties": {
         "type": { "type": "string", "const": "int" },
+        "index": { "$ref": "#/$defs/sparse_array" },
         "values": { "$ref": "#/$defs/data_array" }
       }
     },
@@ -223,6 +244,7 @@
       "additionalProperties": false,
       "properties": {
         "type": { "type": "string", "const": "double" },
+        "index": { "$ref": "#/$defs/sparse_array" },
         "values": { "$ref": "#/$defs/data_array" }
       }
     },
@@ -233,6 +255,7 @@
       "additionalProperties": false,
       "properties": {
         "type": { "type": "string", "const": "weighted" },
+        "index": { "$ref": "#/$defs/sparse_array" },
         "values": { "$ref": "#/$defs/data_array" },
         "variances": { "$ref": "#/$defs/data_array" }
       }
@@ -244,6 +267,7 @@
       "additionalProperties": false,
       "properties": {
         "type": { "type": "string", "const": "mean" },
+        "index": { "$ref": "#/$defs/sparse_array" },
         "counts": { "$ref": "#/$defs/data_array" },
         "values": { "$ref": "#/$defs/data_array" },
         "variances": { "$ref": "#/$defs/data_array" }
@@ -262,6 +286,7 @@
       "additionalProperties": false,
       "properties": {
         "type": { "type": "string", "const": "weighted_mean" },
+        "index": { "$ref": "#/$defs/sparse_array" },
         "sum_of_weights": { "$ref": "#/$defs/data_array" },
         "sum_of_weights_squared": { "$ref": "#/$defs/data_array" },
         "values": { "$ref": "#/$defs/data_array" },
