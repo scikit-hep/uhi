@@ -62,15 +62,18 @@ docs = [
   "myst-parser",
   "sphinx_github_changelog",
 ]
-test = [
+test-core = [
   "pytest>=6",
   "boost-histogram>=1.4",
   "hist>=2.6",
   "fastjsonschema",
   "packaging",
-  "h5py; platform_python_implementation == 'cpython'",
 ]
-dev = [{ include-group = "test"}]
+test = [
+  { include-group = "test-core" },
+  "h5py; platform_python_implementation == 'CPython' and python_version<'3.14'",  # Doesn't support free-threaded Python currently
+]
+dev = [{ include-group = "test" }]
 
 
 [tool.hatch]
