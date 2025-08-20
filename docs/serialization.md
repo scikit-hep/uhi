@@ -253,6 +253,10 @@ representation, and`uhi_hist` is an intermediate representation; you can pass
 it to `boost_histogram.Histogram` or `hist.Hist`. You should create the group
 you want the histogram to be in.
 
+By default, we do not compress arrays smaller than 1,000 elements. You can
+control this by setting `min_compress_elements`; set it to 0 to compress all
+arrays. You can also pass through `compression` and `compression_opts`.
+
 :::{warning}
 
 Note that h5py doesn't support free-threaded Python with wheels, and it
