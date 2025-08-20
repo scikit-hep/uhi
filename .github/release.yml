@@ -1,5 +1,4 @@
 changelog:
   exclude:
     authors:
-      - dependabot
-      - pre-commit-ci
+      - '*[bot]'

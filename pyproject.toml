@@ -23,7 +23,7 @@ dependencies = [
   "typing_extensions>=4; python_version<'3.11'",
 ]
 classifiers = [
-  "Development Status :: 4 - Beta",
+  "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
   "Intended Audience :: Science/Research",
   "Operating System :: OS Independent",
