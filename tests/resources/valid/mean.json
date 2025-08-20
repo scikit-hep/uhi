@@ -10,8 +10,7 @@
         "bins": 4,
         "underflow": true,
         "overflow": true,
-        "circular": false,
-        "metadata": {}
+        "circular": false
       }
     ],
     "storage": {
@@ -37,8 +36,7 @@
         "bins": 4,
         "underflow": true,
         "overflow": true,
-        "circular": false,
-        "metadata": {}
+        "circular": false
       }
     ],
     "storage": {
