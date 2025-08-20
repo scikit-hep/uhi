@@ -9,6 +9,11 @@ VALID_FILES = DIR.glob("resources/valid/*.json")
 INVALID_FILES = DIR.glob("resources/invalid/*.json")
 
 
+@pytest.fixture(scope="session")
+def resources() -> Path:
+    return DIR / "resources"
+
+
 @pytest.fixture(params=VALID_FILES, ids=lambda p: p.name)
 def valid(request: pytest.FixtureRequest) -> Path:
     return request.param  # type: ignore[no-any-return]

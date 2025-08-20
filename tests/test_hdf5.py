@@ -16,8 +16,6 @@ uhi_io_hdf5 = pytest.importorskip("uhi.io.hdf5")
 BHVERSION = packaging.version.Version(importlib.metadata.version("boost_histogram"))
 HISTVERSION = packaging.version.Version(importlib.metadata.version("hist"))
 
-DIR = Path(__file__).parent.resolve()
-
 
 def test_valid_json(valid: Path, tmp_path: Path, sparse: bool) -> None:
     data = valid.read_text(encoding="utf-8")
@@ -49,8 +47,8 @@ def test_valid_json(valid: Path, tmp_path: Path, sparse: bool) -> None:
         assert redata == data
 
 
-def test_reg_load(tmp_path: Path) -> None:
-    data = DIR / "resources/valid/reg.json"
+def test_reg_load(tmp_path: Path, resources: Path) -> None:
+    data = resources / "valid/reg.json"
     hists = json.loads(
         data.read_text(encoding="utf-8"), object_hook=uhi.io.json.object_hook
     )

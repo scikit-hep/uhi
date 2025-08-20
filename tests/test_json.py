@@ -12,8 +12,6 @@ import uhi.io.json
 BHVERSION = packaging.version.Version(importlib.metadata.version("boost_histogram"))
 HISTVERSION = packaging.version.Version(importlib.metadata.version("hist"))
 
-DIR = Path(__file__).parent.resolve()
-
 
 def test_valid_json(valid: Path) -> None:
     data = valid.read_text(encoding="utf-8")
@@ -28,8 +26,8 @@ def test_valid_json(valid: Path) -> None:
     assert hist.keys() == rehist.keys()
 
 
-def test_reg_load() -> None:
-    data = DIR / "resources/valid/reg.json"
+def test_reg_load(resources: Path) -> None:
+    data = resources / "valid/reg.json"
     hists = json.loads(
         data.read_text(encoding="utf-8"), object_hook=uhi.io.json.object_hook
     )
