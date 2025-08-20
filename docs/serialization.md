@@ -94,8 +94,8 @@ For example, a histogram created with boost-histogram might contain:
     "boost-histogram": {
       "version": "1.0.0",
     }
-  }
-  ...,
+  },
+  "...": "...",
 }
 ```
 
@@ -253,7 +253,12 @@ representation, and`uhi_hist` is an intermediate representation; you can pass
 it to `boost_histogram.Histogram` or `hist.Hist`. You should create the group
 you want the histogram to be in.
 
-<!-- TODO: make sure writer_info is stored, and make sure it's a nested group (via schema too) -->
+:::{warning}
+
+Note that h5py doesn't support free-threaded Python with wheels, and it
+currently (as of 3.14rc2) doesn't provide 3.14 wheels either.
+
+:::
 
 ### ROOT
 
