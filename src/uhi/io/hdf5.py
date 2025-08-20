@@ -44,9 +44,20 @@ def _handle_metadata_writer_info(
                 inner_wi_grp.attrs[k] = v
 
 
-def write(grp: h5py.Group, /, histogram: AnyHistogramIR | ToUHIHistogram) -> None:
+def write(
+    grp: h5py.Group,
+    /,
+    histogram: AnyHistogramIR | ToUHIHistogram,
+    *,
+    compression: str = "gzip",
+    compression_opts: int = 4,
+    min_compress_elements: int = 1_000,
+) -> None:
     """
-    Write a histogram to an HDF5 group.
+    Write a histogram to an HDF5 group. Arrays larger than
+    `min_compress_elements` will be compressed; set to 0 to compress all
+    arrays. The `compression` and `compression_opts` arguments are passed
+    through.
     """
     histogram = _convert_input(histogram)
     # All referenced objects will be stored inside of /{name}/ref_axes
@@ -77,9 +88,25 @@ def write(grp: h5py.Group, /, histogram: AnyHistogramIR | ToUHIHistogram) -> Non
         for key, val2 in ax_info.items():
             ax_group.attrs[key] = val2
         if ax_edges is not None:
-            ax_group.create_dataset("edges", shape=ax_edges.shape, data=ax_edges)
+            if ax_edges.size < min_compress_elements:
+                ax_group.create_dataset("edges", data=ax_edges)
+            else:
+                ax_group.create_dataset(
+                    "edges",
+                    data=ax_edges,
+                    compression=compression,
+                    compression_opts=compression_opts,
+                )
         if ax_cats is not None:
-            ax_group.create_dataset("categories", shape=len(ax_cats), data=ax_cats)
+            if len(ax_cats) < min_compress_elements:
+                ax_group.create_dataset("categories", data=ax_cats)
+            else:
+                ax_group.create_dataset(
+                    "categories",
+                    data=ax_cats,
+                    compression=compression,
+                    compression_opts=compression_opts,
+                )
         axes_dataset[i] = ax_group.ref
 
     # Storage
@@ -92,7 +119,15 @@ def write(grp: h5py.Group, /, histogram: AnyHistogramIR | ToUHIHistogram) -> Non
         if key == "type":
             continue
         npvalue = np.asarray(val3)
-        storage_grp.create_dataset(key, shape=npvalue.shape, data=npvalue)
+        if npvalue.size < min_compress_elements:
+            storage_grp.create_dataset(key, data=npvalue)
+        else:
+            storage_grp.create_dataset(
+                key,
+                data=npvalue,
+                compression=compression,
+                compression_opts=compression_opts,
+            )
 
 
 def _convert_item(name: str, item: Any, /) -> Any:

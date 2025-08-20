@@ -55,7 +55,9 @@ def test_reg_load(tmp_path: Path, resources: Path) -> None:
 
     tmp_file = tmp_path / "test.h5"
     with h5py.File(tmp_file, "w") as h5_file:
-        uhi_io_hdf5.write(h5_file.create_group("one"), hists["one"])
+        uhi_io_hdf5.write(
+            h5_file.create_group("one"), hists["one"], min_compress_elements=0
+        )
 
     with h5py.File(tmp_file, "r") as h5_file:
         one = uhi_io_hdf5.read(h5_file["one"])
