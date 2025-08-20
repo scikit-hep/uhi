@@ -78,6 +78,32 @@ def test_all_valid(valid: Path) -> None:
         assert v["axes"] == dv["axes"]
         assert v["storage"].keys() == dv["storage"].keys()
         assert v["storage"]["values"] == pytest.approx(dv["storage"]["values"])
-        assert v["storage"].get("variances") == pytest.approx(
-            dv["storage"].get("variances")
-        )
+        if v["storage"]["type"] == "weighted_mean":
+            v_var = v["storage"]["variances"]
+            dv_var = dv["storage"]["variances"]
+            assert np.all(np.isnan(v_var) == np.isnan(dv_var))
+            assert v_var[~np.isnan(v_var)] == pytest.approx(dv_var[~np.isnan(dv_var)])
+            assert v["storage"]["sum_of_weights"] == pytest.approx(
+                dv["storage"]["sum_of_weights"]
+            )
+            assert v["storage"]["sum_of_weights_squared"] == pytest.approx(
+                dv["storage"]["sum_of_weights_squared"]
+            )
+
+        else:
+            assert v["storage"].get("variances") == pytest.approx(
+                dv["storage"].get("variances")
+            )
+            assert v["storage"].get("counts") == pytest.approx(
+                dv["storage"].get("counts")
+            )
+
+
+@pytest.mark.parametrize("name", ["mean", "weighted_mean"])
+def test_mean(resources: Path, name: str) -> None:
+    data = resources.joinpath("valid/mean.json").read_text()
+    hist = json.loads(data, object_hook=uhi.io.json.object_hook)[name]
+    sparse_hist = to_sparse(hist)
+
+    assert len(sparse_hist["storage"]["values"]) == 2
+    assert sparse_hist["storage"]["index"].shape == (1, 2)

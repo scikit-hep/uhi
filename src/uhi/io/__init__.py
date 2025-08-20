@@ -74,6 +74,14 @@ def _compute_axis_length(axis: AxisIR) -> int:
     assert_never(axis["type"])
 
 
+def _zerokey(storage_type: str, key: str) -> bool:
+    """
+    Returns False if the comparison should be NaN instead of zero.
+    """
+
+    return storage_type != "weighted_mean" or key != "variances"
+
+
 def to_sparse(hist: H, /) -> H:
     """
     Convert a dense histogram to a sparse one. Leaves a sparse histogram alone.
@@ -90,7 +98,13 @@ def to_sparse(hist: H, /) -> H:
     arrays = {k: np.asarray(v) for k, v in storage.items() if k != "type"}
 
     # Build mask of nonzero bins across *all* present keys
-    mask = np.any([arr != 0 for arr in arrays.values()], axis=0)
+    mask = np.any(
+        [
+            arr != 0 if _zerokey(storage_type, k) else ~np.isnan(arr)
+            for k, arr in arrays.items()
+        ],
+        axis=0,
+    )
 
     # Get the flat indices (or unravel them)
     nonzero_indices = np.nonzero(mask)
@@ -114,7 +128,10 @@ def from_sparse(sparse: H, /) -> H:
     Convert sparse histogram data back to dense format. If the histogram is already
     dense, just return it.
     """
+
     storage = sparse["storage"]
+    storage_type = storage["type"]
+
     index = storage.get("index")
     if index is None:
         return sparse
@@ -131,8 +148,12 @@ def from_sparse(sparse: H, /) -> H:
         arr1dnp = np.asarray(arr1d)
         if k in {"index", "type"}:
             continue
-        # Allocate a zeros array of the original shape
-        full = np.zeros(shape, dtype=arr1dnp.dtype)
+
+        # Allocate a zeros (or nan) array of the original shape
+        full = np.full(
+            shape, 0 if _zerokey(storage_type, k) else np.nan, dtype=arr1dnp.dtype
+        )
+
         # Scatter sparse values back into dense array
         full[tuple(index)] = arr1dnp
         dense_storage[k] = full
