@@ -12,20 +12,20 @@ your own library (`my.Histogram` in this example) like this:
 ```python
 import uhi.testing.indexing
 
-class TestAccess1D(uhi.testing.indexing.Indexing1D[my.Histogram]):
+class TestAccess1D(uhi.testing.indexing.Indexing1D[bh.Histogram]):
     @classmethod
-    def make_histogram(cls) -> my.Histogram:
-        return my.Histogram(cls.get_uhi())
+    def make_histogram(cls) -> bh.Histogram:
+        return bh.Histogram(dict(cls.get_uhi()))
 
-class TestAccess1D(uhi.testing.indexing.Indexing2D[my.Histogram]):
+class TestAccess2D(uhi.testing.indexing.Indexing2D[bh.Histogram]):
     @classmethod
-    def make_histogram(cls) -> my.Histogram:
-        return my.Histogram(cls.get_uhi())
+    def make_histogram(cls) -> bh.Histogram:
+        return bh.Histogram(dict(cls.get_uhi()))
 
-class TestAccess1D(uhi.testing.indexing.Indexing3D[my.Histogram]):
+class TestAccess3D(uhi.testing.indexing.Indexing3D[bh.Histogram]):
     @classmethod
-    def make_histogram(cls) -> my.Histogram:
-        return my.Histogram(cls.get_uhi())
+    def make_histogram(cls) -> bh.Histogram:
+        return bh.Histogram(dict(cls.get_uhi()))
 ```
 
 If you don't support serialization, then you can manually set the values with
