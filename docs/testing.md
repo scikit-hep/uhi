@@ -17,12 +17,12 @@ class TestAccess1D(uhi.testing.indexing.Indexing1D[my.Histogram]):
     def make_histogram(cls) -> my.Histogram:
         return my.Histogram(cls.get_uhi())
 
-class TestAccess1D(uhi.testing.indexing.Indexing2D[my.Histogram]):
+class TestAccess2D(uhi.testing.indexing.Indexing2D[my.Histogram]):
     @classmethod
     def make_histogram(cls) -> my.Histogram:
         return my.Histogram(cls.get_uhi())
 
-class TestAccess1D(uhi.testing.indexing.Indexing3D[my.Histogram]):
+class TestAccess3D(uhi.testing.indexing.Indexing3D[my.Histogram]):
     @classmethod
     def make_histogram(cls) -> my.Histogram:
         return my.Histogram(cls.get_uhi())
