@@ -68,6 +68,7 @@ test-core = [
   "hist>=2.6",
   "fastjsonschema",
   "packaging",
+  "tomllib; python_version<'3.11'",
 ]
 test = [
   { include-group = "test-core" },
