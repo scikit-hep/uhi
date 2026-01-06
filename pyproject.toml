@@ -14,7 +14,7 @@ authors = [
 maintainers = [
   {name="The Scikit-HEP admins", email="scikit-hep-admins@googlegroups.com"},
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 readme = "README.md"
 license = "bsd-3-clause"
 license-files =["LICENSE"]
@@ -27,7 +27,6 @@ classifiers = [
   "Intended Audience :: Developers",
   "Intended Audience :: Science/Research",
   "Operating System :: OS Independent",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
@@ -47,7 +46,6 @@ Changelog = "https://github.com/scikit-hep/uhi/releases"
 [project.optional-dependencies]
 schema = [
   "fastjsonschema",
-  "importlib-resources; python_version<'3.9'",
 ]
 hdf5 = [
   "h5py",
@@ -93,7 +91,7 @@ log_level = "INFO"
 
 [tool.mypy]
 files = ["src", "tests"]
-python_version = "3.9"
+python_version = "3.10"
 warn_unused_configs = true
 strict = true
 warn_unreachable = true
