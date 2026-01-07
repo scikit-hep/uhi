@@ -140,9 +140,11 @@ class NumPyPlottableHistogram:
         if len(bins) == 0:
             bins = tuple([None] * len(hist.shape))
 
+        raw_bins: tuple[np.typing.NDArray[Any] | None, ...] = bins  # type: ignore[assignment]
+
         self.kind = kind
         self.axes: Sequence[PlottableAxis] = [
-            _bin_helper(shape, b) for shape, b in zip(hist.shape, bins)
+            _bin_helper(shape, b) for shape, b in zip(hist.shape, raw_bins, strict=True)
         ]
 
     def __repr__(self) -> str:
@@ -153,13 +155,13 @@ class NumPyPlottableHistogram:
         axes = ", ".join(repr(s) for s in self.axes)
         return f"{self.__class__.__name__}({self._values!r}, <{axes}>)"
 
-    def values(self) -> np.typing.NDArray[Any]:
+    def values(self) -> np.typing.NDArray[np.float64]:
         return self._values
 
-    def counts(self) -> np.typing.NDArray[Any]:
+    def counts(self) -> np.typing.NDArray[np.float64]:
         return self._values
 
-    def variances(self) -> np.typing.NDArray[Any] | None:
+    def variances(self) -> np.typing.NDArray[np.float64] | None:
         return self._variances
 
 
@@ -195,7 +197,7 @@ class ROOTAxis(abc.ABC):
         if not isinstance(other, ROOTAxis):
             return NotImplemented
         return len(self) == len(other) and all(
-            aEdges == bEdges for aEdges, bEdges in zip(self, other)
+            aEdges == bEdges for aEdges, bEdges in zip(self, other, strict=True)
         )
 
     @abc.abstractmethod
@@ -284,12 +286,14 @@ class ROOTPlottableHistogram(ROOTPlottableHistBase):
             return self.values()
 
         sumw = self.values()
-        return np.divide(
+        result = np.zeros_like(sumw, dtype=np.float64)
+        np.divide(
             sumw**2,
             self.variances(),
-            out=np.zeros_like(sumw, dtype=np.float64),
+            out=result,
             where=sumw != 0,
         )
+        return result
 
 
 class ROOTPlottableProfile(ROOTPlottableHistBase):
@@ -321,12 +325,14 @@ class ROOTPlottableProfile(ROOTPlottableHistBase):
         sumw2 = _roottarray_asnumpy(self.thist.GetSumw2(), shape=self._shape)[
             tuple([slice(1, -1)] * len(self._shape))
         ]
-        return np.divide(
+        result = np.zeros_like(sumw, dtype=np.float64)
+        np.divide(
             sumw**2,
             sumw2,
-            out=np.zeros_like(sumw, dtype=np.float64),
+            out=result,
             where=sumw != 0,
         )
+        return result
 
 
 if TYPE_CHECKING:
@@ -369,7 +375,7 @@ def ensure_plottable_histogram(hist: Any) -> PlottableHistogram:
             raise TypeError(msg)
         if (
             len(hist) == 2
-            and isinstance(hist[1], (list, tuple))
+            and isinstance(hist[1], list | tuple)
             and all(isinstance(h, np.ndarray) for h in hist[1])
         ):
             # histogramdd tuple

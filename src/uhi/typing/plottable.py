@@ -12,7 +12,7 @@ MyPy will force you to only use items in the Protocol.
 from __future__ import annotations
 
 from collections.abc import Iterator, Sequence
-from typing import Any, Protocol, TypeVar, Union, runtime_checkable
+from typing import Any, Protocol, TypeVar, runtime_checkable
 
 # NumPy 1.20+ will work much, much better than previous versions when type checking
 import numpy as np
@@ -90,7 +90,7 @@ PlottableAxisContinuous = PlottableAxisGeneric[tuple[float, float]]
 PlottableAxisInt = PlottableAxisGeneric[int]
 PlottableAxisStr = PlottableAxisGeneric[str]
 
-PlottableAxis = Union[PlottableAxisContinuous, PlottableAxisInt, PlottableAxisStr]
+PlottableAxis = PlottableAxisContinuous | PlottableAxisInt | PlottableAxisStr
 
 
 @runtime_checkable
@@ -105,7 +105,7 @@ class PlottableHistogram(Protocol):
     # If this is included, it should return an array with flow bins added,
     # normal ordering.
 
-    def values(self) -> np.typing.NDArray[Any]:
+    def values(self) -> np.typing.NDArray[np.float64]:
         """
         Returns the accumulated values. The counts for simple histograms, the
         sum of weights for weighted histograms, the mean for profiles, etc.
@@ -114,7 +114,7 @@ class PlottableHistogram(Protocol):
         kind == "MEAN".
         """
 
-    def variances(self) -> np.typing.NDArray[Any] | None:
+    def variances(self) -> np.typing.NDArray[np.float64] | None:
         """
         Returns the estimated variance of the accumulated values. The sum of squared
         weights for weighted histograms, the variance of samples for profiles, etc.
@@ -129,7 +129,7 @@ class PlottableHistogram(Protocol):
         weighted if the weight variance was tracked by the implementation.
         """
 
-    def counts(self) -> np.typing.NDArray[Any] | None:
+    def counts(self) -> np.typing.NDArray[np.float64] | None:
         """
         Returns the number of entries in each bin for an unweighted
         histogram or profile and an effective number of entries (defined below)

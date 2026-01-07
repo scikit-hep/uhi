@@ -18,10 +18,9 @@ def test_root_th1f_convert() -> None:
     th.FillRandom("gaus", 10000)
     h = ensure_plottable_histogram(th)
     assert all(th.GetBinContent(i + 1) == approx(iv) for i, iv in enumerate(h.values()))
-    assert all(
-        th.GetBinError(i + 1) == approx(ie)
-        for i, ie in enumerate(np.sqrt(h.variances()))
-    )
+    var = h.variances()
+    assert var is not None
+    assert all(th.GetBinError(i + 1) == approx(ie) for i, ie in enumerate(np.sqrt(var)))
 
 
 def test_root_th2f_convert() -> None:
@@ -34,8 +33,10 @@ def test_root_th2f_convert() -> None:
         for i, row in enumerate(h.values())
         for j, iv in enumerate(row)
     )
+    var = h.variances()
+    assert var is not None
     assert all(
         th.GetBinError(i + 1, j + 1) == approx(ie)
-        for i, row in enumerate(np.sqrt(h.variances()))
+        for i, row in enumerate(np.sqrt(var))
         for j, ie in enumerate(row)
     )

@@ -136,7 +136,7 @@ def from_sparse(sparse: H, /) -> H:
     if index is None:
         return sparse
 
-    ndim, n_nonzero = index.shape
+    ndim, _n_nonzero = index.shape
     shape = [_compute_axis_length(a) for a in sparse["axes"]]  # type: ignore[arg-type]
 
     if len(shape) != ndim:
