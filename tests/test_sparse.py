@@ -54,7 +54,7 @@ def test_to_from_sparse_roundtrip() -> None:
     for key, value in hist["storage"].items():
         if key == "type":
             continue
-        assert np.allclose(dense["storage"][key], value)  # type: ignore[literal-required]
+        assert np.allclose(dense["storage"][key], value)  # type: ignore[literal-required,arg-type]
 
 
 def test_all_valid(valid: Path) -> None:
@@ -73,7 +73,7 @@ def test_all_valid(valid: Path) -> None:
         assert "index" not in h["storage"]
 
     assert hists.keys() == dhists.keys()
-    for v, dv in zip(hists.values(), dhists.values()):
+    for v, dv in zip(hists.values(), dhists.values(), strict=True):
         assert v.keys() == dv.keys()
         assert v["axes"] == dv["axes"]
         assert v["storage"].keys() == dv["storage"].keys()
