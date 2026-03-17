@@ -118,7 +118,7 @@ def test_convert_bh(tmp_path: Path) -> None:
         uhi.io.zip.write(zip_file, "histogram", h)
     with zipfile.ZipFile(tmp_file, "r") as zip_file:
         rehist = uhi.io.zip.read(zip_file, "histogram")
-    h2 = bh.Histogram(rehist)
+    h2 = bh.Histogram[bh.storage.Double](rehist)
 
     assert h == h2
 
@@ -143,5 +143,5 @@ def test_convert_hist(tmp_path: Path) -> None:
         uhi.io.zip.write(zip_file, "histogram", h)
     with zipfile.ZipFile(tmp_file, "r") as zip_file:
         rehist = uhi.io.zip.read(zip_file, "histogram")
-    h2 = hist.Hist(rehist)
+    h2 = hist.Hist[hist.storage.Double](rehist)
     assert h == h2
