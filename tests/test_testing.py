@@ -5,21 +5,21 @@ import boost_histogram as bh
 import uhi.testing.indexing
 
 
-class TestAccess1D(uhi.testing.indexing.Indexing1D[bh.Histogram]):
+class TestAccess1D(uhi.testing.indexing.Indexing1D[bh.Histogram[bh.storage.Double]]):
     @classmethod
-    def make_histogram(cls) -> bh.Histogram:
+    def make_histogram(cls) -> bh.Histogram[bh.storage.Double]:
         return bh.Histogram(dict(cls.get_uhi()))
 
 
-class TestAccess2D(uhi.testing.indexing.Indexing2D[bh.Histogram]):
+class TestAccess2D(uhi.testing.indexing.Indexing2D[bh.Histogram[bh.storage.Double]]):
     @classmethod
-    def make_histogram(cls) -> bh.Histogram:
+    def make_histogram(cls) -> bh.Histogram[bh.storage.Double]:
         return bh.Histogram(dict(cls.get_uhi()))
 
 
-class TestAccess3D(uhi.testing.indexing.Indexing3D[bh.Histogram]):
+class TestAccess3D(uhi.testing.indexing.Indexing3D[bh.Histogram[bh.storage.Double]]):
     @classmethod
-    def make_histogram(cls) -> bh.Histogram:
+    def make_histogram(cls) -> bh.Histogram[bh.storage.Double]:
         return bh.Histogram(dict(cls.get_uhi()))
 
 

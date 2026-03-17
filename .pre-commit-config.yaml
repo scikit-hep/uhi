@@ -35,8 +35,8 @@ repos:
         - pytest
         - importlib_resources
         - tomli
-        - boost-histogram>=1.6.1
-        - hist>=2.9.0
+        - boost-histogram>=1.7.1
+        - hist>=2.10.1
 
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
