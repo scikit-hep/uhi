@@ -2,8 +2,9 @@ name: uhi
 channels:
   - conda-forge
 dependencies:
+  - boost-histogram
+  - dependency-groups
   - pip
   - pytest
-  - root
   - pytest
-  - boost-histogram
+  - root

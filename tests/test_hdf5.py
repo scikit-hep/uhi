@@ -102,6 +102,43 @@ def test_convert_bh(tmp_path: Path) -> None:
 
 
 @pytest.mark.skipif(
+    packaging.version.Version("1.7.2") > BHVERSION,
+    reason="Requires boost-histogram 1.7.2+ for keep_storage=False support",
+)
+def test_convert_bh_no_storage(tmp_path: Path) -> None:
+    """Test HDF5 serialization with keep_storage=False (structure-only histograms)."""
+    import boost_histogram as bh
+    import boost_histogram.serialization
+
+    h = bh.Histogram(
+        bh.axis.Regular(3, 0, 10, __dict__={"name": "x"}), storage=bh.storage.Weight()
+    )
+    h.fill([0.1, 0.3, 0.5], weight=[1.5, 2.5, 3.5])
+
+    # Convert to UHI format without storage values
+    uhi_dict = boost_histogram.serialization.to_uhi(h, keep_storage=False)
+
+    # Verify storage has type but no values
+    assert "storage" in uhi_dict
+    assert uhi_dict["storage"]["type"] == "weighted"
+    assert "values" not in uhi_dict["storage"]
+
+    # Write to HDF5
+    tmp_file = tmp_path / "test.h5"
+    with h5py.File(tmp_file, "w") as h5_file:
+        uhi_io_hdf5.write(h5_file.create_group("histogram"), uhi_dict)
+
+    # Read back from HDF5
+    with h5py.File(tmp_file, "r") as h5_file:
+        rehist = uhi_io_hdf5.read(h5_file["histogram"])
+
+    # Should be able to reconstruct a histogram with the same structure
+    h2 = bh.Histogram(rehist)
+    assert h.axes == h2.axes
+    assert isinstance(h2.storage_type(), bh.storage.Weight)
+
+
+@pytest.mark.skipif(
     packaging.version.Version("1.6.1") > BHVERSION
     or packaging.version.Version("2.9.0") > HISTVERSION,
     reason="Requires boost-histogram 1.6+ / Hist 2.9+",

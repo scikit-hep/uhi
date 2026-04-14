@@ -7,6 +7,7 @@ import sysconfig
 from pathlib import Path
 
 import pytest
+from dependency_groups import resolve
 from packaging.requirements import Requirement
 
 if sys.version_info < (3, 11):
@@ -46,12 +47,12 @@ def pytest_report_header() -> str:
 
     pkgs = project.get("dependencies", [])
     pkgs += [p for ps in project.get("optional-dependencies", {}).values() for p in ps]
-    pkgs += [
-        p
-        for ps in project.get("dependency-groups", {}).values()
-        for p in ps
-        if isinstance(p, str)
-    ]
+
+    # Process dependency groups, resolving {include-group = "..."} references
+    dep_groups = pyproject.get("dependency-groups", {})
+    if dep_groups:
+        pkgs += resolve(dep_groups, *dep_groups.keys())
+
     if "name" in project:
         pkgs.append(project["name"])
     interesting_packages = {Requirement(p).name for p in pkgs}
