@@ -126,6 +126,48 @@ def test_convert_bh(tmp_path: Path) -> None:
 
 
 @pytest.mark.skipif(
+    packaging.version.Version("1.7.2") > BHVERSION,
+    reason="Requires boost-histogram 1.7.2+ for keep_storage=False support",
+)
+def test_convert_bh_no_storage(tmp_path: Path) -> None:
+    """Test ZIP serialization with keep_storage=False (structure-only histograms)."""
+    import typing
+
+    import boost_histogram as bh
+    import boost_histogram.serialization
+
+    from uhi.typing.serialization import AnyHistogramIR
+
+    h = bh.Histogram(
+        bh.axis.Regular(3, 0, 10, __dict__={"name": "x"}), storage=bh.storage.Weight()
+    )
+    h.fill([0.1, 0.3, 0.5], weight=[1.5, 2.5, 3.5])
+
+    # Convert to UHI format without storage values
+    uhi_untyped = boost_histogram.serialization.to_uhi(h, keep_storage=False)
+    uhi_dict = typing.cast(AnyHistogramIR, uhi_untyped)
+
+    # Verify storage has type but no values
+    assert "storage" in uhi_dict
+    assert uhi_dict["storage"]["type"] == "weighted"
+    assert "values" not in uhi_dict["storage"]
+
+    # Write to ZIP
+    tmp_file = tmp_path / "test.zip"
+    with zipfile.ZipFile(tmp_file, "w") as zip_file:
+        uhi.io.zip.write(zip_file, "histogram", uhi_dict)
+
+    # Read back from ZIP
+    with zipfile.ZipFile(tmp_file, "r") as zip_file:
+        rehist = uhi.io.zip.read(zip_file, "histogram")
+
+    # Should be able to reconstruct a histogram with the same structure
+    h2: bh.Histogram[bh.storage.Weight] = bh.Histogram(rehist)
+    assert h.axes == h2.axes
+    assert isinstance(h2.storage_type(), bh.storage.Weight)
+
+
+@pytest.mark.skipif(
     packaging.version.Version("1.6.1") > BHVERSION
     or packaging.version.Version("2.9.0") > HISTVERSION,
     reason="Requires boost-histogram 1.6+ / Hist 2.9+",
