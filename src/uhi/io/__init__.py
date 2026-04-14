@@ -85,13 +85,14 @@ def _zerokey(storage_type: str, key: str) -> bool:
 def to_sparse(hist: H, /) -> H:
     """
     Convert a dense histogram to a sparse one. Leaves a sparse histogram alone.
+    Leaves empty (metadata-only) histograms alone.
     """
 
     storage = hist["storage"]
     storage_type = storage["type"]
 
-    # Ignore histograms that have 0 dimensions or are already sparse
-    if "index" in storage or not hist["axes"]:
+    # Ignore histograms that have 0 dimensions, are already sparse, or are empty
+    if "index" in storage or not hist["axes"] or len(storage) == 1:
         return hist
 
     # Get the arrays inside storage, ignoring "type"

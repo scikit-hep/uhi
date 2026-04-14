@@ -101,6 +101,38 @@ def test_convert_hist() -> None:
     assert h == h2
 
 
+def test_empty_storage_roundtrip() -> None:
+    """Test that empty storages can be read and written with JSON."""
+    data = {
+        "empty_int": {
+            "uhi_schema": 1,
+            "axes": [
+                {
+                    "type": "regular",
+                    "lower": 0,
+                    "upper": 10,
+                    "bins": 5,
+                    "underflow": False,
+                    "overflow": False,
+                    "circular": False,
+                }
+            ],
+            "storage": {"type": "int"},
+        }
+    }
+
+    # Dump to JSON
+    json_str = json.dumps(data, default=uhi.io.json.default)
+
+    # Load back from JSON
+    loaded = json.loads(json_str, object_hook=uhi.io.json.object_hook)
+
+    # Verify structure is preserved
+    assert loaded == data
+    assert loaded["empty_int"]["storage"]["type"] == "int"
+    assert "values" not in loaded["empty_int"]["storage"]
+
+
 @pytest.mark.skipif(
     packaging.version.Version("1.6.1") > BHVERSION,
     reason="Requires boost-histogram 1.6+",

@@ -79,6 +79,25 @@ The following storages are supported:
   values, `"sum_of_weights"`, `"sum_of_weights_squared"`, `"values"`, and
   `"variances"`. Boost-histogram's `WeightedMean` storage maps to this.
 
+All storage types support **empty (metadata-only) histograms**, where the storage
+contains only the `"type"` field and no data arrays. This is useful for creating
+histograms that contain axes and metadata but no actual bin data. Empty storages
+can be filled later or used for schema/template purposes. For example:
+
+```json
+{
+  "storage": { "type": "int" }
+}
+```
+
+Empty storages are compatible with all serialization formats and can be converted
+to/from dense or sparse forms using the standard conversion functions.
+
+```{versionadded} 1.1
+
+Empty (metadata-only) histogram support.
+```
+
 Current backends (such as zip and hdf5) allow flexibility in the size of
 integer and floating point storage. It is allowed to use a smaller floating
 point or integer storage type for such storages; the reference is 64-bit floats
@@ -133,6 +152,9 @@ following sparse histogram with three filled bins:
 The `0, 3` bin is filled with 5, the `1, 3` bin is filled with 6, and the
 `2, 4` bin is filled with 7. If the first axes has `"underflow"` enabled, that
 first bin is an underflow bin.
+
+Empty (metadata-only) histograms are unaffected by sparse/dense conversions; they
+remain as-is since there is no data to convert.
 
 If a histogram library doesn't support sparse histograms, you can convert a
 sparse histogram to a dense one. UHI provides helpers `uhi.io.to_sparse` and

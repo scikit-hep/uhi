@@ -141,3 +141,10 @@ cython_debug/
 
 # Version file
 _version.py
+
+# Editor output
+.vscode
+
+# Lockfiles
+*.lock
+pylock*.toml

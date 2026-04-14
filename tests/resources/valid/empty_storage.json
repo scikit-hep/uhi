@@ -1,0 +1,76 @@
+{
+  "empty_int": {
+    "uhi_schema": 1,
+    "metadata": { "description": "metadata-only histogram with int storage" },
+    "axes": [
+      {
+        "type": "regular",
+        "lower": 0,
+        "upper": 10,
+        "bins": 5,
+        "underflow": false,
+        "overflow": false,
+        "circular": false
+      }
+    ],
+    "storage": { "type": "int" }
+  },
+  "empty_double": {
+    "uhi_schema": 1,
+    "metadata": {
+      "description": "metadata-only histogram with double storage"
+    },
+    "axes": [
+      {
+        "type": "regular",
+        "lower": 0,
+        "upper": 10,
+        "bins": 5,
+        "underflow": true,
+        "overflow": true,
+        "circular": false
+      }
+    ],
+    "storage": { "type": "double" }
+  },
+  "empty_weighted": {
+    "uhi_schema": 1,
+    "metadata": {
+      "description": "metadata-only histogram with weighted storage"
+    },
+    "axes": [
+      {
+        "type": "variable",
+        "edges": [0.0, 2.5, 5.0, 7.5, 10.0],
+        "underflow": false,
+        "overflow": false,
+        "circular": false
+      }
+    ],
+    "storage": { "type": "weighted" }
+  },
+  "empty_mean": {
+    "uhi_schema": 1,
+    "metadata": { "description": "metadata-only histogram with mean storage" },
+    "axes": [
+      {
+        "type": "category_str",
+        "categories": ["a", "b", "c"],
+        "flow": false
+      }
+    ],
+    "storage": { "type": "mean" }
+  },
+  "empty_weighted_mean": {
+    "uhi_schema": 1,
+    "metadata": {
+      "description": "metadata-only histogram with weighted_mean storage"
+    },
+    "axes": [
+      {
+        "type": "boolean"
+      }
+    ],
+    "storage": { "type": "weighted_mean" }
+  }
+}
