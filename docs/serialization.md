@@ -68,16 +68,21 @@ The following storages are supported:
 
 * `"int"`: A collection of integers. Boost-histogram's `Int64` and `AtomicInt64`
   map to this, and sometimes `Unlimited`.
-* `"double"`: A collection of 64-bit floating point values. Boost-histogram's
+* `"double"`: A collection of floating point values. Boost-histogram's
   `Double` storage maps to this, and sometimes `Unlimited`.
-* `"weighted"`: A collection of two arrays of 64-bit floating point values,
+* `"weighted"`: A collection of two arrays of floating point values,
   `"value"` and `"variance"`. Boost-histogram's `Weight` storage maps to this.
-* `"mean"`: A collection of three arrays of 64-bit floating point values,
+* `"mean"`: A collection of three arrays of floating point values,
   "`count"`, `"value"`, and `"variance"`. Boost-histogram's `Mean` storage maps to
   this.
-* `"weighted_mean"`: A collection of four arrays of 64-bit floating point
+* `"weighted_mean"`: A collection of four arrays of floating point
   values, `"sum_of_weights"`, `"sum_of_weights_squared"`, `"values"`, and
   `"variances"`. Boost-histogram's `WeightedMean` storage maps to this.
+
+Current backends (such as zip and hdf5) allow flexibility in the size of
+integer and floating point storage. It is allowed to use a smaller floating
+point or integer storage type for such storages; the reference is 64-bit floats
+and 64-bit integers.
 
 A library can fill the optional `"writer_info"` field with a key specific to
 the library containing library specific metadata anywhere a metadata field is
