@@ -91,6 +91,43 @@ def test_from_bh_integer() -> None:
     assert h.axes[0][2] == 3
 
 
+def test_from_numpy_stacked() -> None:
+    """Regression test for issue #233.
+
+    A tuple of (list_of_value_arrays, bin_edges) — a stacked histogram format
+    used by histoprint — was mishandled: the list was converted to a 2D array
+    but only one bin dimension was supplied, causing zip() to raise ValueError.
+    """
+    rng = np.random.default_rng(42)
+    bins = np.linspace(-5, 5, 16)  # 15 bins → 16 edges
+    values = [rng.integers(0, 300, size=15) for _ in range(3)]
+    hist = (values, bins)
+
+    h = ensure_plottable_histogram(hist)
+
+    assert h.values() == approx(np.asarray(values))
+    assert len(h.axes) == 1
+    assert len(h.axes[0]) == 15
+    assert h.axes[0][0] == approx(bins[0:2])
+    assert h.axes[0][-1] == approx(bins[-2:])
+
+
+def test_from_numpy_excess_bins_raises() -> None:
+    """If more bin arrays are provided than histogram dimensions, raise.
+
+    This exercises the new guard that prevents passing e.g. two bin arrays
+    for a 1-D values array.
+    """
+    values = np.arange(5)
+    bins1 = np.linspace(0, 5, 6)
+    bins2 = np.linspace(0, 5, 6)
+    # Provide two bin arrays for a 1-D histogram
+    hist = (values, (bins1, bins2))
+
+    with pytest.raises(ValueError, match="Too many bin arrays"):
+        ensure_plottable_histogram(hist)
+
+
 def test_from_bh_str_cat() -> None:
     bh = pytest.importorskip("boost_histogram")
     h1 = bh.Histogram(bh.axis.StrCategory(["hi", "ho"]))

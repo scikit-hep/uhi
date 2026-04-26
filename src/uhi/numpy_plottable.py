@@ -142,9 +142,18 @@ class NumPyPlottableHistogram:
 
         raw_bins: tuple[np.typing.NDArray[Any] | None, ...] = bins  # type: ignore[assignment]
 
+        if len(raw_bins) > len(hist.shape):
+            msg = f"Too many bin arrays ({len(raw_bins)}) for histogram with {hist.ndim} dimension(s)"
+            raise ValueError(msg)
+
         self.kind = kind
+        # zip over only the last len(raw_bins) dimensions, so that a 2-D
+        # "stacked" values array (e.g. multiple 1-D histograms sharing one
+        # axis) is handled naturally: the leading dimension(s) are treated as
+        # a stacking dimension and produce no axis entry.
         self.axes: Sequence[PlottableAxis] = [
-            _bin_helper(shape, b) for shape, b in zip(hist.shape, raw_bins, strict=True)
+            _bin_helper(shape, b)
+            for shape, b in zip(hist.shape[-len(raw_bins) :], raw_bins, strict=True)
         ]
 
     def __repr__(self) -> str:
