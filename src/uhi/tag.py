@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 import typing
-from typing import Any
+from typing import Protocol
 
 from .typing.plottable import PlottableAxis
 
@@ -57,6 +57,9 @@ class Locator:
 class loc(Locator):
     __slots__ = ("value",)
 
+    class locIndex(Protocol):
+        def index(self, value: str | float) -> int: ...
+
     def __init__(self, value: str | float, offset: int = 0) -> None:
         super().__init__(offset)
         self.value = value
@@ -64,9 +67,8 @@ class loc(Locator):
     def _print_self_(self) -> str:
         return f"({self.value})"
 
-    # TODO: clarify that .index() is required
-    def __call__(self, axis: Any) -> int:
-        return axis.index(self.value) + self.offset  # type: ignore[no-any-return]
+    def __call__(self, axis: locIndex) -> int:
+        return axis.index(self.value) + self.offset
 
 
 class Underflow(Locator):
