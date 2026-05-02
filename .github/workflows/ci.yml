@@ -41,7 +41,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
         allow-prereleases: true
 
-    - uses: astral-sh/setup-uv@v8.0.0
+    - uses: astral-sh/setup-uv@v8.1.0
 
     - name: Install package
       run: uv pip install --system -e.[schema] --group test
@@ -61,7 +61,7 @@ jobs:
       with:
         fetch-depth: 0
 
-    - uses: conda-incubator/setup-miniconda@v3
+    - uses: conda-incubator/setup-miniconda@v4
       with:
         use-mamba: true
         environment-file: environment.yml
