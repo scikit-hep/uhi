@@ -18,14 +18,14 @@ repos:
     - id: trailing-whitespace
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.15.9"
+    rev: "v0.15.12"
     hooks:
       - id: ruff-check
         args: ["--fix", "--show-fixes"]
       - id: ruff-format
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.20.0
+    rev: v1.20.2
     hooks:
     - id: mypy
       files: ^(src|tests)
@@ -62,13 +62,13 @@ repos:
         exclude: .pre-commit-config.yaml
 
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: "v3.8.1"
+    rev: "v3.8.3"
     hooks:
       - id: prettier
         types_or: [json]
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.37.1
+    rev: 0.37.2
     hooks:
       - id: check-readthedocs
       - id: check-github-workflows
@@ -80,6 +80,6 @@ repos:
         files: ^tests/resources/valid/.*\.json
 
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: 2026.04.03
+    rev: 2026.04.26
     hooks:
       - id: validate-pyproject
