@@ -148,3 +148,7 @@ _version.py
 # Lockfiles
 *.lock
 pylock*.toml
+
+# Symlink to AGENTS.md
+CLAUDE.md
+.claude/

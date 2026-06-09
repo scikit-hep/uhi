@@ -27,6 +27,46 @@ Some key files:
 - `src/uhi/testing/`: Testing utilities and helpers
 - `tests/`: Test suite
 
+## Architecture
+
+UHI is primarily a **standards + typing + testing** package, not a runtime
+dependency (the base package only needs numpy). The code splits into four
+largely independent concerns under `src/uhi/`:
+
+1. **Protocols (`typing/`)** — `typing/plottable.py` defines the
+   `PlottableHistogram`/`PlottableAxis`/`PlottableTraits` Protocols (all
+   `@runtime_checkable`, so `isinstance` works). `protocol_version` and the
+   open-ended `Kind` string live here. `typing/serialization.py` defines the
+   `TypedDict` "IR" (intermediate representation) types — `HistogramIR`,
+   `AxisIR`, storage types — that the I/O layer reads and writes. These two
+   files are the source of truth for the standard; changing them ripples into
+   I/O, schema, and tests.
+
+2. **Indexing tags (`tag.py`)** — the user-facing indexing vocabulary:
+   `loc`, `at`, `rebin`, `Underflow`/`overflow`, all subclasses of `Locator`
+   with offset arithmetic (`loc(1.0) + 2`). This is the spec implementation
+   referenced by the docs (`docs/indexing.rst`).
+
+3. **Serialization (`io/` + `schema.py` + `resources/`)** — the JSON Schema in
+   `resources/histogram.schema.json` is the contract; `schema.py` compiles it
+   with `fastjsonschema` (optional `[schema]` extra) and exposes `validate()`.
+   `io/json.py`, `io/zip.py`, `io/hdf5.py` (optional `[hdf5]` extra) each
+   serialize/deserialize the IR types. `io/__init__.py` holds format-agnostic
+   helpers: `to_sparse`/`from_sparse` (dense⇄sparse storage conversion) and
+   `remove_writer_info`. `io/_common.py` is shared internals. The serialization
+   format is documented in `docs/serialization.md`.
+
+4. **Adapters + conformance (`numpy_plottable.py`, `testing/`)** —
+   `numpy_plottable.py` adapts NumPy-style histogram tuples into objects
+   satisfying `PlottableHistogram` (`ensure_plottable_histogram`).
+   `testing/indexing.py` provides `unittest`-based mixin classes
+   (`Indexing1D`, `Indexing3D`) that downstream libraries subclass to verify
+   their histograms conform to UHI indexing semantics.
+
+The optional dependencies matter: `schema`/I/O code imports `fastjsonschema`
+and `h5py` lazily so the base package stays dependency-light. Downstream
+consumers: boost-histogram, hist, mplhep, uproot, histoprint.
+
 ## Dev environment
 
 The CLI tools `uv`, `prek`, and `nox` should be pre-installed as Python tools.
@@ -44,9 +84,14 @@ The CLI tools `uv`, `prek`, and `nox` should be pre-installed as Python tools.
 ## Testing instructions
 
 - `uv run pytest` is a good way to run tests. Args can be easily added, like for
-  a specific test.
+  a specific test: `uv run pytest tests/test_serialization.py -k sparse`.
 - You can request a Python 3.15 alpha with `uv run --python 3.15 pytest`,
   remember it is "sticky", the `.venv` will be made with 3.15.
+- `tests/utils/` is on `pythonpath`/`mypy_path` (see `pyproject.toml`) and holds
+  shared `helpers.py`. JSON fixtures live in `tests/resources/{valid,invalid}/`;
+  invalid cases pair a `.json` with a `.error.txt` expected message.
+- `tests/test_root.py` needs ROOT; run it via `nox -s root_tests` (conda-based).
+- Validate a histogram JSON file with `uv run python -m uhi.schema <file.json>`.
 - Always add/update tests.
 - Run `prek -a` to fixup style and look for linting issues.
 - When running `prek -a` or `nox -s pylint`, the linting rules are _very_
