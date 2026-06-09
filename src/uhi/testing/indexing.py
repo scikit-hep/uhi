@@ -234,7 +234,7 @@ class Indexing1D(typing.Generic[T], Indexing):
         self.assertEqualSum(v, 94)
 
     def test_non_flow_integration(self) -> None:
-        v = self.h[0:len:sum]  # type: ignore[misc]
+        v = self.h[0:len:sum]
         self.assertEqualSum(v, 90)
 
     def test_ranged_integration(self) -> None:

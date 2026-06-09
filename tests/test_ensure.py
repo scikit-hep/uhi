@@ -15,9 +15,9 @@ def test_from_numpy() -> None:
     assert h.values() == approx(np.array(hist1[0]))
     assert len(h.axes) == 1
     assert len(h.axes[0]) == 3
-    assert h.axes[0][0] == (0, 1)
-    assert h.axes[0][1] == (1, 2)
-    assert h.axes[0][2] == (2, 3)
+    assert h.axes[0][0] == (0.0, 1.0)
+    assert h.axes[0][1] == (1.0, 2.0)
+    assert h.axes[0][2] == (2.0, 3.0)
 
 
 def test_from_numpy_2d() -> None:
