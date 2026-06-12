@@ -12,7 +12,7 @@ from uhi.typing.serialization import HistogramIR
 
 T = typing.TypeVar("T", bound=Any)
 
-__all__ = ["Indexing1D", "Indexing3D"]
+__all__ = ["Indexing1D", "Indexing2D", "Indexing3D"]
 
 
 if typing.TYPE_CHECKING:
@@ -427,9 +427,9 @@ class Indexing2D(typing.Generic[T], Indexing):
             },
         }
 
-    @staticmethod
+    @classmethod
     @abc.abstractmethod
-    def make_histogram() -> T:
+    def make_histogram(cls) -> T:
         pass
 
     @classmethod
