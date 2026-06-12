@@ -155,7 +155,7 @@ AxisIR = (
 class AnyStorageIR(TypedDict, total=False):
     type: Required[Literal["int", "double", "weighted", "mean", "weighted_mean"]]
     index: NDArray[np.integer[Any]]
-    values: NDArray[np.floating[Any]]
+    values: NDArray[np.number[Any]]
     variances: NDArray[np.float64]
     sum_of_weights: NDArray[np.float64]
     sum_of_weights_squared: NDArray[np.float64]
