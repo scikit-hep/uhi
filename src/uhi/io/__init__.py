@@ -72,7 +72,7 @@ def _compute_axis_length(axis: AxisIR) -> int:
             return len(axis["categories"]) + axis["flow"]
         case "boolean":
             return 2
-        case _ as unreachable:
+        case unreachable:
             assert_never(unreachable)
 
 
