@@ -22,6 +22,11 @@ def test_remove_writer_info() -> None:
     }
     assert remove_writer_info(d, library="c") == d
 
+    # A histogram without writer_info must not raise (issue #241).
+    no_wi = {"uhi_schema": 1}
+    assert remove_writer_info(no_wi, library=None) == {"uhi_schema": 1}
+    assert remove_writer_info(no_wi, library="a") == {"uhi_schema": 1}
+
 
 @dataclasses.dataclass
 class _Simple:

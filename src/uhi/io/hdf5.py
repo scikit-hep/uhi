@@ -192,7 +192,9 @@ def read(grp: h5py.Group, /) -> HistogramIR:
     assert isinstance(axes_ref, h5py.Group)
     assert isinstance(axes_grp, h5py.Dataset)
 
-    axes = [_convert_axes(axes_ref[unref_axis_ref]) for unref_axis_ref in axes_ref]
+    # Dereference the ordered ``axes`` dataset rather than iterating the
+    # ``ref_axes`` group, which h5py yields in alphabetical (not numeric) order.
+    axes = [_convert_axes(axes_ref[ref]) for ref in axes_grp]
 
     storage_grp = grp["storage"]
     assert isinstance(storage_grp, h5py.Group)

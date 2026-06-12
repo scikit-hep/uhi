@@ -22,13 +22,15 @@ def _remove_empty_metadata(hist: AnyHistogramIR, /) -> AnyHistogramIR:
         hist = typing.cast(
             AnyHistogramIR, {k: v for k, v in hist.items() if k != "metadata"}
         )
-    for i in range(len(hist["axes"])):
-        axis = hist["axes"][i]
+    # Copy the axes list before reassigning elements so the caller's list is
+    # not mutated in place.
+    axes = list(hist["axes"])
+    for i, axis in enumerate(axes):
         if "metadata" in axis and not axis["metadata"]:
-            hist["axes"][i] = typing.cast(
+            axes[i] = typing.cast(
                 AnyAxisIR, {k: v for k, v in axis.items() if k != "metadata"}
             )
-    return hist
+    return typing.cast(AnyHistogramIR, {**hist, "axes": axes})
 
 
 def _convert_input(hist: AnyHistogramIR | ToUHIHistogram, /) -> AnyHistogramIR:
