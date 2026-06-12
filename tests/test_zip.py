@@ -1,19 +1,21 @@
 from __future__ import annotations
 
-import copy
 import importlib.metadata
 import json
+import typing
 import zipfile
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import packaging.version
 import pytest
 from helpers import convert_histogram_to_32bit
 
 import uhi.io.json
 import uhi.io.zip
-from uhi.io import to_sparse
+from uhi.io import ARRAY_KEYS, to_sparse
+from uhi.typing.serialization import AnyHistogramIR
 
 BHVERSION = packaging.version.Version(importlib.metadata.version("boost_histogram"))
 HISTVERSION = packaging.version.Version(importlib.metadata.version("hist"))
@@ -28,11 +30,20 @@ def test_valid_json(valid: Path, tmp_path: Path, sparse: bool) -> None:
     tmp_file = tmp_path / "test.zip"
     with zipfile.ZipFile(tmp_file, "w") as zip_file:
         for name, hist in hists.items():
-            uhi.io.zip.write(zip_file, name, copy.deepcopy(hist))
+            # No deepcopy: write() must not mutate the caller's histogram.
+            uhi.io.zip.write(zip_file, name, hist)
     with zipfile.ZipFile(tmp_file, "r") as zip_file:
         rehists = {name: uhi.io.zip.read(zip_file, name) for name in hists}
 
     assert hists.keys() == rehists.keys()
+
+    # write() must not replace the caller's arrays with path strings.
+    for hist in hists.values():
+        for key in ARRAY_KEYS & hist["storage"].keys():
+            assert not isinstance(hist["storage"][key], str)
+        for axis in hist["axes"]:
+            for key in ARRAY_KEYS & axis.keys():
+                assert not isinstance(axis[key], str)
 
     for name in hists:
         hist = hists[name]
@@ -103,6 +114,47 @@ def test_reg_load(tmp_path: Path, resources: Path) -> None:
 
     assert two["storage"]["type"] == "double"
     assert two["storage"]["values"] == pytest.approx([1, 2, 3, 4, 5, 6, 7])
+
+
+def test_two_variable_axes(tmp_path: Path) -> None:
+    """Two variable axes must not collide on their zip filenames (issue #241)."""
+    edges_a = np.array([0.0, 1.0, 2.0, 3.0])
+    edges_b = np.array([0.0, 10.0, 20.0])
+
+    def axis(edges: np.ndarray) -> dict[str, Any]:
+        return {
+            "type": "variable",
+            "edges": edges,
+            "underflow": False,
+            "overflow": False,
+            "circular": False,
+        }
+
+    hist: dict[str, Any] = {
+        "uhi_schema": 1,
+        "axes": [axis(edges_a), axis(edges_b)],
+        "storage": {
+            "type": "double",
+            "values": np.zeros((len(edges_a) - 1, len(edges_b) - 1)),
+        },
+    }
+
+    tmp_file = tmp_path / "test.zip"
+    with zipfile.ZipFile(tmp_file, "w") as zip_file:
+        uhi.io.zip.write(zip_file, "h", typing.cast(AnyHistogramIR, hist))
+        names = zip_file.namelist()
+
+    # Distinct filenames per axis (no duplicate-name UserWarning, no overwrite).
+    edge_names = [n for n in names if "_axis_" in n]
+    assert len(edge_names) == 2
+    assert len(set(edge_names)) == 2
+
+    with zipfile.ZipFile(tmp_file, "r") as zip_file:
+        rehist = uhi.io.zip.read(zip_file, "h")
+
+    # Each axis must round-trip with its own edges, not the other axis's.
+    assert rehist["axes"][0]["edges"] == pytest.approx(edges_a)
+    assert rehist["axes"][1]["edges"] == pytest.approx(edges_b)
 
 
 @pytest.mark.skipif(

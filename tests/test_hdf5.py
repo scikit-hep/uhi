@@ -79,6 +79,43 @@ def test_reg_load(tmp_path: Path, resources: Path) -> None:
     assert one["storage"]["values"] == pytest.approx([1, 2, 3, 4, 5])
 
 
+def test_axis_order_many_axes(tmp_path: Path) -> None:
+    """Axis order must be preserved past 10 axes (issue #241).
+
+    h5py yields group members alphabetically (axis_0, axis_1, axis_10, axis_11,
+    axis_2, ...), so reading must dereference the ordered ``axes`` dataset.
+    """
+    import numpy as np
+
+    n_axes = 12
+    uppers = [float(i + 1) for i in range(n_axes)]
+    hist = {
+        "uhi_schema": 1,
+        "axes": [
+            {
+                "type": "regular",
+                "lower": 0.0,
+                "upper": upper,
+                "bins": 1,
+                "underflow": False,
+                "overflow": False,
+                "circular": False,
+            }
+            for upper in uppers
+        ],
+        "storage": {"type": "double", "values": np.ones((1,) * n_axes)},
+    }
+
+    tmp_file = tmp_path / "test.h5"
+    with h5py.File(tmp_file, "w") as h5_file:
+        uhi_io_hdf5.write(h5_file.create_group("h"), hist)
+
+    with h5py.File(tmp_file, "r") as h5_file:
+        rehist = uhi_io_hdf5.read(h5_file["h"])
+
+    assert [ax["upper"] for ax in rehist["axes"]] == pytest.approx(uppers)
+
+
 @pytest.mark.skipif(
     packaging.version.Version("1.6.1") > BHVERSION,
     reason="Requires boost-histogram 1.6+",

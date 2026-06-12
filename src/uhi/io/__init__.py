@@ -49,7 +49,7 @@ def remove_writer_info(obj: T, /, *, library: str | None) -> T:
 
     obj = copy.copy(obj)
     if library is None:
-        obj.pop("writer_info")
+        obj.pop("writer_info", None)
     elif library in obj.get("writer_info", {}):
         obj["writer_info"] = copy.copy(obj["writer_info"])
         del obj["writer_info"][library]

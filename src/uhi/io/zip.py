@@ -28,16 +28,24 @@ def write(
     Write a histogram to a zip file.
     """
     histogram = _convert_input(histogram)
+    # Copy the histogram and the dicts/lists we mutate below so the caller's
+    # arrays are not replaced with path strings.
+    histogram = histogram.copy()
+
     # Write out numpy arrays to files in the zipfile
-    for storage_key in ARRAY_KEYS & histogram["storage"].keys():
+    storage = histogram["storage"].copy()
+    histogram["storage"] = storage
+    for storage_key in ARRAY_KEYS & storage.keys():
         path = f"{name}_storage_{storage_key}.npy"
         with zip_file.open(path, "w") as f:
-            np.save(f, histogram["storage"][storage_key])  # type: ignore[literal-required]
-        histogram["storage"][storage_key] = path  # type: ignore[literal-required]
+            np.save(f, storage[storage_key])  # type: ignore[literal-required]
+        storage[storage_key] = path  # type: ignore[literal-required]
 
-    for axis in histogram["axes"]:
+    axes = [axis.copy() for axis in histogram["axes"]]
+    histogram["axes"] = axes
+    for i, axis in enumerate(axes):
         for key in ARRAY_KEYS & axis.keys():
-            path = f"{name}_axis_{key}.npy"
+            path = f"{name}_axis_{i}_{key}.npy"
             with zip_file.open(path, "w") as f:
                 np.save(f, axis[key])  # type: ignore[literal-required]
             axis[key] = path  # type: ignore[literal-required]
