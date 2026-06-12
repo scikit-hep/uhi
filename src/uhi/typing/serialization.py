@@ -100,21 +100,21 @@ class BooleanAxisIR(TypedDict):
 
 class IntStorageIR(TypedDict):
     type: Literal["int"]
-    values: NotRequired[NDArray[np.float64]]
-    index: NotRequired[NDArray[np.float64]]
+    values: NotRequired[NDArray[np.integer[Any]]]
+    index: NotRequired[NDArray[np.integer[Any]]]
 
 
 class DoubleStorageIR(TypedDict):
     type: Literal["double"]
     values: NotRequired[NDArray[np.float64]]
-    index: NotRequired[NDArray[np.float64]]
+    index: NotRequired[NDArray[np.integer[Any]]]
 
 
 class WeightedStorageIR(TypedDict):
     type: Literal["weighted"]
     values: NotRequired[NDArray[np.float64]]
     variances: NotRequired[NDArray[np.float64]]
-    index: NotRequired[NDArray[np.float64]]
+    index: NotRequired[NDArray[np.integer[Any]]]
 
 
 class MeanStorageIR(TypedDict):
@@ -122,7 +122,7 @@ class MeanStorageIR(TypedDict):
     counts: NotRequired[NDArray[np.float64]]
     values: NotRequired[NDArray[np.float64]]
     variances: NotRequired[NDArray[np.float64]]
-    index: NotRequired[NDArray[np.float64]]
+    index: NotRequired[NDArray[np.integer[Any]]]
 
 
 class WeightedMeanStorageIR(TypedDict):
@@ -131,7 +131,7 @@ class WeightedMeanStorageIR(TypedDict):
     sum_of_weights_squared: NotRequired[NDArray[np.float64]]
     values: NotRequired[NDArray[np.float64]]
     variances: NotRequired[NDArray[np.float64]]
-    index: NotRequired[NDArray[np.float64]]
+    index: NotRequired[NDArray[np.integer[Any]]]
 
 
 StorageIR = (
@@ -154,8 +154,8 @@ AxisIR = (
 
 class AnyStorageIR(TypedDict, total=False):
     type: Required[Literal["int", "double", "weighted", "mean", "weighted_mean"]]
-    index: NDArray[np.float64]
-    values: NDArray[np.float64]
+    index: NDArray[np.integer[Any]]
+    values: NDArray[np.number[Any]]
     variances: NDArray[np.float64]
     sum_of_weights: NDArray[np.float64]
     sum_of_weights_squared: NDArray[np.float64]

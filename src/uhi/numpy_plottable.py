@@ -120,12 +120,12 @@ def _bin_helper(shape: int, bins: np.typing.NDArray[Any] | None) -> NumPyPlottab
     """
     if bins is None:
         return NumPyPlottableAxis(
-            np.array([np.arange(0, shape), np.arange(1, shape + 1)]).T
+            np.column_stack([np.arange(0, shape), np.arange(1, shape + 1)])
         )
     if bins.ndim == 2:
         return NumPyPlottableAxis(bins)
     if bins.ndim == 1:
-        return NumPyPlottableAxis(np.array([bins[:-1], bins[1:]]).T)
+        return NumPyPlottableAxis(np.column_stack([bins[:-1], bins[1:]]))
     msg = "Bins not understood, should be 2d array of min/max edges or 1D array of edges or None"
     raise ValueError(msg)
 
