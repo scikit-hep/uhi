@@ -86,8 +86,17 @@ class NumPyPlottableAxis:
     def __eq__(self, other: Any) -> bool:
         """
         Needed for the protocol (should be present to be stored in a Sequence).
+
+        Returns NotImplemented when other has no .edges attribute (so Python can
+        try the reflected operation), and False when shapes differ, to avoid
+        broadcast errors inside np.allclose.
         """
-        return np.allclose(self.edges, other.edges)
+        other_edges = getattr(other, "edges", None)
+        if other_edges is None:
+            return NotImplemented
+        if self.edges.shape != other_edges.shape:
+            return False
+        return bool(np.allclose(self.edges, other_edges))
 
     def __iter__(self) -> Iterator[tuple[float, float]]:
         """
@@ -395,8 +404,12 @@ def ensure_plottable_histogram(hist: Any) -> PlottableHistogram:
             return NumPyPlottableHistogram(
                 np.asarray(hist[0]), *(None for _ in np.asarray(hist[0]).shape)
             )
-        # Standard tuple
-        return NumPyPlottableHistogram(*(np.asarray(h) for h in hist))
+        # Standard tuple — preserve None entries so _bin_helper can use the
+        # default 0..N integer-edges axis for that dimension.
+        return NumPyPlottableHistogram(
+            np.asarray(hist[0]),
+            *(None if b is None else np.asarray(b) for b in hist[1:]),
+        )
 
     if hasattr(hist, "InheritsFrom") and hist.InheritsFrom("TH1"):
         if any(
