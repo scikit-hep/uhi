@@ -27,8 +27,8 @@ def _histogram_schema() -> Callable[[dict[str, Any]], None]:
 
 def validate(data: dict[str, Any]) -> None:
     """Validate a histogram object against the schema."""
-    validate = _histogram_schema()
-    validate(data)
+    validator = _histogram_schema()
+    validator(data)
 
 
 def main(*files: str) -> None:

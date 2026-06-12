@@ -44,6 +44,35 @@ def _handle_metadata_writer_info(
                 inner_wi_grp.attrs[k] = v
 
 
+def _create_dataset(
+    group: h5py.Group,
+    name: str,
+    data: Any,
+    *,
+    compression: str,
+    compression_opts: int,
+    min_compress_elements: int,
+) -> None:
+    """
+    Create an HDF5 dataset, applying compression only when the element count
+    meets the minimum threshold.
+
+    ``data`` may be a NumPy array or a plain Python list (e.g. string
+    categories). The size check uses ``len()`` for lists and ``.size`` for
+    arrays so that the original type is passed through to h5py unchanged.
+    """
+    size = data.size if isinstance(data, np.ndarray) else len(data)
+    if size < min_compress_elements:
+        group.create_dataset(name, data=data)
+    else:
+        group.create_dataset(
+            name,
+            data=data,
+            compression=compression,
+            compression_opts=compression_opts,
+        )
+
+
 def write(
     grp: h5py.Group,
     /,
@@ -88,25 +117,23 @@ def write(
         for key, val2 in ax_info.items():
             ax_group.attrs[key] = val2
         if ax_edges is not None:
-            if ax_edges.size < min_compress_elements:
-                ax_group.create_dataset("edges", data=ax_edges)
-            else:
-                ax_group.create_dataset(
-                    "edges",
-                    data=ax_edges,
-                    compression=compression,
-                    compression_opts=compression_opts,
-                )
+            _create_dataset(
+                ax_group,
+                "edges",
+                ax_edges,
+                compression=compression,
+                compression_opts=compression_opts,
+                min_compress_elements=min_compress_elements,
+            )
         if ax_cats is not None:
-            if len(ax_cats) < min_compress_elements:
-                ax_group.create_dataset("categories", data=ax_cats)
-            else:
-                ax_group.create_dataset(
-                    "categories",
-                    data=ax_cats,
-                    compression=compression,
-                    compression_opts=compression_opts,
-                )
+            _create_dataset(
+                ax_group,
+                "categories",
+                ax_cats,
+                compression=compression,
+                compression_opts=compression_opts,
+                min_compress_elements=min_compress_elements,
+            )
         axes_dataset[i] = ax_group.ref
 
     # Storage
@@ -118,16 +145,14 @@ def write(
     for key, val3 in histogram["storage"].items():
         if key == "type":
             continue
-        npvalue = np.asarray(val3)
-        if npvalue.size < min_compress_elements:
-            storage_grp.create_dataset(key, data=npvalue)
-        else:
-            storage_grp.create_dataset(
-                key,
-                data=npvalue,
-                compression=compression,
-                compression_opts=compression_opts,
-            )
+        _create_dataset(
+            storage_grp,
+            key,
+            val3,
+            compression=compression,
+            compression_opts=compression_opts,
+            min_compress_elements=min_compress_elements,
+        )
 
 
 def _convert_item(name: str, item: Any, /) -> Any:

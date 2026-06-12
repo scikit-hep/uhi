@@ -63,20 +63,24 @@ def remove_writer_info(obj: T, /, *, library: str | None) -> T:
 
 
 def _compute_axis_length(axis: AxisIR) -> int:
-    if axis["type"] == "regular":
-        return axis["bins"] + axis["underflow"] + axis["overflow"]
-    if axis["type"] == "variable":
-        return len(axis["edges"]) - 1 + axis["underflow"] + axis["overflow"]
-    if axis["type"] == "category_str" or axis["type"] == "category_int":
-        return len(axis["categories"]) + axis["flow"]
-    if axis["type"] == "boolean":
-        return 2
-    assert_never(axis["type"])
+    match axis["type"]:
+        case "regular":
+            return axis["bins"] + axis["underflow"] + axis["overflow"]
+        case "variable":
+            return len(axis["edges"]) - 1 + axis["underflow"] + axis["overflow"]
+        case "category_str" | "category_int":
+            return len(axis["categories"]) + axis["flow"]
+        case "boolean":
+            return 2
+        case _ as unreachable:
+            assert_never(unreachable)
 
 
-def _zerokey(storage_type: str, key: str) -> bool:
+def _empty_is_zero(storage_type: str, key: str) -> bool:
     """
-    Returns False if the comparison should be NaN instead of zero.
+    Returns True if empty bins should be represented as zero (the common case).
+    Returns False for weighted_mean variances, which use NaN to distinguish
+    empty bins from bins with zero variance.
     """
 
     return storage_type != "weighted_mean" or key != "variances"
@@ -101,7 +105,7 @@ def to_sparse(hist: H, /) -> H:
     # Build mask of nonzero bins across *all* present keys
     mask = np.any(
         [
-            arr != 0 if _zerokey(storage_type, k) else ~np.isnan(arr)
+            arr != 0 if _empty_is_zero(storage_type, k) else ~np.isnan(arr)
             for k, arr in arrays.items()
         ],
         axis=0,
@@ -146,13 +150,13 @@ def from_sparse(sparse: H, /) -> H:
 
     dense_storage = {"type": storage["type"]}
     for k, arr1d in storage.items():
-        arr1dnp = np.asarray(arr1d)
         if k in {"index", "type"}:
             continue
+        arr1dnp = np.asarray(arr1d)
 
         # Allocate a zeros (or nan) array of the original shape
         full = np.full(
-            shape, 0 if _zerokey(storage_type, k) else np.nan, dtype=arr1dnp.dtype
+            shape, 0 if _empty_is_zero(storage_type, k) else np.nan, dtype=arr1dnp.dtype
         )
 
         # Scatter sparse values back into dense array
