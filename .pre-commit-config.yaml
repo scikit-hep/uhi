@@ -18,14 +18,14 @@ repos:
     - id: trailing-whitespace
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.15.15"
+    rev: "v0.16.1"
     hooks:
       - id: ruff-check
         args: ["--fix", "--show-fixes"]
       - id: ruff-format
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v2.1.0
+    rev: v2.3.0
     hooks:
     - id: mypy
       files: ^(src|tests)
@@ -48,7 +48,7 @@ repos:
       - id: rst-inline-touching-normal
 
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.2
+    rev: v2.4.3
     hooks:
     - id: codespell
       args: ["-L", "hist,thist,ans,nd,gaus"]
@@ -62,13 +62,13 @@ repos:
         exclude: .pre-commit-config.yaml
 
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: "v3.8.3"
+    rev: "v3.9.6"
     hooks:
       - id: prettier
         types_or: [json]
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.37.2
+    rev: 0.37.4
     hooks:
       - id: check-readthedocs
       - id: check-github-workflows
@@ -80,6 +80,6 @@ repos:
         files: ^tests/resources/valid/.*\.json
 
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: 2026.05.28
+    rev: 2026.08.01
     hooks:
       - id: validate-pyproject
