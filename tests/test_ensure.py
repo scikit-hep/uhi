@@ -168,7 +168,7 @@ def test_axis_eq_non_axis_object() -> None:
     # Must not raise — Python reflects NotImplemented to False
     assert (axis == "foo") is False
     assert (axis == 42) is False
-    assert (axis == None) is False  # noqa: E711
+    assert (axis == None) is False
 
 
 def test_axis_eq_different_shape() -> None:

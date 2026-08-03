@@ -12,7 +12,7 @@ MyPy will force you to only use items in the Protocol.
 from __future__ import annotations
 
 from collections.abc import Iterator, Sequence
-from typing import Any, Protocol, TypeVar, runtime_checkable
+from typing import Protocol, TypeVar, runtime_checkable
 
 # NumPy 1.20+ will work much, much better than previous versions when type checking
 import numpy as np
@@ -75,7 +75,7 @@ class PlottableAxisGeneric(Protocol[T_co]):  # noqa: PLW1641
         for this Protocol currently).
         """
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """
         Required to be sequence-like.
         """
