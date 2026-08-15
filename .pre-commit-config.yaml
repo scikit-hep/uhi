@@ -33,7 +33,7 @@ repos:
       exclude: ^tests/utils
       args: []
       additional_dependencies:
-        - numpy
+        - numpy<2.5  # 3.12+ types
         - pytest
         - importlib_resources
         - tomli
