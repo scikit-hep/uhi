@@ -41,7 +41,8 @@ def _convert_array_to_32bit(arr: ArrayLike) -> ArrayLike:
         case list():
             return [_convert_array_to_32bit(item) for item in arr]
         case int(n) if n > 2147483647 or n < -2147483648:
-            return np.int32(n)
+            # numpy's stubs type the scalar constructors as returning Any
+            return typing.cast("np.int32", np.int32(n))
         case _ as other:
             return other
 
