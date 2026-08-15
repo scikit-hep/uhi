@@ -1,0 +1,5 @@
+rules:
+  concurrency-limits:
+    ignore:
+      # The Copilot setup workflow only runs on demand; concurrency is not applicable.
+      - copilot-setup-steps.yml

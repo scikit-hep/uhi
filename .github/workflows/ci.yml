@@ -7,6 +7,8 @@ on:
     branches:
     - main
 
+permissions: {}
+
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
     cancel-in-progress: true
@@ -15,6 +17,8 @@ jobs:
   checks:
     name: Check Python ${{ matrix.python-version }} on ${{ matrix.runs-on }}
     runs-on: ${{ matrix.runs-on }}
+    permissions:
+      contents: read  # to check out the repository
     strategy:
       fail-fast: false
       matrix:
@@ -32,16 +36,17 @@ jobs:
           runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         fetch-depth: 0
+        persist-credentials: false
 
-    - uses: actions/setup-python@v6
+    - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
       with:
         python-version: ${{ matrix.python-version }}
         allow-prereleases: true
 
-    - uses: astral-sh/setup-uv@v8.2.0
+    - uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
 
     - name: Install package
       run: uv pip install --system -e.[schema] --group test
@@ -52,16 +57,19 @@ jobs:
   root:
     name: ROOT test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read  # to check out the repository
     defaults:
       run:
         shell: bash -l {0}
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         fetch-depth: 0
+        persist-credentials: false
 
-    - uses: conda-incubator/setup-miniconda@v4
+    - uses: conda-incubator/setup-miniconda@8ee1f361103df19b6f8c8655fd3967a8ecb162d5 # v4.0.1
       with:
         use-mamba: true
         environment-file: environment.yml

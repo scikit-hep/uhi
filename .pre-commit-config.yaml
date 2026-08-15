@@ -4,7 +4,7 @@ ci:
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c  # frozen: v6.0.0
     hooks:
     - id: check-added-large-files
     - id: check-case-conflict
@@ -17,22 +17,23 @@ repos:
     - id: requirements-txt-fixer
     - id: trailing-whitespace
 
+  # Held at 0.15; 0.16 adds new rules that need source changes
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.15.15"
+    rev: "0671d8ab202c4ac093b78433ae5baf74f3fc7246"  # frozen: v0.15.15
     hooks:
       - id: ruff-check
         args: ["--fix", "--show-fixes"]
       - id: ruff-format
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v2.1.0
+    rev: 41e691678310dfd3833f7ab4e180ddb014310356  # frozen: v2.3.0
     hooks:
     - id: mypy
       files: ^(src|tests)
       exclude: ^tests/utils
       args: []
       additional_dependencies:
-        - numpy
+        - numpy<2.5  # 3.12+ types
         - pytest
         - importlib_resources
         - tomli
@@ -41,14 +42,14 @@ repos:
         - dependency-groups>=1.3
 
   - repo: https://github.com/pre-commit/pygrep-hooks
-    rev: v1.10.0
+    rev: 3a6eb0fadf60b3cccfd80bad9dbb6fae7e47b316  # frozen: v1.10.0
     hooks:
       - id: rst-backticks
       - id: rst-directive-colons
       - id: rst-inline-touching-normal
 
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.2
+    rev: 57b21406f092110c18776e39b0bda50d37c945c8  # frozen: v2.4.3
     hooks:
     - id: codespell
       args: ["-L", "hist,thist,ans,nd,gaus"]
@@ -62,13 +63,13 @@ repos:
         exclude: .pre-commit-config.yaml
 
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: "v3.8.3"
+    rev: "0ee178619d696787ca73d210cc191d720868c631"  # frozen: v3.9.6
     hooks:
       - id: prettier
         types_or: [json]
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.37.2
+    rev: 6b63472e72e1a91ed8a2f6d483790dfb644fa1d3  # frozen: 0.37.4
     hooks:
       - id: check-readthedocs
       - id: check-github-workflows
@@ -80,6 +81,13 @@ repos:
         files: ^tests/resources/valid/.*\.json
 
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: 2026.05.28
+    rev: a12c4f2e45f39cfb516be7842efbe98633eb3789  # frozen: 2026.08.05
     hooks:
       - id: validate-pyproject
+
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: 451b56af716f9f0d0c2b816503a3fd0cf8b036fa  # frozen: v1.29.0
+    hooks:
+      - id: zizmor
+        files: "^\\.github"
+        args: [--persona=pedantic]
