@@ -83,7 +83,7 @@ class NumPyPlottableAxis:
         """
         return self.edges.shape[0]  # type: ignore[no-any-return]
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """
         Needed for the protocol (should be present to be stored in a Sequence).
 
@@ -135,7 +135,7 @@ class NumPyPlottableHistogram:
         self,
         hist: np.typing.NDArray[Any],
         *bins: (
-            np.typing.NDArray[Any] | None | tuple[np.typing.NDArray[Any] | None, ...]
+            np.typing.NDArray[Any] | tuple[np.typing.NDArray[Any] | None, ...] | None
         ),
         variances: np.typing.NDArray[Any] | None = None,
         kind: Kind = Kind.COUNT,
@@ -211,7 +211,7 @@ class ROOTAxis(abc.ABC):
     def __getitem__(self, index: int) -> Any:
         pass
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, ROOTAxis):
             return NotImplemented
         return len(self) == len(other) and all(
