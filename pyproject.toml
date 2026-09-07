@@ -43,6 +43,9 @@ Repository = "https://github.com/Scikit-HEP/uhi"
 Documentation = "https://uhi.readthedocs.io/en/latest/"
 Changelog = "https://github.com/scikit-hep/uhi/releases"
 
+[project.scripts]
+uhi = "uhi.__main__:main"
+
 [project.optional-dependencies]
 schema = [
   "fastjsonschema",
