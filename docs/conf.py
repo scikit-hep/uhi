@@ -49,9 +49,6 @@ myst_enable_extensions = [
 
 # -- Options for LLM-friendly output -----------------------------------------
 
-# Serve each page as "<page>.md" next to "<page>.html"
-llms_txt_suffix_mode = "replace"
-
 # The default is the full README, which is too long for the summary block
 llms_txt_description = (
     "Documentation of histogram indexing, the PlottableHistogram Protocol, and"
