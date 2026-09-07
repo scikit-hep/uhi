@@ -162,10 +162,48 @@ sparse histogram to a dense one. UHI provides helpers `uhi.io.to_sparse` and
 sparse histograms. Scalar histograms (with no axes) are always dense.
 
 
+## Adding histograms
+
+`uhi.io.ops.add` sums histograms bin-by-bin, like ROOT's `hadd`. It works on the
+intermediate representation (or anything with `_to_uhi_`), so histograms from
+different libraries or files can be combined without a histogram library:
+
+```python
+import uhi.io.ops
+
+total = uhi.io.ops.add(h1, h2, h3)
+```
+
+All inputs must have identical axes (metadata and `writer_info` are ignored
+when comparing) and the same storage type. Empty (metadata-only) storages count
+as zero. `"mean"` and `"weighted_mean"` storages are merged correctly, not just
+summed. The metadata and `writer_info` of the first histogram are kept. The
+result is sparse if every input is sparse, and dense otherwise.
+
+```{versionadded} 1.2
+```
+
 ## CLI/API
 
-You can test a JSON file against the schema with the `uhi` command (also
-`python -m uhi`):
+The `uhi` command (also `python -m uhi`) provides `add`, which sums the
+histograms in several files into one file, like `hadd`:
+
+```console
+$ uhi add total.zip run1.zip run2.zip run3.zip
+```
+
+Histograms are matched by name. A name that is only in some of the inputs is
+copied through. The format is chosen by the file extension: `.json` (a JSON
+object mapping names to histograms), `.zip`, `.h5`/`.hdf5` (every group with a
+`uhi_schema` attribute, at any depth), or `.root` (every RNTuple, at any
+depth). The input and output formats do
+not have to match, so this also converts between formats. Pass `-f`/`--force`
+to overwrite an existing output file.
+
+```{versionadded} 1.2
+```
+
+You can test a JSON file against the schema with the same command:
 
 ```console
 $ uhi validate some/file.json
