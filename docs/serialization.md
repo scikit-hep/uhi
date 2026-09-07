@@ -174,8 +174,6 @@ $ uhi validate some/file.json
 ```{versionadded} 1.2
 ```
 
-`python -m uhi.schema some/file.json` also works.
-
 Or with code:
 
 ```python
