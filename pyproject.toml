@@ -59,6 +59,8 @@ docs = [
   "sphinx-jsonschema",
   "myst-parser",
   "sphinx_github_changelog",
+  "sphinx-llms-txt",
+  "sphinx-markdown-builder",
 ]
 test-core = [
   "pytest>=7",
