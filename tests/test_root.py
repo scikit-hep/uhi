@@ -13,6 +13,7 @@ from pytest import approx
 
 import uhi.io.json
 import uhi.schema
+import uhi.io.ops
 from uhi.io import ARRAY_KEYS, to_sparse
 from uhi.numpy_plottable import ensure_plottable_histogram
 
@@ -457,3 +458,35 @@ def test_cli_validate_root_path(
     with pytest.raises(SystemExit):
         main(["validate", f"{tmp_file}:missing"])
     assert capsys.readouterr().out.startswith("ERROR")
+def _root_add_inputs(resources: Path, tmp_path: Path) -> tuple[list[Path], list[Any]]:
+    """Write the same histograms to two ROOT files, nested one level deep."""
+    hists = json.loads(
+        (resources / "valid/reg.json").read_text(encoding="utf-8"),
+        object_hook=uhi.io.json.object_hook,
+    )
+    files = [tmp_path / "in1.root", tmp_path / "in2.root"]
+    for file in files:
+        with ROOT.TFile.Open(str(file), "RECREATE") as root_file:
+            directory = root_file.mkdir("sub")
+            for name, hist in hists.items():
+                uhi_io_root.write(directory, name, hist)
+    return files, [f"sub/{name}" for name in hists]
+
+
+@pytest.mark.parametrize("out_suffix", [".root", ".json"])
+def test_cli_add_root(resources: Path, tmp_path: Path, out_suffix: str) -> None:
+    from uhi.__main__ import _read, main
+
+    files, names = _root_add_inputs(resources, tmp_path)
+    target = tmp_path / f"out{out_suffix}"
+
+    main(["add", str(target), *map(str, files)])
+
+    inputs = [_read(file) for file in files]
+    result = _read(target)
+    assert result.keys() == {*names}
+    for name in names:
+        expected = uhi.io.ops.add(*(hists[name] for hists in inputs))
+        assert result[name]["storage"]["values"] == approx(
+            expected["storage"]["values"]
+        )
