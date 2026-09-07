@@ -1,7 +1,6 @@
-.. uhi documentation master file, created by
-   sphinx-quickstart on Tue Jan 19 16:19:27 2021.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root ``toctree`` directive.
+.. meta::
+   :description: UHI connects histogramming libraries with an indexing standard,
+      the PlottableProtocol, and a serialization format.
 
 UHI: Unified Histogram Interface
 =================================

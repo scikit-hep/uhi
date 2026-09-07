@@ -30,6 +30,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx_copybutton",
     "sphinx_github_changelog",
+    "sphinx_llm.txt",
 ]
 
 source_suffix = [".rst", ".md"]
@@ -45,6 +46,14 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 myst_enable_extensions = [
     "colon_fence",
 ]
+
+# -- Options for LLM-friendly output -----------------------------------------
+
+# The default is the full README, which is too long for the summary block
+llms_txt_description = (
+    "Documentation of histogram indexing, the PlottableHistogram Protocol, and"
+    " the histogram serialization format, with tools for library authors."
+)
 
 
 # -- Options for HTML output -------------------------------------------------
