@@ -72,16 +72,6 @@ def docs(session: nox.Session) -> None:
     else:
         session.run("sphinx-build", "--keep-going", *shared_args)
 
-    if args.builder == "html":
-        # Markdown copies of each page, served next to the HTML as "<page>.md"
-        session.run(
-            "sphinx-build",
-            "-b=markdown",
-            "-d=_build/doctrees-markdown",
-            ".",
-            "_build/html",
-        )
-
 
 @nox.session(default=False)
 def build(session):

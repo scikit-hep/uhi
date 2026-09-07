@@ -22,6 +22,3 @@ build:
       - uv venv "${READTHEDOCS_VIRTUALENV_PATH}"
     install:
       - UV_PROJECT_ENVIRONMENT="${READTHEDOCS_VIRTUALENV_PATH}" uv sync --group docs
-    post_build:
-      # Markdown copies of each page, served next to the HTML as "<page>.md"
-      - python -m sphinx -b markdown -d _build/doctrees-markdown docs "${READTHEDOCS_OUTPUT}/html"

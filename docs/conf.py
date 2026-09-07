@@ -30,8 +30,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx_copybutton",
     "sphinx_github_changelog",
-    "sphinx_llms_txt",
-    "sphinx_markdown_builder",
+    "sphinx_llm.txt",
 ]
 
 source_suffix = [".rst", ".md"]
@@ -50,18 +49,15 @@ myst_enable_extensions = [
 
 # -- Options for LLM-friendly output -----------------------------------------
 
-# Point at the Markdown copies of the pages (see the docs session in noxfile.py)
-llms_txt_uri_template = "{base_url}{docname}.md"
-llms_txt_title = "UHI: Unified Histogram Interface"
-llms_txt_summary = (
+# Serve each page as "<page>.md" next to "<page>.html"
+llms_txt_suffix_mode = "replace"
+
+# The default is the full README, which is too long for the summary block
+llms_txt_description = (
     "Documentation of histogram indexing, the PlottableHistogram Protocol, and"
     " the histogram serialization format, with tools for library authors."
 )
 
-
-html_baseurl = os.environ.get(
-    "READTHEDOCS_CANONICAL_URL", "https://uhi.readthedocs.io/en/latest/"
-)
 
 # -- Options for HTML output -------------------------------------------------
 
