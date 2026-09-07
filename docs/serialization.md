@@ -164,11 +164,17 @@ sparse histograms. Scalar histograms (with no axes) are always dense.
 
 ## CLI/API
 
-You can currently test a JSON file against the schema by running:
+You can test a JSON file against the schema with the `uhi` command (also
+`python -m uhi`):
 
 ```console
-$ python -m uhi.schema some/file.json
+$ uhi validate some/file.json
 ```
+
+```{versionadded} 1.2
+```
+
+`python -m uhi.schema some/file.json` also works.
 
 Or with code:
 
