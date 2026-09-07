@@ -1,7 +1,8 @@
 """
 Command line interface for uhi.
 
-``uhi validate`` checks JSON files against the schema.
+``uhi validate`` checks histogram files (JSON, zip, HDF5, or ROOT) against the
+schema.
 """
 
 from __future__ import annotations
@@ -28,9 +29,12 @@ def main(argv: Sequence[str] | None = None) -> None:
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     validate_parser = subparsers.add_parser(
-        "validate", help="validate JSON histogram files against the schema"
+        "validate",
+        help="validate histogram files (JSON, zip, HDF5, or ROOT) against the schema",
     )
-    validate_parser.add_argument("files", nargs="+", help="JSON files")
+    validate_parser.add_argument(
+        "files", nargs="+", help="histogram files (.json, .zip, .h5, .root)"
+    )
     validate_parser.set_defaults(func=_validate)
 
     args = parser.parse_args(argv)

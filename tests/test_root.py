@@ -375,3 +375,48 @@ def test_convert_bh_32bit_root(tmp_path: Path, storage_type: str) -> None:
     assert rehist_32bit["storage"]["values"] == pytest.approx(
         uhi_32bit["storage"]["values"]
     )
+
+
+# CLI
+
+
+def test_cli_validate_root(
+    valid: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    from uhi.__main__ import main
+
+    hists = json.loads(
+        valid.read_text(encoding="utf-8"), object_hook=uhi.io.json.object_hook
+    )
+
+    tmp_file = tmp_path / "test.root"
+    with ROOT.TFile.Open(str(tmp_file), "RECREATE") as root_file:
+        # Nest one level to check that directories are searched recursively
+        directory = root_file.mkdir("nested")
+        for name, hist in hists.items():
+            uhi_io_root.write(directory, name, hist)
+
+    main(["validate", str(tmp_file)])
+    assert capsys.readouterr().out.startswith("OK")
+
+
+def test_cli_validate_root_invalid(
+    resources: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    from uhi.__main__ import main
+
+    hists = json.loads(
+        (resources / "valid" / "reg.json").read_text(encoding="utf-8"),
+        object_hook=uhi.io.json.object_hook,
+    )
+
+    tmp_file = tmp_path / "test.root"
+    with ROOT.TFile.Open(str(tmp_file), "RECREATE") as root_file:
+        for name, hist in hists.items():
+            hist = dict(hist)  # noqa: PLW2901
+            hist["storage"] = {**hist["storage"], "type": "not_a_storage"}
+            uhi_io_root.write(root_file, name, hist)
+
+    with pytest.raises(SystemExit):
+        main(["validate", str(tmp_file)])
+    assert capsys.readouterr().out.startswith("ERROR")
