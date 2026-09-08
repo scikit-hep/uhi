@@ -13,9 +13,9 @@ well.
 The following formats are being targeted:
 
 ```
-┌──────────────┐ ┌────────┐ ┌────────────┐
-│  ROOT (todo) │ │  HDF5  │ │  ZIP/JSON  │
-└──────────────┘ └────────┘ └────────────┘
+┌────────┐ ┌────────┐ ┌────────────┐
+│  ROOT  │ │  HDF5  │ │  ZIP/JSON  │
+└────────┘ └────────┘ └────────────┘
 ```
 
 Other formats can be used as well, assuming they support out-of-band data and
@@ -297,7 +297,36 @@ currently (as of 3.14rc2) doesn't provide 3.14 wheels either.
 
 ### ROOT
 
-ROOT files are not yet implemented.
+The ROOT format stores each histogram as a single-entry
+[RNTuple](https://root.cern/doc/master/classROOT_1_1RNTuple.html). You need
+[ROOT](https://root.cern) installed to use this format (`conda install -c
+conda-forge root`). The RNTuple has a `"uhi"` string
+field holding the IR as a string and arrays are replaced
+by the name of the field holding them. Storage arrays are stored flattened in
+`std::vector` fields named after their key (`"values"`, `"variances"`, ...). The shape of these arrays is recovered from the axes when reading.
+The `edges` of a variable axis is stored the same way in
+a field named `"axis_{i}_edges"`, where `i` is the axis index.
+
+We provide `uhi.io.root.read` and `uhi.io.root.write`, which work with an open
+`TFile` or `RFile`.
+
+```python
+import ROOT
+import uhi.io.root
+
+with ROOT.TFile.Open("myfile.root", "RECREATE") as root_file:
+    uhi.io.root.write(root_file, "histogram", h)
+
+with ROOT.TFile.Open("myfile.root") as root_file:
+    h2 = uhi.io.root.read(root_file, "histogram")
+```
+
+Above, `h` is a histogram that supports `_to_uhi_` or an intermediate
+representation, and `h2` is an intermediate representation;
+you can pass it to `ROOT.TH1*` or `boost_histogram.Histogram` or `hist.Hist`.
+
+```{versionadded} 1.2
+```
 
 ## Schema
 
