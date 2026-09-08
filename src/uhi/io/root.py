@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import functools
 import json
 from typing import Any
 
@@ -78,13 +77,6 @@ def write(
         writer.Fill(entry)
 
 
-def _object_hook(dct: dict[str, Any], /, *, entry: Any) -> dict[str, Any]:
-    for item in ARRAY_KEYS & dct.keys():
-        if isinstance(dct[item], str):
-            dct[item] = np.array(entry[dct[item]])
-    return dct
-
-
 def read(directory: ROOT.TDirectory, /, name: str) -> dict[str, Any]:
     """
     Read a histogram from a ROOT directory.
@@ -92,8 +84,13 @@ def read(directory: ROOT.TDirectory, /, name: str) -> dict[str, Any]:
     with ROOT.RNTupleReader.Open(directory.Get(name)) as reader:
         entry = reader.CreateEntry()
         reader.LoadEntry(0, entry)
-        object_hook = functools.partial(_object_hook, entry=entry)
-        output: dict[str, Any] = json.loads(str(entry["uhi"]), object_hook=object_hook)
+        output: dict[str, Any] = json.loads(str(entry["uhi"]))
+        # Only storage and axes contain array references; metadata and writer
+        # info may use the same keys for arbitrary strings.
+        for obj in [output["storage"], *output["axes"]]:
+            for key in ARRAY_KEYS & obj.keys():
+                if isinstance(obj[key], str):
+                    obj[key] = np.array(entry[obj[key]])
     _check_uhi_schema_version(output["uhi_schema"])
 
     # Arrays are stored flattened; the shape is recovered from the axes

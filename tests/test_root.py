@@ -12,7 +12,7 @@ from helpers import convert_histogram_to_32bit
 from pytest import approx
 
 import uhi.io.json
-from uhi.io import to_sparse
+from uhi.io import ARRAY_KEYS, to_sparse
 from uhi.numpy_plottable import ensure_plottable_histogram
 
 ROOT = pytest.importorskip("ROOT")
@@ -134,6 +134,43 @@ def test_reg_load(tmp_path: Path, resources: Path) -> None:
 
     assert two["storage"]["type"] == "double"
     assert two["storage"]["values"] == pytest.approx([1, 2, 3, 4, 5, 6, 7])
+
+
+@pytest.mark.parametrize("value", ["description", "values", "axis_0_edges"])
+def test_metadata_array_keys(tmp_path: Path, value: str) -> None:
+    metadata = dict.fromkeys(ARRAY_KEYS, value)
+    writer_info = {"test": metadata}
+    hist: dict[str, Any] = {
+        "uhi_schema": 1,
+        "metadata": metadata,
+        "writer_info": writer_info,
+        "axes": [
+            {
+                "type": "variable",
+                "edges": np.array([0.0, 1.0, 2.0]),
+                "underflow": False,
+                "overflow": False,
+                "circular": False,
+                "metadata": metadata,
+                "writer_info": writer_info,
+            }
+        ],
+        "storage": {"type": "double", "values": np.array([1.0, 2.0])},
+    }
+
+    tmp_file = tmp_path / "metadata.root"
+    with ROOT.TFile.Open(str(tmp_file), "RECREATE") as root_file:
+        uhi_io_root.write(root_file, "histogram", hist)
+
+    with ROOT.TFile.Open(str(tmp_file)) as root_file:
+        rehist = uhi_io_root.read(root_file, "histogram")
+
+    assert rehist["metadata"] == metadata
+    assert rehist["writer_info"] == writer_info
+    assert rehist["axes"][0]["metadata"] == metadata
+    assert rehist["axes"][0]["writer_info"] == writer_info
+    assert rehist["axes"][0]["edges"] == pytest.approx(hist["axes"][0]["edges"])
+    assert rehist["storage"]["values"] == pytest.approx(hist["storage"]["values"])
 
 
 def test_two_variable_axes(tmp_path: Path) -> None:
