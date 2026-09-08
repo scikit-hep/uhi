@@ -26,7 +26,7 @@ class Locator:
     def __init__(self, offset: int = 0) -> None:
         if not isinstance(offset, int):
             msg = "The offset must be an integer"  # type: ignore[unreachable]
-            raise ValueError(msg)
+            raise TypeError(msg)
 
         self.offset = offset
 
@@ -116,7 +116,7 @@ class rebin:
     def __init__(self, factor: int) -> None:
         if not isinstance(factor, int):
             msg = "The factor must be an integer"  # type: ignore[unreachable]
-            raise ValueError(msg)
+            raise TypeError(msg)
         # Items with .factor are specially treated in boost-histogram,
         # performing a high performance rebinning
         self.factor = factor
