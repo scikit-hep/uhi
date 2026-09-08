@@ -12,15 +12,18 @@ your own library (`my.Histogram` in this example) like this:
 ```python
 import uhi.testing.indexing
 
+
 class TestAccess1D(uhi.testing.indexing.Indexing1D[my.Histogram]):
     @classmethod
     def make_histogram(cls) -> my.Histogram:
         return my.Histogram(cls.get_uhi())
 
+
 class TestAccess2D(uhi.testing.indexing.Indexing2D[my.Histogram]):
     @classmethod
     def make_histogram(cls) -> my.Histogram:
         return my.Histogram(cls.get_uhi())
+
 
 class TestAccess3D(uhi.testing.indexing.Indexing3D[my.Histogram]):
     @classmethod

@@ -61,7 +61,7 @@ class Indexing(abc.ABC, unittest.TestCase):
         self.assertEqual(self.sum_to_value(bin), value)
 
 
-class Indexing1D(typing.Generic[T], Indexing):
+class Indexing1D(Indexing, typing.Generic[T]):
     """
     This test requires a histogram to be created first.
 
@@ -384,7 +384,7 @@ class Indexing1D(typing.Generic[T], Indexing):
             h[1:4] = self.values_to_bins(range(5))
 
 
-class Indexing2D(typing.Generic[T], Indexing):
+class Indexing2D(Indexing, typing.Generic[T]):
     """
     This test requires histograms to be created first.
 
@@ -584,7 +584,7 @@ class Indexing2D(typing.Generic[T], Indexing):
         self.assertEqualBinValue(h[1, 4], 43)
 
 
-class Indexing3D(typing.Generic[T], Indexing):
+class Indexing3D(Indexing, typing.Generic[T]):
     """
     This test requires histograms to be created first.
 

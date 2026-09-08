@@ -17,16 +17,15 @@ repos:
     - id: requirements-txt-fixer
     - id: trailing-whitespace
 
-  # Held at 0.15; 0.16 adds new rules that need source changes
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "0671d8ab202c4ac093b78433ae5baf74f3fc7246"  # frozen: v0.15.15
+    rev: "321478e58f4938179c6b86e4ddfa923d1547a49b"  # frozen: v0.16.6
     hooks:
       - id: ruff-check
         args: ["--fix", "--show-fixes"]
       - id: ruff-format
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: 41e691678310dfd3833f7ab4e180ddb014310356  # frozen: v2.3.0
+    rev: 7ff8d35ae36a7d2b968f2f90b4c723e292e594ee  # frozen: v2.3.1
     hooks:
     - id: mypy
       files: ^(src|tests)
@@ -69,7 +68,7 @@ repos:
         types_or: [json]
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 6b63472e72e1a91ed8a2f6d483790dfb644fa1d3  # frozen: 0.37.4
+    rev: c4654a7e007c9619a5eb63c39a456572a0fa1851  # frozen: 0.38.0
     hooks:
       - id: check-readthedocs
       - id: check-github-workflows
@@ -81,12 +80,12 @@ repos:
         files: ^tests/resources/valid/.*\.json
 
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: a12c4f2e45f39cfb516be7842efbe98633eb3789  # frozen: 2026.08.05
+    rev: 0cee1769d7b9f642b7545be04c079f94277d6833  # frozen: 2026.09.04
     hooks:
       - id: validate-pyproject
 
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: 451b56af716f9f0d0c2b816503a3fd0cf8b036fa  # frozen: v1.29.0
+    rev: cef8b8350da46d8114c7e6b7272aebdccdf193ce  # frozen: v1.30.0
     hooks:
       - id: zizmor
         files: "^\\.github"
