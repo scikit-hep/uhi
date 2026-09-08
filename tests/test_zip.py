@@ -304,3 +304,37 @@ def test_convert_bh_32bit_zip(tmp_path: Path, storage_type: str) -> None:
     # Verify JSON representation is consistent
     redata = json.dumps(rehist_32bit, default=uhi.io.json.default)
     assert len(redata) > 0
+
+
+def test_metadata_with_array_key_names(tmp_path: Path) -> None:
+    """
+    Metadata keys can collide with array key names; they must not be treated
+    as references to stored arrays.
+    """
+    hist: Any = {
+        "uhi_schema": 1,
+        "metadata": {"values": "description", "edges": [1, 2, 3]},
+        "axes": [
+            {
+                "type": "regular",
+                "lower": 0.0,
+                "upper": 1.0,
+                "bins": 1,
+                "underflow": False,
+                "overflow": False,
+                "circular": False,
+                "metadata": {"counts": "label"},
+            }
+        ],
+        "storage": {"type": "int", "values": np.array([1])},
+    }
+
+    tmp_file = tmp_path / "meta.zip"
+    with zipfile.ZipFile(tmp_file, "w") as zip_file:
+        uhi.io.zip.write(zip_file, "h", hist)
+    with zipfile.ZipFile(tmp_file, "r") as zip_file:
+        rehist = uhi.io.zip.read(zip_file, "h")
+
+    assert rehist["metadata"] == {"values": "description", "edges": [1, 2, 3]}
+    assert rehist["axes"][0]["metadata"] == {"counts": "label"}
+    np.testing.assert_array_equal(rehist["storage"]["values"], [1])
