@@ -92,7 +92,7 @@ The CLI tools `uv`, `prek`, and `nox` should be pre-installed as Python tools.
 - Validate a histogram JSON file with `uv run python -m uhi.schema <file.json>`.
 - Always add/update tests.
 - Run `prek -a` to fixup style and look for linting issues.
-- When running `prek -a`, the linting rules are _very_ strict, so adding a
+- When running `prek -a --quiet`, the linting rules are _very_ strict, so adding a
   local or global skip for a troublesome rule is fine if it makes the code
   better.
 
