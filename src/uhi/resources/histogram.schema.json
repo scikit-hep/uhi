@@ -2,12 +2,23 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://raw.githubusercontent.com/scikit-hep/uhi/main/src/uhi/resources/histogram.schema.json",
   "title": "Histogram",
-  "type": "object",
-  "additionalProperties": false,
-  "patternProperties": {
-    ".+": {
+  "description": "A single histogram, or an object mapping names to histograms.",
+  "oneOf": [
+    { "$ref": "#/$defs/histogram" },
+    {
       "type": "object",
-      "required": ["axes", "storage"],
+      "description": "An object mapping names to histograms.",
+      "additionalProperties": false,
+      "patternProperties": {
+        ".+": { "$ref": "#/$defs/histogram" }
+      }
+    }
+  ],
+  "$defs": {
+    "histogram": {
+      "description": "A single histogram.",
+      "type": "object",
+      "required": ["uhi_schema", "axes", "storage"],
       "additionalProperties": false,
       "properties": {
         "uhi_schema": {
@@ -40,9 +51,7 @@
           ]
         }
       }
-    }
-  },
-  "$defs": {
+    },
     "supported_metadata": {
       "oneOf": [
         { "type": "string" },

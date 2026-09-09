@@ -10,6 +10,7 @@ import pytest
 from helpers import convert_histogram_to_32bit
 
 import uhi.io.json
+import uhi.schema
 
 BHVERSION = packaging.version.Version(importlib.metadata.version("boost_histogram"))
 HISTVERSION = packaging.version.Version(importlib.metadata.version("hist"))
@@ -224,3 +225,25 @@ def test_convert_bh_32bit(storage_type: str) -> None:
     # Verify values can be serialized again without error
     redata2 = json.dumps(rehist_32bit, default=uhi.io.json.default)
     assert len(redata2) > 0
+
+
+@pytest.mark.skipif(
+    packaging.version.Version("1.6.1") > BHVERSION,
+    reason="Requires boost-histogram 1.6+",
+)
+def test_mapping_round_trip() -> None:
+    """A JSON document can map names to histogram objects."""
+    import boost_histogram as bh
+
+    h1 = bh.Histogram(bh.axis.Regular(3, 0, 1), storage=bh.storage.Weight())
+    h1.fill([0.1, 0.5], weight=[2, 3])
+    h2 = bh.Histogram(bh.axis.Integer(0, 4), bh.axis.Boolean())
+    h2.fill([1, 2], [True, False])
+
+    data = json.dumps({"a": h1, "b": h2}, default=uhi.io.json.default)
+    uhi.schema.validate(json.loads(data))
+
+    rehists = json.loads(data, object_hook=uhi.io.json.object_hook)
+    assert rehists.keys() == {"a", "b"}
+    assert bh.Histogram(rehists["a"]) == h1
+    assert bh.Histogram(rehists["b"]) == h2

@@ -185,6 +185,12 @@ with filename.open(encoding="utf-8") as f:
 uhi.schema.validate(data)
 ```
 
+A JSON document is either one histogram (an object with a `"uhi_schema"` key)
+or an object mapping names to histograms. Both the command and
+`uhi.schema.validate` accept both forms. For a mapping, each entry is validated
+and an error names the failing entry, such as `data.two must contain ['axes']
+properties`.
+
 Eventually this should also be usable for JSON's inside zip, HDF5 attributes,
 and maybe more.
 
@@ -222,6 +228,15 @@ uhi_hist = json.loads(ob, object_hook=uhi.io.json.object_hook)
 Above, `h` is a histogram that supports `_to_uhi_` or an intermediate
 representation,`ob` is a JSON string, and `uhi_hist` is an intermediate
 representation; you can pass it to `boost_histogram.Histogram` or `hist.Hist`.
+
+A JSON document can also be an object mapping names to histograms. The same
+helpers work with a dictionary of histograms:
+
+```python
+ob = json.dumps({"one": h1, "two": h2}, default=uhi.io.json.default)
+uhi_hists = json.loads(ob, object_hook=uhi.io.json.object_hook)
+h1_again = boost_histogram.Histogram(uhi_hists["one"])
+```
 
 
 ### ZIP
@@ -334,7 +349,9 @@ A typing helper for the intermediate representation, `HistogramIR`, is provided
 in `uhi.typing.serialization` as a `TypedDict`. The schema, provided in
 `resources` as `histogram.schema.json`, also allows strings for data members,
 since some formats (like ZIP) put data into an optimized location and specify a
-reference to them.
+reference to them. The top level of the schema accepts either one histogram or
+an object mapping names to histograms; the histogram itself is defined in
+`$defs/histogram`.
 
 ### Rendered schema
 
