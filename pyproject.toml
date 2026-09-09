@@ -53,6 +53,9 @@ schema = [
 hdf5 = [
   "h5py",
 ]
+root = [
+  "ROOT",
+]
 
 [dependency-groups]
 docs = [
@@ -109,7 +112,7 @@ warn_unreachable = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 
 [[tool.mypy.overrides]]
-module = ["fastjsonschema", "h5py"]
+module = ["fastjsonschema", "h5py", "ROOT"]
 ignore_missing_imports = true
 
 
