@@ -147,9 +147,9 @@ stored directly at the top level:
 { "uhi_schema": 1, "axes": ["..."], "storage": { "...": "..." } }
 ```
 
-Readers can tell the two forms apart by the `"axes"` key: it is a list in a
-single histogram, and it is not present (or is a histogram) in a dictionary of
-histograms. The single form is the natural output of `json.dumps` on one
+Readers can tell the two forms apart by the `"uhi_schema"` key: it is present
+(and required) in a single histogram, and a histogram name is never
+`"uhi_schema"` in a dictionary of histograms. The single form is the natural output of `json.dumps` on one
 histogram, and it matches the HDF5 layout, where each histogram is a group.
 
 Two schemas are provided. `histogram.schema.json` describes one histogram,

@@ -4,7 +4,7 @@
   "title": "Histogram",
   "description": "A single histogram, the intermediate representation (IR). See histograms.schema.json for the JSON file format.",
   "type": "object",
-  "required": ["axes", "storage"],
+  "required": ["uhi_schema", "axes", "storage"],
   "additionalProperties": false,
   "properties": {
     "uhi_schema": {
