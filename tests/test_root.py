@@ -12,6 +12,7 @@ from helpers import convert_histogram_to_32bit
 from pytest import approx
 
 import uhi.io.json
+import uhi.schema
 from uhi.io import ARRAY_KEYS, to_sparse
 from uhi.numpy_plottable import ensure_plottable_histogram
 
@@ -419,4 +420,40 @@ def test_cli_validate_root_invalid(
 
     with pytest.raises(SystemExit):
         main(["validate", str(tmp_file)])
+    assert capsys.readouterr().out.startswith("ERROR")
+
+
+def test_cli_validate_root_path(
+    resources: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    from uhi.__main__ import main
+
+    hists = json.loads(
+        (resources / "valid" / "reg.json").read_text(encoding="utf-8"),
+        object_hook=uhi.io.json.object_hook,
+    )
+
+    tmp_file = tmp_path / "test.root"
+    with ROOT.TFile.Open(str(tmp_file), "RECREATE") as root_file:
+        good = root_file.mkdir("good")
+        bad = root_file.mkdir("bad")
+        for name, hist in hists.items():
+            uhi_io_root.write(good, name, hist)
+            broken = {**hist, "storage": {**hist["storage"], "type": "not_a_storage"}}
+            uhi_io_root.write(bad, name, broken)
+
+    assert set(uhi.schema.load(tmp_file, path="good")) == set(hists)
+    assert set(uhi.schema.load(tmp_file, path="good/")) == set(hists)
+    single = uhi.schema.load(tmp_file, path="good/one")
+    assert single["uhi_schema"] == 1
+
+    main(["validate", f"{tmp_file}:good", f"{tmp_file}:good/one"])
+    assert capsys.readouterr().out.count("OK") == 2
+
+    with pytest.raises(SystemExit):
+        main(["validate", f"{tmp_file}:bad"])
+    assert capsys.readouterr().out.startswith("ERROR")
+
+    with pytest.raises(SystemExit):
+        main(["validate", f"{tmp_file}:missing"])
     assert capsys.readouterr().out.startswith("ERROR")

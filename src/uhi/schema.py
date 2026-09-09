@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import functools
 import json
+import re
 import sys
 import zipfile
 from collections.abc import Callable
@@ -72,7 +73,7 @@ def _load_zip(path: Path) -> dict[str, Any]:
         return {name: uhi.io.zip.read(zip_file, name) for name in names}
 
 
-def _load_hdf5(path: Path) -> dict[str, Any]:
+def _load_hdf5(path: Path, subpath: str | None) -> dict[str, Any]:
     import h5py  # noqa: PLC0415
 
     import uhi.io.hdf5  # noqa: PLC0415
@@ -84,11 +85,14 @@ def _load_hdf5(path: Path) -> dict[str, Any]:
             hists[name] = uhi.io.hdf5.read(obj)
 
     with h5py.File(path, "r") as h5_file:
-        h5_file.visititems(visit)
+        start = h5_file[subpath] if subpath else h5_file
+        if "uhi_schema" in start.attrs:
+            return dict(uhi.io.hdf5.read(start))
+        start.visititems(visit)
     return hists
 
 
-def _load_root(path: Path) -> dict[str, Any]:
+def _load_root(path: Path, subpath: str | None) -> dict[str, Any]:
     import ROOT  # noqa: PLC0415
 
     import uhi.io.root  # noqa: PLC0415
@@ -109,27 +113,58 @@ def _load_root(path: Path) -> dict[str, Any]:
         msg = f"Could not open {path} as a ROOT file"
         raise OSError(msg)
     with root_file:
-        visit(root_file, "")
-    return hists
+        if not subpath:
+            visit(root_file, "")
+            return hists
+        parent, _, name = subpath.rstrip("/").rpartition("/")
+        directory = root_file.Get(parent) if parent else root_file
+        key = directory.GetKey(name) if directory else None
+        if not key:
+            msg = f"{subpath!r} not found in {path}"
+            raise KeyError(msg)
+        if key.GetClassName() in {"TDirectory", "TDirectoryFile"}:
+            visit(directory.Get(name), "")
+            return hists
+        # A single RNTuple
+        return uhi.io.root.read(directory, name)
 
 
-def load(file: str | Path, /) -> dict[str, Any]:
+_SPEC_RE = re.compile(r"^(.+?\.(?:json|zip|h5|hdf5|hdf|root)):(.+)$", re.IGNORECASE)
+
+
+def _split_spec(spec: str) -> tuple[str, str | None]:
+    """Split ``file.root:dir/name`` into ``("file.root", "dir/name")``."""
+    if match := _SPEC_RE.match(spec):
+        return match[1], match[2]
+    return spec, None
+
+
+def load(file: str | Path, /, *, path: str | None = None) -> dict[str, Any]:
     """
     Load all histograms from a file as a ``{name: histogram}`` dict with
     JSON-compatible values. The format is selected by suffix: ``.json``,
     ``.zip``, ``.h5``/``.hdf5``/``.hdf``, or ``.root``.
+
+    For HDF5 and ROOT files, ``path`` restricts the search to a group or
+    directory inside the file. If it names a single histogram, that histogram
+    is returned instead of a dict.
     """
-    path = Path(file)
-    match path.suffix.lower():
-        case ".json":
-            with path.open(encoding="utf-8") as f:
-                data: dict[str, Any] = json.load(f)
-        case ".zip":
-            data = _load_zip(path)
+    filepath = Path(file)
+    match filepath.suffix.lower():
         case ".h5" | ".hdf5" | ".hdf":
-            data = _load_hdf5(path)
+            data = _load_hdf5(filepath, path)
         case ".root":
-            data = _load_root(path)
+            data = _load_root(filepath, path)
+        case _ if path:
+            msg = (
+                f"An in-file path ({path!r}) is only supported for HDF5 and ROOT files"
+            )
+            raise ValueError(msg)
+        case ".json":
+            with filepath.open(encoding="utf-8") as f:
+                data = json.load(f)
+        case ".zip":
+            data = _load_zip(filepath)
         case suffix:
             msg = f"Unknown file format {suffix!r}, expected .json, .zip, .h5, or .root"
             raise ValueError(msg)
@@ -143,8 +178,9 @@ def main(*files: str) -> None:
     retval = 0
 
     for file in files:
+        filename, path = _split_spec(file)
         try:
-            validate(load(file))
+            validate(load(filename, path=path))
         except fastjsonschema.JsonSchemaValueException as e:
             print(f"ERROR {file}: {e.message}")  # noqa: T201
             retval = 1

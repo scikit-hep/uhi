@@ -33,7 +33,10 @@ def main(argv: Sequence[str] | None = None) -> None:
         help="validate histogram files (JSON, zip, HDF5, or ROOT) against the schema",
     )
     validate_parser.add_argument(
-        "files", nargs="+", help="histogram files (.json, .zip, .h5, .root)"
+        "files",
+        nargs="+",
+        help="histogram files (.json, .zip, .h5, .root); use file.h5:group or "
+        "file.root:dir to select a group or directory inside the file",
     )
     validate_parser.set_defaults(func=_validate)
 

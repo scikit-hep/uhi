@@ -207,6 +207,13 @@ checked:
 $ uhi validate some/file.json some/other.zip some/data.h5 some/data.root
 ```
 
+For HDF5 and ROOT files, add `:path` to restrict the check to one group or
+directory inside the file, or to a single histogram:
+
+```console
+$ uhi validate some/data.h5:run1/results some/data.root:analysis/main
+```
+
 ```{versionadded} 1.2
 ```
 
@@ -224,6 +231,13 @@ uhi.schema.validate(data)
 `validate` checks a JSON file object, in either form. Use
 `uhi.schema.validate_histogram` to check a single histogram (the intermediate
 representation).
+
+`uhi.schema.load` reads any supported file into a JSON-compatible dict, with an
+optional `path` keyword for HDF5 and ROOT files:
+
+```python
+uhi.schema.validate(uhi.schema.load("data.root", path="analysis"))
+```
 
 
 ## Format specific details and helpers
