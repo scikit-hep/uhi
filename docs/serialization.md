@@ -196,11 +196,22 @@ sparse histograms. Scalar histograms (with no axes) are always dense.
 
 ## CLI/API
 
-You can test a JSON file against the schema with the `uhi` command (also
-`python -m uhi`):
+You can test a file against the schema with the `uhi` command (also
+`python -m uhi`). The format is selected by the file suffix: `.json`, `.zip`,
+`.h5`/`.hdf5`/`.hdf` (needs the `hdf5` extra), or `.root` (needs ROOT). Every
+histogram in a zip file (each `*.json` entry), HDF5 file (each group with a
+`uhi_schema` attribute), or ROOT file (each RNTuple, searched recursively) is
+checked:
 
 ```console
-$ uhi validate some/file.json
+$ uhi validate some/file.json some/other.zip some/data.h5 some/data.root
+```
+
+For HDF5 and ROOT files, add `:path` to restrict the check to one group or
+directory inside the file, or to a single histogram:
+
+```console
+$ uhi validate some/data.h5:run1/results some/data.root:analysis/main
 ```
 
 ```{versionadded} 1.2
@@ -221,8 +232,12 @@ uhi.schema.validate(data)
 `uhi.schema.validate_histogram` to check a single histogram (the intermediate
 representation).
 
-Eventually this should also be usable for JSON's inside zip, HDF5 attributes,
-and maybe more.
+`uhi.schema.load` reads any supported file into a JSON-compatible dict, with an
+optional `path` keyword for HDF5 and ROOT files:
+
+```python
+uhi.schema.validate(uhi.schema.load("data.root", path="analysis"))
+```
 
 
 ## Format specific details and helpers
