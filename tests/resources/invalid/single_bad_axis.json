@@ -1,0 +1,5 @@
+{
+  "uhi_schema": 1,
+  "axes": [{ "type": "regular", "lower": 0, "upper": 5 }],
+  "storage": { "type": "int", "values": [1, 2, 3, 4, 5] }
+}

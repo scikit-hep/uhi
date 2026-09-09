@@ -123,12 +123,39 @@ For example, a histogram created with boost-histogram might contain:
 }
 ```
 
-There is one more required top-level key: `"uhi_schema"`, which must be set to
-1 currently. If there is a future revision with a backward incompatible change,
-this will be bumped to 2, and readers should always error on future schemas,
-and support all older schemas. This is hoped to be unlikely/rare, but this also
-serves as a check that this is in fact a uhi serialization object. Non-breaking
-changes like additions are allowed without bumping the schema.
+There is one more required key for each histogram: `"uhi_schema"`, which must
+be set to 1 currently. If there is a future revision with a backward
+incompatible change, this will be bumped to 2, and readers should always error
+on future schemas, and support all older schemas. This is hoped to be
+unlikely/rare, but this also serves as a check that this is in fact a uhi
+serialization object. Non-breaking changes like additions are allowed without
+bumping the schema.
+
+### Named and single histograms
+
+A file can hold either a dictionary of named histograms, or a single histogram
+stored directly at the top level:
+
+```json
+{
+  "one": { "uhi_schema": 1, "axes": ["..."], "storage": { "...": "..." } },
+  "two": { "uhi_schema": 1, "axes": ["..."], "storage": { "...": "..." } }
+}
+```
+
+```json
+{ "uhi_schema": 1, "axes": ["..."], "storage": { "...": "..." } }
+```
+
+Readers can tell the two forms apart by the `"axes"` key: it is a list in a
+single histogram, and it is not present (or is a histogram) in a dictionary of
+histograms. The single form is the natural output of `json.dumps` on one
+histogram, and it matches the HDF5 layout, where each histogram is a group.
+
+```{versionadded} 1.2
+
+The single histogram form is accepted by the schema.
+```
 
 ## Sparse storage
 
@@ -222,6 +249,8 @@ uhi_hist = json.loads(ob, object_hook=uhi.io.json.object_hook)
 Above, `h` is a histogram that supports `_to_uhi_` or an intermediate
 representation,`ob` is a JSON string, and `uhi_hist` is an intermediate
 representation; you can pass it to `boost_histogram.Histogram` or `hist.Hist`.
+This stores a single histogram directly. To store several histograms in one
+file, pass a dictionary of histograms instead; both forms are valid.
 
 
 ### ZIP

@@ -28,6 +28,17 @@ def test_valid_json(valid: Path) -> None:
     assert hist.keys() == rehist.keys()
 
 
+def test_valid_single_json(valid_single: Path) -> None:
+    data = valid_single.read_text(encoding="utf-8")
+    hist = json.loads(data, object_hook=uhi.io.json.object_hook)
+    redata = json.dumps(hist, default=uhi.io.json.default)
+
+    assert redata.replace(" ", "").replace("\n", "") == data.replace(" ", "").replace(
+        "\n", ""
+    )
+    assert hist["storage"]["values"] == pytest.approx([1, 2, 3, 4, 5])
+
+
 def test_reg_load(resources: Path) -> None:
     data = resources / "valid/reg.json"
     hists = json.loads(
