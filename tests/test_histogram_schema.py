@@ -20,6 +20,14 @@ def test_valid_single_schemas(valid_single: Path) -> None:
     with valid_single.open(encoding="utf-8") as f:
         data = json.load(f)
     uhi.schema.validate(data)
+    uhi.schema.validate_histogram(data)
+
+
+def test_named_not_a_histogram(valid: Path) -> None:
+    with valid.open(encoding="utf-8") as f:
+        data = json.load(f)
+    with pytest.raises(fastjsonschema.exceptions.JsonSchemaException):
+        uhi.schema.validate_histogram(data)
 
 
 def test_invalid_schemas(invalid: Path) -> None:

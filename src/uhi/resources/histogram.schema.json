@@ -2,52 +2,42 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://raw.githubusercontent.com/scikit-hep/uhi/main/src/uhi/resources/histogram.schema.json",
   "title": "Histogram",
-  "description": "Either a dictionary of named histograms, or a single histogram stored directly. A single histogram is detected by its `axes` list.",
+  "description": "A single histogram, the intermediate representation (IR). See histograms.schema.json for the JSON file format.",
   "type": "object",
-  "if": { "required": ["axes"], "properties": { "axes": { "type": "array" } } },
-  "then": { "$ref": "#/$defs/histogram" },
-  "else": {
-    "additionalProperties": false,
-    "patternProperties": { ".+": { "$ref": "#/$defs/histogram" } }
-  },
-  "$defs": {
-    "histogram": {
-      "type": "object",
-      "description": "A single histogram.",
-      "required": ["axes", "storage"],
-      "additionalProperties": false,
-      "properties": {
-        "uhi_schema": {
-          "const": 1,
-          "description": "The schema version number"
-        },
-        "writer_info": { "$ref": "#/$defs/writer_info" },
-        "metadata": { "$ref": "#/$defs/metadata" },
-        "axes": {
-          "type": "array",
-          "description": "A list of the axes of the histogram.",
-          "items": {
-            "oneOf": [
-              { "$ref": "#/$defs/regular_axis" },
-              { "$ref": "#/$defs/variable_axis" },
-              { "$ref": "#/$defs/category_str_axis" },
-              { "$ref": "#/$defs/category_int_axis" },
-              { "$ref": "#/$defs/boolean_axis" }
-            ]
-          }
-        },
-        "storage": {
-          "description": "The storage of the bins of the histogram.",
-          "oneOf": [
-            { "$ref": "#/$defs/int_storage" },
-            { "$ref": "#/$defs/double_storage" },
-            { "$ref": "#/$defs/weighted_storage" },
-            { "$ref": "#/$defs/mean_storage" },
-            { "$ref": "#/$defs/weighted_mean_storage" }
-          ]
-        }
+  "required": ["axes", "storage"],
+  "additionalProperties": false,
+  "properties": {
+    "uhi_schema": {
+      "const": 1,
+      "description": "The schema version number"
+    },
+    "writer_info": { "$ref": "#/$defs/writer_info" },
+    "metadata": { "$ref": "#/$defs/metadata" },
+    "axes": {
+      "type": "array",
+      "description": "A list of the axes of the histogram.",
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/regular_axis" },
+          { "$ref": "#/$defs/variable_axis" },
+          { "$ref": "#/$defs/category_str_axis" },
+          { "$ref": "#/$defs/category_int_axis" },
+          { "$ref": "#/$defs/boolean_axis" }
+        ]
       }
     },
+    "storage": {
+      "description": "The storage of the bins of the histogram.",
+      "oneOf": [
+        { "$ref": "#/$defs/int_storage" },
+        { "$ref": "#/$defs/double_storage" },
+        { "$ref": "#/$defs/weighted_storage" },
+        { "$ref": "#/$defs/mean_storage" },
+        { "$ref": "#/$defs/weighted_mean_storage" }
+      ]
+    }
+  },
+  "$defs": {
     "supported_metadata": {
       "oneOf": [
         { "type": "string" },

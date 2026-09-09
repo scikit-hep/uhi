@@ -152,9 +152,14 @@ single histogram, and it is not present (or is a histogram) in a dictionary of
 histograms. The single form is the natural output of `json.dumps` on one
 histogram, and it matches the HDF5 layout, where each histogram is a group.
 
+Two schemas are provided. `histogram.schema.json` describes one histogram,
+the intermediate representation. `histograms.schema.json` describes a JSON
+file, in either form above, and refers to the first schema for each histogram.
+
 ```{versionadded} 1.2
 
-The single histogram form is accepted by the schema.
+The single histogram form is accepted, and the schema is split into
+`histogram.schema.json` (one histogram) and `histograms.schema.json` (a file).
 ```
 
 ## Sparse storage
@@ -211,6 +216,10 @@ with filename.open(encoding="utf-8") as f:
 
 uhi.schema.validate(data)
 ```
+
+`validate` checks a JSON file object, in either form. Use
+`uhi.schema.validate_histogram` to check a single histogram (the intermediate
+representation).
 
 Eventually this should also be usable for JSON's inside zip, HDF5 attributes,
 and maybe more.
@@ -363,9 +372,12 @@ A typing helper for the intermediate representation, `HistogramIR`, is provided
 in `uhi.typing.serialization` as a `TypedDict`. The schema, provided in
 `resources` as `histogram.schema.json`, also allows strings for data members,
 since some formats (like ZIP) put data into an optimized location and specify a
-reference to them.
+reference to them. The JSON file schema, `histograms.schema.json`, wraps it.
 
 ### Rendered schema
+
+```{jsonschema} ../src/uhi/resources/histograms.schema.json
+```
 
 ```{jsonschema} ../src/uhi/resources/histogram.schema.json
 ```
@@ -373,7 +385,11 @@ reference to them.
 
 ### Full schema
 
-The full schema is below:
+The full schemas are below:
+
+```{literalinclude} ../src/uhi/resources/histograms.schema.json
+:language: json
+```
 
 ```{literalinclude} ../src/uhi/resources/histogram.schema.json
 :language: json

@@ -8,27 +8,45 @@ from importlib import resources
 from pathlib import Path
 from typing import Any
 
-histogram_file = resources.files("uhi") / "resources/histogram.schema.json"
+_resources = resources.files("uhi") / "resources"
+histogram_file = _resources / "histogram.schema.json"
+histograms_file = _resources / "histograms.schema.json"
 
-__all__ = ["histogram_file", "validate"]
+__all__ = ["histogram_file", "histograms_file", "validate", "validate_histogram"]
 
 
 def __dir__() -> list[str]:
     return __all__
 
 
+def _load_local(uri: str) -> dict[str, Any]:
+    """Resolve a relative ``$ref`` to a schema shipped in ``resources``."""
+    with (_resources / uri).open(encoding="utf-8") as f:
+        return json.load(f)  # type: ignore[no-any-return]
+
+
 @functools.cache
-def _histogram_schema() -> Callable[[dict[str, Any]], None]:
+def _compile(name: str) -> Callable[[dict[str, Any]], None]:
     import fastjsonschema  # noqa: PLC0415
 
-    with histogram_file.open(encoding="utf-8") as f:
-        return fastjsonschema.compile(json.load(f))  # type: ignore[no-any-return]
+    with (_resources / name).open(encoding="utf-8") as f:
+        return fastjsonschema.compile(  # type: ignore[no-any-return]
+            json.load(f), handlers={"": _load_local}
+        )
 
 
 def validate(data: dict[str, Any]) -> None:
-    """Validate a histogram object against the schema."""
-    validator = _histogram_schema()
-    validator(data)
+    """
+    Validate a JSON file object against the schema.
+
+    This accepts a dictionary of named histograms or a single histogram.
+    """
+    _compile("histograms.schema.json")(data)
+
+
+def validate_histogram(data: dict[str, Any]) -> None:
+    """Validate a single histogram (the IR) against the schema."""
+    _compile("histogram.schema.json")(data)
 
 
 def main(*files: str) -> None:

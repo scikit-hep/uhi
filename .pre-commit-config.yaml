@@ -73,11 +73,15 @@ repos:
       - id: check-readthedocs
       - id: check-github-workflows
       - id: check-metaschema
-        files: ^src/uhi/resources/histogram.schema.json$
+        files: ^src/uhi/resources/histograms?\.schema\.json$
       - id: check-jsonschema
         name: Validate Histogram examples
-        args: [--schemafile, src/uhi/resources/histogram.schema.json]
+        args: [--schemafile, src/uhi/resources/histograms.schema.json]
         files: ^tests/resources/valid/.*\.json
+      - id: check-jsonschema
+        name: Validate single Histogram examples
+        args: [--schemafile, src/uhi/resources/histogram.schema.json]
+        files: ^tests/resources/valid_single/.*\.json
 
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
     rev: 0cee1769d7b9f642b7545be04c079f94277d6833  # frozen: 2026.09.04
