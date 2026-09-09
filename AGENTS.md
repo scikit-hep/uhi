@@ -76,8 +76,6 @@ The CLI tools `uv`, `prek`, and `nox` should be pre-installed as Python tools.
 - `uv run <command>` is a good way to run things like `pytest`. It will
   automatically make the `.venv` folder if it doesn't exist yet.
 - `prek -a` will check the formatting and style.
-- `nox -s pylint` will run pylint, a little slower (few seconds) but can report
-  issues the faster checks can't.
 - Docs are built with `nox -s docs --non-interactive`, which uses Sphinx to
   generate documentation from `.rst` files in the `docs/` directory.
 
@@ -94,9 +92,9 @@ The CLI tools `uv`, `prek`, and `nox` should be pre-installed as Python tools.
 - Validate a histogram JSON file with `uv run python -m uhi.schema <file.json>`.
 - Always add/update tests.
 - Run `prek -a` to fixup style and look for linting issues.
-- When running `prek -a` or `nox -s pylint`, the linting rules are _very_
-  strict, so adding a local or global skip for a troublesome rule is fine if it
-  makes the code better.
+- When running `prek -a`, the linting rules are _very_ strict, so adding a
+  local or global skip for a troublesome rule is fine if it makes the code
+  better.
 
 ## Working on code
 
@@ -112,4 +110,4 @@ The CLI tools `uv`, `prek`, and `nox` should be pre-installed as Python tools.
 ## PR instructions
 
 - Titles follow Conventional Commits (like `feat: ...`)
-- Always run `prek -a` and `nox -s pylint` before committing.
+- Always run `prek -a` before committing.
