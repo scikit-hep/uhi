@@ -1,0 +1,16 @@
+{
+  "uhi_schema": 1,
+  "metadata": { "one": true, "two": 2, "three": "three" },
+  "axes": [
+    {
+      "type": "regular",
+      "lower": 0,
+      "upper": 5,
+      "bins": 3,
+      "underflow": true,
+      "overflow": true,
+      "circular": false
+    }
+  ],
+  "storage": { "type": "int", "values": [1, 2, 3, 4, 5] }
+}
