@@ -13,6 +13,7 @@ import numpy as np
 import pytest
 
 import uhi.io
+import uhi.io._files
 import uhi.io.json
 import uhi.io.zip
 from uhi.__main__ import main
@@ -237,10 +238,8 @@ def _write_file(path: Path, hists: dict[str, bh.Histogram[Any]]) -> None:
                     hdf5.write(f.create_group(name), hist)
 
 
-def _read_file(path: Path) -> dict[str, Any]:
-    from uhi.__main__ import _read
-
-    return _read(path)
+def _read_file(path: Path, name: str | None = None) -> Any:
+    return uhi.io._files.load(path, path=name)
 
 
 @pytest.mark.parametrize("in_suffix", [".json", ".zip", ".h5"])
@@ -274,5 +273,106 @@ def test_cli_add_force(tmp_path: Path) -> None:
 
 def test_cli_add_unknown_extension(tmp_path: Path) -> None:
     files, _ = _make_files(tmp_path, ".json")
-    with pytest.raises(SystemExit, match=re.escape("Unknown file extension '.txt'")):
+    with pytest.raises(SystemExit, match=re.escape("Unknown file format '.txt'")):
         main(["add", str(tmp_path / "out.txt"), *map(str, files)])
+
+
+def _write_single(path: Path, hist: bh.Histogram[Any]) -> None:
+    path.write_text(json.dumps(hist, default=uhi.io.json.default), encoding="utf-8")
+
+
+@pytest.mark.parametrize("out_suffix", [".json", ".h5"])
+def test_cli_add_single(tmp_path: Path, out_suffix: str) -> None:
+    """Unnamed (top-level) JSON histograms sum to an unnamed histogram."""
+    if out_suffix == ".h5":
+        pytest.importorskip("h5py")
+    a = _fill(bh.Histogram(bh.axis.Regular(3, -1, 1), bh.axis.Regular(4, -2, 2)), 100)
+    b = _fill(bh.Histogram(bh.axis.Regular(3, -1, 1), bh.axis.Regular(4, -2, 2)), 100)
+    _write_single(tmp_path / "a.json", a)
+    _write_single(tmp_path / "b.json", b)
+    target = tmp_path / f"out{out_suffix}"
+
+    main(["add", str(target), str(tmp_path / "a.json"), str(tmp_path / "b.json")])
+
+    result = _read_file(target)
+    assert uhi.io._files.is_single(result)
+    _assert_storage_equal(result["storage"], (a + b)._to_uhi_()["storage"])
+
+
+@pytest.mark.parametrize("out_suffix", [".json", ".zip", ".h5"])
+def test_cli_add_named_output(tmp_path: Path, out_suffix: str) -> None:
+    """``target:name`` names a single result; ``file:name`` selects inputs."""
+    if out_suffix == ".h5":
+        pytest.importorskip("h5py")
+    files, expected = _make_files(tmp_path, ".json")
+    _write_single(tmp_path / "c.json", expected["only_in_first"])
+    target = tmp_path / f"out{out_suffix}"
+
+    main(
+        [
+            "add",
+            f"{target}:sub/total",
+            f"{files[0]}:h",
+            f"{files[1]}:h",
+            str(tmp_path / "c.json"),
+        ]
+    )
+
+    result = _read_file(target)
+    assert result.keys() == {"sub/total"}
+    total = expected["h"] + expected["only_in_first"]
+    _assert_storage_equal(result["sub/total"]["storage"], total._to_uhi_()["storage"])
+    _assert_storage_equal(
+        _read_file(target, "sub/total")["storage"], total._to_uhi_()["storage"]
+    )
+
+
+def test_cli_add_named_output_prefix(tmp_path: Path) -> None:
+    """``target:dir`` prefixes every name when the result is a dict."""
+    files, expected = _make_files(tmp_path, ".json")
+    target = tmp_path / "out.zip"
+
+    main(["add", f"{target}:run", *map(str, files)])
+
+    result = _read_file(target)
+    assert result.keys() == {f"run/{name}" for name in expected}
+    assert _read_file(target, "run").keys() == expected.keys()
+
+
+def test_cli_add_single_needs_name(tmp_path: Path) -> None:
+    a = _fill(bh.Histogram(bh.axis.Regular(3, -1, 1), bh.axis.Regular(4, -2, 2)), 10)
+    _write_single(tmp_path / "a.json", a)
+    with pytest.raises(SystemExit, match="A name is needed"):
+        main(["add", str(tmp_path / "out.zip"), str(tmp_path / "a.json")])
+    assert not (tmp_path / "out.zip").exists()
+
+
+def test_cli_add_mixed_single_and_named(tmp_path: Path) -> None:
+    files, expected = _make_files(tmp_path, ".json")
+    _write_single(tmp_path / "c.json", expected["h"])
+    with pytest.raises(SystemExit, match="Cannot mix"):
+        main(
+            ["add", str(tmp_path / "out.json"), str(files[0]), str(tmp_path / "c.json")]
+        )
+
+
+def test_cli_add_missing_input_name(tmp_path: Path) -> None:
+    files, _ = _make_files(tmp_path, ".json")
+    with pytest.raises(SystemExit, match="'nope' not found"):
+        main(["add", str(tmp_path / "out.json"), f"{files[0]}:nope"])
+
+
+def test_cli_add_mismatched_axes(tmp_path: Path) -> None:
+    a = _fill(bh.Histogram(bh.axis.Regular(3, -1, 1), bh.axis.Regular(4, -2, 2)), 10)
+    b = _fill(bh.Histogram(bh.axis.Regular(3, -1, 1), bh.axis.Regular(5, -2, 2)), 10)
+    _write_single(tmp_path / "a.json", a)
+    _write_single(tmp_path / "b.json", b)
+    with pytest.raises(SystemExit, match="axes that do not match"):
+        main(
+            [
+                "add",
+                str(tmp_path / "out.json"),
+                str(tmp_path / "a.json"),
+                str(tmp_path / "b.json"),
+            ]
+        )

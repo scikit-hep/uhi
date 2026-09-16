@@ -3,9 +3,11 @@ from __future__ import annotations
 import json
 import zipfile
 from pathlib import Path
+from typing import Any
 
 import pytest
 
+import uhi.io._files
 import uhi.io.json
 import uhi.io.zip
 import uhi.schema
@@ -121,15 +123,60 @@ def test_cli_validate_hdf5_invalid(
     ],
 )
 def test_split_spec(spec: str, expected: tuple[str, str | None]) -> None:
-    assert uhi.schema._split_spec(spec) == expected
+    assert uhi.io._files.split_spec(spec) == expected
 
 
-def test_cli_validate_path_unsupported(
+def test_cli_validate_json_path(
     resources: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
+    reg = resources / "valid" / "reg.json"
+    single = uhi.schema.load(reg, path="one")
+    assert single["uhi_schema"] == 1
+
+    main(["validate", f"{reg}:one"])
+    assert capsys.readouterr().out.startswith("OK")
+
     with pytest.raises(SystemExit):
-        main(["validate", f"{resources / 'valid' / 'reg.json'}:main"])
-    assert "only supported for HDF5 and ROOT" in capsys.readouterr().out
+        main(["validate", f"{reg}:missing"])
+    assert "'missing' not found" in capsys.readouterr().out
+
+    with pytest.raises(SystemExit):
+        main(["validate", f"{resources / 'valid_single' / 'reg.json'}:one"])
+    assert "'one' not found" in capsys.readouterr().out
+
+
+def test_cli_validate_zip_path(
+    resources: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    hists = json.loads(
+        (resources / "valid" / "reg.json").read_text(encoding="utf-8"),
+        object_hook=uhi.io.json.object_hook,
+    )
+    tmp_file = tmp_path / "test.zip"
+    with zipfile.ZipFile(tmp_file, "w") as zip_file:
+        for name, hist in hists.items():
+            uhi.io.zip.write(zip_file, f"good/{name}", hist)
+            broken: Any = {
+                **hist,
+                "storage": {**hist["storage"], "type": "not_a_storage"},
+            }
+            uhi.io.zip.write(zip_file, f"bad/{name}", broken)
+
+    assert set(uhi.schema.load(tmp_file, path="good")) == set(hists)
+    assert set(uhi.schema.load(tmp_file, path="good/")) == set(hists)
+    single = uhi.schema.load(tmp_file, path="good/one")
+    assert single["uhi_schema"] == 1
+
+    main(["validate", f"{tmp_file}:good", f"{tmp_file}:good/one"])
+    assert capsys.readouterr().out.count("OK") == 2
+
+    with pytest.raises(SystemExit):
+        main(["validate", f"{tmp_file}:bad"])
+    assert capsys.readouterr().out.startswith("ERROR")
+
+    with pytest.raises(SystemExit):
+        main(["validate", f"{tmp_file}:missing"])
+    assert "'missing' not found" in capsys.readouterr().out
 
 
 def test_cli_validate_hdf5_path(
