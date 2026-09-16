@@ -18,6 +18,7 @@ else:
 DIR = Path(__file__).parent.resolve()
 VALID_FILES = DIR.glob("resources/valid/*.json")
 INVALID_FILES = DIR.glob("resources/invalid/*.json")
+VALID_SINGLE_FILES = DIR.glob("resources/valid_single/*.json")
 
 
 @pytest.fixture(scope="session")
@@ -32,6 +33,12 @@ def valid(request: pytest.FixtureRequest) -> Path:
 
 @pytest.fixture(params=INVALID_FILES, ids=lambda p: p.name)
 def invalid(request: pytest.FixtureRequest) -> Path:
+    return request.param  # type: ignore[no-any-return]
+
+
+@pytest.fixture(params=VALID_SINGLE_FILES, ids=lambda p: p.name)
+def valid_single(request: pytest.FixtureRequest) -> Path:
+    """A single histogram stored directly, without a name."""
     return request.param  # type: ignore[no-any-return]
 
 

@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Histograms",
+  "description": "A JSON file holding either a dictionary of named histograms, or a single histogram stored directly. A single histogram is detected by its `uhi_schema` key. Each histogram follows histogram.schema.json.",
+  "type": "object",
+  "if": { "required": ["uhi_schema"] },
+  "then": { "$ref": "histogram.schema.json" },
+  "else": {
+    "additionalProperties": false,
+    "patternProperties": { ".+": { "$ref": "histogram.schema.json" } }
+  }
+}

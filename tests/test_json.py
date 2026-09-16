@@ -10,6 +10,7 @@ import pytest
 from helpers import convert_histogram_to_32bit
 
 import uhi.io.json
+import uhi.schema
 
 BHVERSION = packaging.version.Version(importlib.metadata.version("boost_histogram"))
 HISTVERSION = packaging.version.Version(importlib.metadata.version("hist"))
@@ -26,6 +27,17 @@ def test_valid_json(valid: Path) -> None:
     )
 
     assert hist.keys() == rehist.keys()
+
+
+def test_valid_single_json(valid_single: Path) -> None:
+    data = valid_single.read_text(encoding="utf-8")
+    hist = json.loads(data, object_hook=uhi.io.json.object_hook)
+    redata = json.dumps(hist, default=uhi.io.json.default)
+
+    assert redata.replace(" ", "").replace("\n", "") == data.replace(" ", "").replace(
+        "\n", ""
+    )
+    assert hist["storage"]["values"] == pytest.approx([1, 2, 3, 4, 5])
 
 
 def test_reg_load(resources: Path) -> None:
@@ -224,3 +236,24 @@ def test_convert_bh_32bit(storage_type: str) -> None:
     # Verify values can be serialized again without error
     redata2 = json.dumps(rehist_32bit, default=uhi.io.json.default)
     assert len(redata2) > 0
+
+
+@pytest.mark.skipif(
+    packaging.version.Version("1.6.1") > BHVERSION,
+    reason="Requires boost-histogram 1.6+",
+)
+def test_named_round_trip() -> None:
+    import boost_histogram as bh
+
+    h1 = bh.Histogram(bh.axis.Regular(3, 0, 1), storage=bh.storage.Weight())
+    h1.fill([0.1, 0.5], weight=[2, 3])
+    h2 = bh.Histogram(bh.axis.Integer(0, 4), bh.axis.Boolean())
+    h2.fill([1, 2], [True, False])
+
+    data = json.dumps({"a": h1, "b": h2}, default=uhi.io.json.default)
+    uhi.schema.validate(json.loads(data))
+
+    rehists = json.loads(data, object_hook=uhi.io.json.object_hook)
+    assert rehists.keys() == {"a", "b"}
+    assert bh.Histogram(rehists["a"]) == h1
+    assert bh.Histogram(rehists["b"]) == h2
