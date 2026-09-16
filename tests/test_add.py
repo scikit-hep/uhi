@@ -122,6 +122,37 @@ def test_add_keeps_int_dtype() -> None:
     np.testing.assert_array_equal(result["storage"]["values"], [0, 2, 4, 0, 0])
 
 
+def test_add_scalar_int_is_json_serializable() -> None:
+    h = bh.Histogram(storage=bh.storage.Int64())
+    h.fill()
+    result = add(h, h)
+    assert isinstance(result["storage"]["values"], np.ndarray)
+    assert json.loads(json.dumps(result, default=uhi.io.json.default))["storage"] == {
+        "type": "int",
+        "values": 2,
+    }
+
+
+@pytest.mark.parametrize("bad", [np.inf, np.nan])
+def test_add_mean_keeps_nonfinite_variance(bad: float) -> None:
+    """A populated bin with a nonfinite variance must not become zero."""
+    h = bh.Histogram(bh.axis.Integer(0, 2), storage=bh.storage.Mean())
+    h.fill([0, 0], sample=[1.0, 3.0])
+    ir = _ir(h)
+    ir["storage"]["variances"] = np.asarray([0.0, bad, 0.0, 0.0])
+    result = add(ir, ir)
+    assert np.isnan(result["storage"]["variances"][1]) == np.isnan(bad)
+    assert np.isinf(result["storage"]["variances"][1]) == np.isinf(bad)
+
+    w = bh.Histogram(bh.axis.Integer(0, 2), storage=bh.storage.WeightedMean())
+    w.fill([0, 0], sample=[1.0, 3.0], weight=[0.5, 2.0])
+    wir = _ir(w)
+    wir["storage"]["variances"] = np.asarray([0.0, bad, 0.0, 0.0])
+    wresult = add(wir, wir)
+    assert np.isnan(wresult["storage"]["variances"][1]) == np.isnan(bad)
+    assert np.isinf(wresult["storage"]["variances"][1]) == np.isinf(bad)
+
+
 def test_add_mixed_sparse_gives_dense() -> None:
     h = bh.Histogram(bh.axis.Integer(0, 3))
     h.fill([0, 1, 1])
@@ -256,6 +287,18 @@ def test_cli_add(tmp_path: Path, in_suffix: str, out_suffix: str) -> None:
     assert result.keys() == expected.keys()
     for name, hist in expected.items():
         _assert_storage_equal(result[name]["storage"], hist._to_uhi_()["storage"])
+
+
+def test_cli_add_scalar(tmp_path: Path) -> None:
+    h = bh.Histogram(storage=bh.storage.Int64())
+    h.fill()
+    src = tmp_path / "in.json"
+    uhi.io._files.write(src, {"one": h})
+    target = tmp_path / "out.json"
+
+    main(["add", str(target), str(src), str(src)])
+
+    assert _read_file(target)["one"]["storage"]["values"] == 2
 
 
 def test_cli_add_force(tmp_path: Path) -> None:

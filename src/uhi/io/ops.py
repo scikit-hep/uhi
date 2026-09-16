@@ -65,8 +65,9 @@ def _add_mean(a: AnyStorageIR, b: AnyStorageIR, /) -> AnyStorageIR:
         m = np.divide(
             n_a * m_a + n_b * m_b, n, out=np.zeros_like(n, dtype=float), where=n != 0
         )
-        m2_a = np.where(np.isfinite(v_a), v_a * (n_a - 1), 0.0)
-        m2_b = np.where(np.isfinite(v_b), v_b * (n_b - 1), 0.0)
+        # The variance is undefined (0/0) for fewer than two entries
+        m2_a = np.where(n_a > 1, v_a * (n_a - 1), 0.0)
+        m2_b = np.where(n_b > 1, v_b * (n_b - 1), 0.0)
         m2 = (
             m2_a
             + m2_b
@@ -78,7 +79,12 @@ def _add_mean(a: AnyStorageIR, b: AnyStorageIR, /) -> AnyStorageIR:
             )
         )
         v = m2 / (n - 1)
-    return {"type": "mean", "counts": n, "values": m, "variances": v}
+    return {
+        "type": "mean",
+        "counts": np.asarray(n),
+        "values": np.asarray(m),
+        "variances": np.asarray(v),
+    }
 
 
 def _add_weighted_mean(a: AnyStorageIR, b: AnyStorageIR, /) -> AnyStorageIR:
@@ -107,8 +113,9 @@ def _add_weighted_mean(a: AnyStorageIR, b: AnyStorageIR, /) -> AnyStorageIR:
         d_b = w_b - np.divide(
             w2_b, w_b, out=np.zeros_like(w, dtype=float), where=w_b != 0
         )
-        m2_a = np.where(np.isfinite(v_a), v_a * d_a, 0.0)
-        m2_b = np.where(np.isfinite(v_b), v_b * d_b, 0.0)
+        # The variance is undefined (0/0) when the denominator is zero
+        m2_a = np.where(d_a != 0, v_a * d_a, 0.0)
+        m2_b = np.where(d_b != 0, v_b * d_b, 0.0)
         m2 = (
             m2_a
             + m2_b
@@ -122,25 +129,30 @@ def _add_weighted_mean(a: AnyStorageIR, b: AnyStorageIR, /) -> AnyStorageIR:
         v = m2 / (w - w2 / w)
     return {
         "type": "weighted_mean",
-        "sum_of_weights": w,
-        "sum_of_weights_squared": w2,
-        "values": m,
-        "variances": v,
+        "sum_of_weights": np.asarray(w),
+        "sum_of_weights_squared": np.asarray(w2),
+        "values": np.asarray(m),
+        "variances": np.asarray(v),
     }
 
 
 def _add_storage(a: AnyStorageIR, b: AnyStorageIR, /) -> AnyStorageIR:
     """
-    Add two dense, non-empty storages of the same type.
+    Add two dense, non-empty storages of the same type. Results are always
+    arrays; NumPy scalars (from zero-dimensional histograms) are not JSON
+    serializable.
     """
     match a["type"]:
         case "int" | "double":
-            return {"type": a["type"], "values": np.add(a["values"], b["values"])}
+            return {
+                "type": a["type"],
+                "values": np.asarray(np.add(a["values"], b["values"])),
+            }
         case "weighted":
             return {
                 "type": "weighted",
-                "values": np.add(a["values"], b["values"]),
-                "variances": np.add(a["variances"], b["variances"]),
+                "values": np.asarray(np.add(a["values"], b["values"])),
+                "variances": np.asarray(np.add(a["variances"], b["variances"])),
             }
         case "mean":
             return _add_mean(a, b)

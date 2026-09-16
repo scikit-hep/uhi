@@ -51,11 +51,11 @@ def is_single(data: Any, /) -> bool:
     return "uhi_schema" in data
 
 
-def _load_json(path: Path, subpath: str | None) -> Any:
+def _load_json(path: Path, subpath: str | None, *, raw: bool = False) -> Any:
     from .json import object_hook  # noqa: PLC0415
 
     with path.open(encoding="utf-8") as f:
-        data = json.load(f, object_hook=object_hook)
+        data = json.load(f, object_hook=None if raw else object_hook)
     if subpath is None:
         return data
     if is_single(data) or subpath not in data:
@@ -142,16 +142,17 @@ def _load_root(path: Path, subpath: str | None) -> Any:
         return root.read(directory, name)
 
 
-def load(file: str | Path, /, *, path: str | None = None) -> Any:
+def load(file: str | Path, /, *, path: str | None = None, raw: bool = False) -> Any:
     """
     Load a file as a ``{name: histogram}`` dict, or as a single histogram
     if the file (or ``path`` inside it) holds only one. Arrays are NumPy
-    arrays. The format is selected by suffix.
+    arrays, except that ``raw`` keeps JSON files exactly as written so that
+    validation sees the original types. The format is selected by suffix.
     """
     filepath = Path(file)
     match file_format(filepath):
         case "json":
-            return _load_json(filepath, path)
+            return _load_json(filepath, path, raw=raw)
         case "zip":
             return _load_zip(filepath, path)
         case "hdf5":

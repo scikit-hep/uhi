@@ -5,6 +5,7 @@ import zipfile
 from pathlib import Path
 from typing import Any
 
+import fastjsonschema
 import pytest
 
 import uhi.io._files
@@ -214,4 +215,26 @@ def test_cli_validate_hdf5_path(
 
     with pytest.raises(SystemExit):
         main(["validate", f"{tmp_file}:missing"])
+    assert capsys.readouterr().out.startswith("ERROR")
+
+
+def test_cli_validate_json_keeps_raw_types(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Loading for validation must not coerce JSON values into arrays."""
+    bad = {
+        "one": {
+            "uhi_schema": 1,
+            "axes": [{"type": "boolean"}],
+            "storage": {"type": "double", "values": [True, 1]},
+        }
+    }
+    tmp_file = tmp_path / "bad.json"
+    tmp_file.write_text(json.dumps(bad), encoding="utf-8")
+
+    with pytest.raises(fastjsonschema.exceptions.JsonSchemaException):
+        uhi.schema.validate(uhi.schema.load(tmp_file))
+
+    with pytest.raises(SystemExit):
+        main(["validate", str(tmp_file)])
     assert capsys.readouterr().out.startswith("ERROR")

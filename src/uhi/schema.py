@@ -75,7 +75,7 @@ def load(file: str | Path, /, *, path: str | None = None) -> dict[str, Any]:
     to a single histogram by name. If the file or ``path`` holds a single
     histogram, that histogram is returned instead of a dict.
     """
-    return _to_json_compatible(_files.load(file, path=path))
+    return _to_json_compatible(_files.load(file, path=path, raw=True))
 
 
 def main(*files: str) -> None:
