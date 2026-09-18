@@ -62,6 +62,12 @@ llms_txt_description = (
 # a list of builtin themes.
 html_theme = "furo"
 
+html_theme_options = {
+    "source_repository": "https://github.com/scikit-hep/uhi",
+    "source_branch": "main",
+    "source_directory": "docs/",
+}
+
 
 # -- Changelog builder -------------------------------------------------------
 if "GITHUB_API_TOKEN" in os.environ:
