@@ -20,6 +20,8 @@ authors:
   email: "jpivarski@gmail.com"
 - family-names: "Taider"
   given-names: "Silia"
+  affiliation: "CERN"
+  orcid: "https://orcid.org/0009-0003-5322-1499"
   email: "siliataider@gmail.com"
 doi: https://doi.org/10.5281/zenodo.13883674
 repository-code: "https://github.com/scikit-hep/uhi"
