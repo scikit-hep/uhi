@@ -30,6 +30,11 @@ Axes have:
 * ``ax.traits.circular``: True if circular
 * ``ax.traits.discrete``: True if the bin represents a single value (e.g. Integer or Category axes) instead of an interval (e.g. Regular or Variable axes)
 
+A histogram can have no axes (a 0D histogram, like a counter or the sum of a
+1D histogram). Then ``h.axes`` is empty, and ``.values()``, ``.variances()``,
+and ``.counts()`` return 0D arrays (shape ``()``). Plotters that support this
+case can show the single value without an x axis.
+
 Plotters should see if ``.counts()`` is None; no boost-histogram objects currently
 return None, but a future storage or different library could.
 
