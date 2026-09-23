@@ -55,7 +55,7 @@ largely independent concerns under `src/uhi/`:
    them with `fastjsonschema` (optional `[schema]` extra) and exposes
    `validate()` (a file), `validate_histogram()` (one histogram), and `load()`
    (read any supported file). `io/json.py`, `io/zip.py`, `io/hdf5.py`
-   (optional `[hdf5]` extra), `io/root.py` (PyROOT, `[root]` extra), and
+   (optional `[hdf5]` extra), `io/root.py` (PyROOT, from conda-forge), and
    `io/uproot.py` (`[uproot]` extra) each serialize/deserialize the IR types.
    The two ROOT backends share the RNTuple layout in `io/_rntuple.py`.
    `io/_files.py` reads and writes whole files in any format, picked by

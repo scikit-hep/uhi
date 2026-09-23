@@ -137,7 +137,10 @@ def _import_root() -> Any:
     try:
         import ROOT  # noqa: PLC0415
     except ModuleNotFoundError as err:
-        msg = "ROOT files need uproot 5.7+ (pip install 'uhi[uproot]') or PyROOT"
+        msg = (
+            "ROOT files need uproot 5.7+ (pip install 'uhi[uproot]') or "
+            "PyROOT (conda install -c conda-forge root)"
+        )
         raise ModuleNotFoundError(msg, name=err.name) from err
     return ROOT
 

@@ -53,9 +53,6 @@ schema = [
 hdf5 = [
   "h5py",
 ]
-root = [
-  "ROOT",
-]
 uproot = [
   "awkward>=2",
   "uproot>=5.7",
