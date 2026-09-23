@@ -79,6 +79,37 @@ def test_reg_load(tmp_path: Path, resources: Path) -> None:
     assert one["storage"]["values"] == pytest.approx([1, 2, 3, 4, 5])
 
 
+def test_scalar_storage(tmp_path: Path) -> None:
+    hist: dict[str, Any] = {
+        "uhi_schema": 1,
+        "axes": [],
+        "storage": {"type": "double", "values": 3.0},
+    }
+
+    tmp_file = tmp_path / "test.h5"
+    with h5py.File(tmp_file, "w") as h5_file:
+        uhi_io_hdf5.write(h5_file.create_group("scalar"), hist)
+
+    with h5py.File(tmp_file, "r") as h5_file:
+        rehist = uhi_io_hdf5.read(h5_file["scalar"])
+
+    assert rehist["axes"] == []
+    assert rehist["storage"]["values"] == pytest.approx(3.0)
+
+
+def test_create_dataset_nested_list_size(tmp_path: Path) -> None:
+    with h5py.File(tmp_path / "test.h5", "w") as h5_file:
+        uhi_io_hdf5._create_dataset(
+            h5_file,
+            "nested",
+            [[1, 2], [3, 4]],
+            compression="gzip",
+            compression_opts=4,
+            min_compress_elements=3,
+        )
+        assert h5_file["nested"].compression == "gzip"
+
+
 def test_axis_order_many_axes(tmp_path: Path) -> None:
     """Axis order must be preserved past 10 axes (issue #241).
 

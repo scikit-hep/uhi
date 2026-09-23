@@ -183,6 +183,18 @@ def test_axis_eq_different_shape() -> None:
     assert axis_3 != axis_4
 
 
+def test_axis_eq_list_edges() -> None:
+    """Comparing to an object whose .edges is a list should not raise."""
+    from types import SimpleNamespace
+
+    from uhi.numpy_plottable import NumPyPlottableAxis
+
+    axis = NumPyPlottableAxis(np.array([[0.0, 1.0], [1.0, 2.0]]))
+
+    assert axis == SimpleNamespace(edges=[[0.0, 1.0], [1.0, 2.0]])
+    assert axis != SimpleNamespace(edges=[[0.0, 1.0]])
+
+
 def test_from_bh_str_cat() -> None:
     bh = pytest.importorskip("boost_histogram")
     h1 = bh.Histogram(bh.axis.StrCategory(["hi", "ho"]))

@@ -57,11 +57,12 @@ def _create_dataset(
     Create an HDF5 dataset, applying compression only when the element count
     meets the minimum threshold.
 
-    ``data`` may be a NumPy array or a plain Python list (e.g. string
-    categories). The size check uses ``len()`` for lists and ``.size`` for
-    arrays so that the original type is passed through to h5py unchanged.
+    ``data`` may be a NumPy array, a scalar, or a (possibly nested) Python
+    list (e.g. string categories). The element count comes from
+    ``np.asarray(data).size``, but the original ``data`` goes to h5py
+    unchanged.
     """
-    size = data.size if isinstance(data, np.ndarray) else len(data)
+    size = np.asarray(data).size
     if size < min_compress_elements:
         group.create_dataset(name, data=data)
     else:

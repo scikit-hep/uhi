@@ -94,6 +94,7 @@ class NumPyPlottableAxis:
         other_edges = getattr(other, "edges", None)
         if other_edges is None:
             return NotImplemented
+        other_edges = np.asarray(other_edges)
         if self.edges.shape != other_edges.shape:
             return False
         return bool(np.allclose(self.edges, other_edges))
