@@ -114,3 +114,28 @@ def test_mean(resources: Path, name: str) -> None:
 
     assert len(sparse_hist["storage"]["values"]) == 2
     assert sparse_hist["storage"]["index"].shape == (1, 2)
+
+
+def test_from_sparse_empty_index_json_roundtrip() -> None:
+    """An all-zero histogram has an empty index; JSON reads it back as float."""
+    hist: HistogramIR = {
+        "uhi_schema": 1,
+        "storage": {"type": "double", "values": np.zeros(3)},
+        "axes": [
+            {
+                "type": "regular",
+                "bins": 3,
+                "overflow": False,
+                "underflow": False,
+                "lower": 0,
+                "upper": 1,
+                "circular": False,
+            },
+        ],
+    }
+    text = json.dumps(to_sparse(hist), default=uhi.io.json.default)
+    shist = json.loads(text, object_hook=uhi.io.json.object_hook)
+    assert shist["storage"]["index"].shape == (1, 0)
+
+    dense = from_sparse(shist)
+    np.testing.assert_array_equal(dense["storage"]["values"], np.zeros(3))

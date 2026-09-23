@@ -141,6 +141,8 @@ def from_sparse(sparse: H, /) -> H:
     if index is None:
         return sparse
 
+    # An empty index is read from JSON as float
+    index = np.asarray(index, dtype=np.intp)
     ndim, _n_nonzero = index.shape
     shape = [_compute_axis_length(a) for a in sparse["axes"]]  # type: ignore[arg-type]
 

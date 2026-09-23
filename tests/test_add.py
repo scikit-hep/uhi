@@ -302,6 +302,19 @@ def test_cli_add_scalar(tmp_path: Path) -> None:
     assert _read_file(target)["one"]["storage"]["values"] == 2
 
 
+def test_cli_add_sparse_all_zero(tmp_path: Path) -> None:
+    """An empty sparse index reads back from JSON as float."""
+    ir = to_sparse(_ir(bh.Histogram(bh.axis.Regular(3, -1, 1))))
+    src = tmp_path / "in.json"
+    src.write_text(json.dumps(ir, default=uhi.io.json.default), encoding="utf-8")
+    target = tmp_path / "out.json"
+
+    main(["add", str(target), str(src), str(src)])
+
+    result = uhi.io.from_sparse(_read_file(target))
+    np.testing.assert_array_equal(result["storage"]["values"], np.zeros(5))
+
+
 def test_cli_add_force(tmp_path: Path) -> None:
     files, _ = _make_files(tmp_path, ".json")
     target = tmp_path / "out.json"
