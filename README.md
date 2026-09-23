@@ -19,8 +19,8 @@
 This is a package meant primarily for [documenting][rtd-link] histogram
 indexing and the PlottableHistogram Protocol and any future cross-library
 standards. It also contains the code for the PlottableHistogram Protocol, to be
-used in type checking libraries wanting to conform to the protocol. Eventually,
-it might gain a set of tools for testing conformance to UHI indexing, as well.
+used in type checking libraries wanting to conform to the protocol, and
+`uhi.testing`, a set of tools for testing conformance to UHI indexing.
 It is not usually a runtime dependency, but only a type checking, testing,
 and/or docs dependency in support of other libraries (such as
 [boost-histogram][] 0.13+, [hist][] 2.1+, [mplhep][] 0.2.15+, [uproot][] 4+,
@@ -35,10 +35,11 @@ tuples into a simple PlottableHistogram.
 The `uhi.io` module can read and write histograms in JSON, ZIP, HDF5, and ROOT
 (with uproot or PyROOT),
 and `uhi.io.ops.add` sums histograms bin-by-bin. The `uhi add` command does the
-same for files, like ROOT's `hadd`.
+same for files, like ROOT's `hadd`. The `uhi validate` command checks files
+against the schema (needs the `schema` extra).
 
 The Protocols provided do support runtime checking, so
-`isinstance(h, uhi.typing.plotting.PlottableHistogram)` is valid at runtime and
+`isinstance(h, uhi.typing.plottable.PlottableHistogram)` is valid at runtime and
 might be simpler than manually checking for the expected methods.
 
 [actions-badge]:            https://github.com/Scikit-HEP/uhi/workflows/CI/badge.svg
@@ -67,5 +68,5 @@ might be simpler than manually checking for the expected methods.
 [boost-histogram]:          https://github.com/scikit-hep/boost-histogram
 [hist]:                     https://github.com/scikit-hep/hist
 [mplhep]:                   https://github.com/scikit-hep/mplhep
-[uproot]:                   https://github.com/scikit-hep/uproot4
+[uproot]:                   https://github.com/scikit-hep/uproot5
 [histoprint]:               https://github.com/scikit-hep/histoprint

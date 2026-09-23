@@ -19,6 +19,7 @@ Some key files:
 - `.pre-commit-config.yaml`: `prek` (pre-commit) configuration
 - `src/uhi/`: Core package code
 - `src/uhi/__init__.py`: Main package
+- `src/uhi/__main__.py`: The `uhi` CLI (`uhi add`, `uhi validate`)
 - `src/uhi/schema.py`: Histogram schema definitions
 - `src/uhi/tag.py`: Tag implementations
 - `src/uhi/numpy_plottable.py`: NumPy histogram compatibility
@@ -30,7 +31,7 @@ Some key files:
 ## Architecture
 
 UHI is primarily a **standards + typing + testing** package, not a runtime
-dependency (the base package only needs numpy). The code splits into four
+dependency (the base package only needs numpy). The code splits into a few
 largely independent concerns under `src/uhi/`:
 
 1. **Protocols (`typing/`)** — `typing/plottable.py` defines the
@@ -47,12 +48,20 @@ largely independent concerns under `src/uhi/`:
    with offset arithmetic (`loc(1.0) + 2`). This is the spec implementation
    referenced by the docs (`docs/indexing.rst`).
 
-3. **Serialization (`io/` + `schema.py` + `resources/`)** — the JSON Schema in
-   `resources/histogram.schema.json` is the contract; `schema.py` compiles it
-   with `fastjsonschema` (optional `[schema]` extra) and exposes `validate()`.
-   `io/json.py`, `io/zip.py`, `io/hdf5.py` (optional `[hdf5]` extra) each
-   serialize/deserialize the IR types. `io/__init__.py` holds format-agnostic
-   helpers: `to_sparse`/`from_sparse` (dense⇄sparse storage conversion) and
+3. **Serialization (`io/` + `schema.py` + `resources/`)** — the JSON Schemas
+   in `resources/` are the contract: `histogram.schema.json` describes one
+   histogram (the IR), and `histograms.schema.json` describes a JSON file
+   (a single histogram or a dict of named histograms). `schema.py` compiles
+   them with `fastjsonschema` (optional `[schema]` extra) and exposes
+   `validate()` (a file), `validate_histogram()` (one histogram), and `load()`
+   (read any supported file). `io/json.py`, `io/zip.py`, `io/hdf5.py`
+   (optional `[hdf5]` extra), `io/root.py` (PyROOT, `[root]` extra), and
+   `io/uproot.py` (`[uproot]` extra) each serialize/deserialize the IR types.
+   The two ROOT backends share the RNTuple layout in `io/_rntuple.py`.
+   `io/_files.py` reads and writes whole files in any format, picked by
+   suffix, with `file:path` specs. `io/ops.py` has `add` (bin-by-bin sum,
+   like `hadd`). `io/__init__.py` holds format-agnostic helpers:
+   `to_sparse`/`from_sparse` (dense⇄sparse storage conversion) and
    `remove_writer_info`. `io/_common.py` is shared internals. The serialization
    format is documented in `docs/serialization.md`.
 
@@ -63,9 +72,13 @@ largely independent concerns under `src/uhi/`:
    (`Indexing1D`, `Indexing3D`) that downstream libraries subclass to verify
    their histograms conform to UHI indexing semantics.
 
-The optional dependencies matter: `schema`/I/O code imports `fastjsonschema`
-and `h5py` lazily so the base package stays dependency-light. Downstream
-consumers: boost-histogram, hist, mplhep, uproot, histoprint.
+5. **CLI (`__main__.py`)** — the `uhi` command (also `python -m uhi`).
+   `uhi add` sums histograms from several files into one; `uhi validate`
+   checks files against the schema. Both use `io/_files.py`.
+
+The optional dependencies matter: `schema`/I/O code imports `fastjsonschema`,
+`h5py`, `ROOT`, and `uproot` lazily so the base package stays dependency-light.
+Downstream consumers: boost-histogram, hist, mplhep, uproot, histoprint.
 
 ## Dev environment
 
@@ -88,8 +101,10 @@ The CLI tools `uv`, `prek`, and `nox` should be pre-installed as Python tools.
 - `tests/utils/` is on `pythonpath`/`mypy_path` (see `pyproject.toml`) and holds
   shared `helpers.py`. JSON fixtures live in `tests/resources/{valid,invalid}/`;
   invalid cases pair a `.json` with a `.error.txt` expected message.
-- `tests/test_root.py` needs ROOT; run it via `nox -s root_tests` (conda-based).
-- Validate a histogram JSON file with `uv run python -m uhi.schema <file.json>`.
+- `tests/test_root.py` needs ROOT 6.36+; run it and `tests/test_uproot.py` via
+  `nox -s root_tests` (conda-based).
+- Validate a histogram file (JSON, zip, HDF5, or ROOT) with
+  `uv run uhi validate <file>`.
 - Always add/update tests.
 - Run `prek -a` to fixup style and look for linting issues.
 - When running `prek -a --quiet`, the linting rules are _very_ strict, so adding a

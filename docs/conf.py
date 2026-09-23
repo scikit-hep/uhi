@@ -8,6 +8,9 @@ from __future__ import annotations
 
 import importlib.metadata
 import os
+from typing import Any
+
+import sphinx_github_changelog.changelog
 
 # -- Project information -----------------------------------------------------
 
@@ -70,6 +73,20 @@ html_theme_options = {
 
 
 # -- Changelog builder -------------------------------------------------------
+
+# GitHub release notes start at H2. The changelog extension parses them with
+# default docutils settings, so suppress_warnings in this file has no effect.
+_changelog_default_settings = sphinx_github_changelog.changelog.get_default_settings
+
+
+def _changelog_settings(*components: Any) -> Any:
+    settings = _changelog_default_settings(*components)
+    settings.myst_suppress_warnings = ["myst.header"]
+    return settings
+
+
+sphinx_github_changelog.changelog.get_default_settings = _changelog_settings
+
 if "GITHUB_API_TOKEN" in os.environ:
     sphinx_github_changelog_token = os.environ["GITHUB_API_TOKEN"]
 

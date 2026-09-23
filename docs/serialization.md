@@ -28,7 +28,7 @@ This structure was based heavily on boost-histogram, but it is intended to be
 general, and can be expanded in the future as needed. As such, the following
 limitations are required:
 
-* Serialization followed by deserialisation may cause axis changes. Axis types
+* Serialization followed by deserialization may cause axis changes. Axis types
   may change to an equivalent but less performant axis, growth status will be
   lost, etc. Libraries can record custom `"writer_info"` attributes to improve
   round trips, but histograms must always be openable without the extra info.
@@ -57,9 +57,8 @@ The following axes types are supported:
 
 Axes with gaps are currently not supported.
 
-All axes support `metadata`, a string-valued dictionary of arbitrary data.
-Currently, strings, numbers, and booleans are supported. Other values here are
-not currently supported. Libraries are encouraged to provide a way to indicate
+All axes support `metadata`, a dictionary of arbitrary data. The values can be
+strings, numbers, or booleans. Other value types are not supported. Libraries are encouraged to provide a way to indicate
 unserializable metadata; our recommendation is to avoid adding any metadata
 that starts with a `@` to the metadata dictionary. Libraries should not
 include keys with `None` values, as some formats might not support null values.
@@ -71,9 +70,9 @@ The following storages are supported:
 * `"double"`: A collection of floating point values. Boost-histogram's
   `Double` storage maps to this, and sometimes `Unlimited`.
 * `"weighted"`: A collection of two arrays of floating point values,
-  `"value"` and `"variance"`. Boost-histogram's `Weight` storage maps to this.
+  `"values"` and `"variances"`. Boost-histogram's `Weight` storage maps to this.
 * `"mean"`: A collection of three arrays of floating point values,
-  "`count"`, `"value"`, and `"variance"`. Boost-histogram's `Mean` storage maps to
+  `"counts"`, `"values"`, and `"variances"`. Boost-histogram's `Mean` storage maps to
   this.
 * `"weighted_mean"`: A collection of four arrays of floating point
   values, `"sum_of_weights"`, `"sum_of_weights_squared"`, `"values"`, and
@@ -109,7 +108,7 @@ allowed. There is one defined key at the Histogram level, `"version"`, which
 contains the version of the library that created the histogram. Libraries
 should include this key when creating a histogram. It is not required for
 reading histograms.  Histogram libraries can put custom metadata here that they
-can use to record province information or help with same-library round trips.
+can use to record provenance information or help with same-library round trips.
 For example, a histogram created with boost-histogram might contain:
 
 ```json
@@ -227,7 +226,7 @@ $ uhi add total.zip run1.zip run2.zip run3.zip
 Histograms are matched by name. A name that is only in some of the inputs is
 copied through. The format is chosen by the file extension: `.json` (a JSON
 object mapping names to histograms, or a single histogram), `.zip`,
-`.h5`/`.hdf5` (every group with a `uhi_schema` attribute, at any depth), or
+`.h5`/`.hdf5`/`.hdf` (every group with a `uhi_schema` attribute, at any depth), or
 `.root` (every RNTuple, at any depth). The input and output formats do not
 have to match, so this also converts between formats. Pass `-f`/`--force` to
 overwrite an existing output file.
@@ -246,8 +245,9 @@ $ uhi add out.root:merged run1.h5:results run2.h5:results
 ```{versionadded} 1.2
 ```
 
-You can test a file against the schema with the same command. The format is
-selected by the file suffix: `.json`, `.zip`, `.h5`/`.hdf5`/`.hdf` (needs the
+You can test a file against the schema with `uhi validate`. This needs the
+`schema` extra (`pip install uhi[schema]`). The format is selected by the file
+suffix: `.json`, `.zip`, `.h5`/`.hdf5`/`.hdf` (needs the
 `hdf5` extra), or `.root` (needs the `uproot` extra or PyROOT). Every histogram in a zip file (each
 `*.json` entry), HDF5 file (each group with a `uhi_schema` attribute), or ROOT
 file (each RNTuple, searched recursively) is checked:
@@ -269,6 +269,8 @@ $ uhi validate some/file.json:h some/data.h5:run1/results some/data.root:analysi
 Or with code:
 
 ```python
+import json
+
 import uhi.schema
 
 with filename.open(encoding="utf-8") as f:
@@ -335,22 +337,24 @@ containing the array. The names are arbitrary; see the uhi code if you want to s
 how uhi creates names. The metadata is in a file with the name of the histogram and
 a `.json` extension.
 
-We provide `uhi.io.json.write` and `uhi.io.json.read`, which work with open zip
-files from the standard library (or probably anything with a similar API).
+We provide `uhi.io.zip.write` and `uhi.io.zip.read`, which work with open
+`zipfile.ZipFile` objects from the standard library (or probably anything with
+a similar API).
 
 ```python
-import zip
+import zipfile
+
 import uhi.io.zip
 
-with zip.open("myfile.zip", "w") as z:
+with zipfile.ZipFile("myfile.zip", "w") as zip_file:
     uhi.io.zip.write(zip_file, "histogram", h)
 
-with zip.open("myfile.zip", "r") as z:
+with zipfile.ZipFile("myfile.zip", "r") as zip_file:
     h2 = uhi.io.zip.read(zip_file, "histogram")
 ```
 
 Above, `h` is a histogram that supports `_to_uhi_` or an intermediate
-representation, and`uhi_hist` is an intermediate representation; you can pass
+representation, and `h2` is an intermediate representation; you can pass
 it to `boost_histogram.Histogram` or `hist.Hist`. The metadata name in the file
 is `"histogram.json"`. The contents of that file are identical to the JSON
 format, except arrays are replaced by string names to files inside the zipfile.
@@ -362,7 +366,7 @@ The HDF5 format is ideal for combining histograms with other data. You need the
 here compared to the other formats. The groups are `"axes"`, `"ref_axes"`,
 `"metadata"`, and `"storage"`. Arrays for the axes are placed in `"ref_axes"`,
 since hdf5 doesn't have lists of arrays. Storage arrays are in-place. A
-Reference type is used to link the axes array with the data. "`edges"` and
+Reference type is used to link the axes array with the data. `"edges"` and
 `"categories"` are datasets; the other axes values are attributes (or groups
 with attributes, like `"metadata"` and `"writer_info"`, which is a nested
 group).
@@ -375,6 +379,10 @@ group.  The structure is relative; you can place it anywhere inside a hdf5
 file.
 
 ```python
+import h5py
+
+import uhi.io.hdf5
+
 with h5py.File("myfile.hdf5", "w") as h5_file:
     uhi.io.hdf5.write(h5_file.create_group("histogram"), h)
 
@@ -383,28 +391,23 @@ with h5py.File("myfile.hdf5", "r") as h5_file:
 ```
 
 Above, `h` is a histogram that supports `_to_uhi_` or an intermediate
-representation, and`uhi_hist` is an intermediate representation; you can pass
-it to `boost_histogram.Histogram` or `hist.Hist`. You should create the group
+representation, and `h2` is an intermediate representation; you can pass it to
+`boost_histogram.Histogram` or `hist.Hist`. You should create the group
 you want the histogram to be in.
 
 By default, we do not compress arrays smaller than 1,000 elements. You can
 control this by setting `min_compress_elements`; set it to 0 to compress all
 arrays. You can also pass through `compression` and `compression_opts`.
 
-:::{warning}
-
-Note that h5py doesn't support free-threaded Python with wheels, and it
-currently (as of 3.14rc2) doesn't provide 3.14 wheels either.
-
-:::
-
 ### ROOT
 
 The ROOT format stores each histogram as a single-entry
 [RNTuple](https://root.cern/doc/master/classROOT_1_1RNTuple.html). You can use
 [uproot](https://uproot.readthedocs.io) 5.7+ (`pip install uhi[uproot]`) or
-[ROOT](https://root.cern) (`conda install -c conda-forge root`) for this format;
-both write the same files. The RNTuple has a `"uhi"` string
+[ROOT](https://root.cern) 6.36+ (`conda install -c conda-forge root`) for this
+format; both write the same files. The `root` extra installs the `ROOT` package
+from PyPI, which is a prerelease and only has Linux wheels. We recommend ROOT
+from conda-forge, or uproot. The RNTuple has a `"uhi"` string
 field holding the IR as a string and arrays are replaced
 by the name of the field holding them. Storage arrays are stored flattened in
 `std::vector` fields named after their key (`"values"`, `"variances"`, ...). The shape of these arrays is recovered from the axes when reading.
@@ -412,7 +415,7 @@ The `edges` of a variable axis is stored the same way in
 a field named `"axis_{i}_edges"`, where `i` is the axis index.
 
 We provide `uhi.io.root.read` and `uhi.io.root.write`, which work with an open
-`TFile` or `RFile`.
+`TFile` or other `TDirectory`.
 
 ```python
 import ROOT
