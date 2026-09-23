@@ -61,6 +61,11 @@ def to_fields(
             axis[key] = field  # type: ignore[literal-required]
 
     for field, array in arrays.items():
+        # RNTuple has no small integer fields here; upcast like JSON would
+        if array.dtype.kind in "bi" and array.dtype.itemsize < 4:
+            array = array.astype(np.int64)  # noqa: PLW2901
+        elif array.dtype.kind == "u" and array.dtype.itemsize < 4:
+            array = array.astype(np.uint64)  # noqa: PLW2901
         if array.dtype.name not in FIELD_TYPES:
             msg = f"Unsupported array dtype {array.dtype} for {field}"
             raise TypeError(msg)

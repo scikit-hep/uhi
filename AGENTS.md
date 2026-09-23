@@ -69,7 +69,7 @@ largely independent concerns under `src/uhi/`:
    `numpy_plottable.py` adapts NumPy-style histogram tuples into objects
    satisfying `PlottableHistogram` (`ensure_plottable_histogram`).
    `testing/indexing.py` provides `unittest`-based mixin classes
-   (`Indexing1D`, `Indexing3D`) that downstream libraries subclass to verify
+   (`Indexing1D`, `Indexing2D`, `Indexing3D`) that downstream libraries subclass to verify
    their histograms conform to UHI indexing semantics.
 
 5. **CLI (`__main__.py`)** — the `uhi` command (also `python -m uhi`).
@@ -101,6 +101,8 @@ The CLI tools `uv`, `prek`, and `nox` should be pre-installed as Python tools.
 - `tests/utils/` is on `pythonpath`/`mypy_path` (see `pyproject.toml`) and holds
   shared `helpers.py`. JSON fixtures live in `tests/resources/{valid,invalid}/`;
   invalid cases pair a `.json` with a `.error.txt` expected message.
+  `tests/resources/valid_single/` holds files with one histogram at the top
+  level (not a dict of named histograms).
 - `tests/test_root.py` needs ROOT 6.36+; run it and `tests/test_uproot.py` via
   `nox -s root_tests` (conda-based).
 - Validate a histogram file (JSON, zip, HDF5, or ROOT) with

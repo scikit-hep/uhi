@@ -57,6 +57,7 @@ root = [
   "ROOT",
 ]
 uproot = [
+  "awkward>=2",
   "uproot>=5.7",
 ]
 
