@@ -90,3 +90,17 @@ def test_named_entry_not_object() -> None:
         match=re.escape("data.bad must be object"),
     ):
         uhi.schema.validate({"bad": 1})
+
+
+def test_refs_resolve_locally(valid: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def no_network(*args: object, **kwargs: object) -> None:
+        msg = "network access attempted"
+        raise AssertionError(msg)
+
+    monkeypatch.setattr("urllib.request.urlopen", no_network)
+    uhi.schema._compile.cache_clear()
+    try:
+        with valid.open(encoding="utf-8") as f:
+            uhi.schema.validate(json.load(f))
+    finally:
+        uhi.schema._compile.cache_clear()

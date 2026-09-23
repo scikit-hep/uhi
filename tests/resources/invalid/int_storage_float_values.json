@@ -1,0 +1,15 @@
+{
+  "uhi_schema": 1,
+  "axes": [
+    {
+      "type": "regular",
+      "lower": 0,
+      "upper": 1,
+      "bins": 2,
+      "underflow": false,
+      "overflow": false,
+      "circular": false
+    }
+  ],
+  "storage": { "type": "int", "values": [1.5, 2] }
+}

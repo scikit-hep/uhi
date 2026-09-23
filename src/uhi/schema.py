@@ -27,9 +27,19 @@ def __dir__() -> list[str]:
     return __all__
 
 
+_BASE_URI = "https://raw.githubusercontent.com/scikit-hep/uhi/main/src/uhi/resources/"
+
+
 def _load_local(uri: str) -> dict[str, Any]:
-    """Resolve a relative ``$ref`` to a schema shipped in ``resources``."""
-    with (_resources / uri).open(encoding="utf-8") as f:
+    """
+    Resolve a ``$ref`` to a schema shipped in ``resources``. The ``$id`` makes
+    refs absolute URLs; they are read from the package, never the network.
+    """
+    name = uri.removeprefix(_BASE_URI)
+    if "/" in name or ":" in name:
+        msg = f"Cannot resolve {uri!r} without network access"
+        raise ValueError(msg)
+    with (_resources / name).open(encoding="utf-8") as f:
         return json.load(f)  # type: ignore[no-any-return]
 
 
@@ -39,7 +49,7 @@ def _compile(name: str) -> Callable[[dict[str, Any]], None]:
 
     with (_resources / name).open(encoding="utf-8") as f:
         return fastjsonschema.compile(  # type: ignore[no-any-return]
-            json.load(f), handlers={"": _load_local}
+            json.load(f), handlers={"": _load_local, "https": _load_local}
         )
 
 
