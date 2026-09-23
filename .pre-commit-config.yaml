@@ -60,6 +60,18 @@ repos:
         language: pygrep
         entry: PyBind|Numpy|Cmake|CCache|Github|PyTest|Weighed
         exclude: .pre-commit-config.yaml
+      # The $id would make check-jsonschema fetch histogram.schema.json from
+      # GitHub; a file:// base URI keeps the $ref local.
+      - id: validate-histograms
+        name: Validate Histogram examples
+        language: python
+        additional_dependencies: [check-jsonschema==0.38.0]
+        entry: >-
+          python -c "import pathlib, sys; from check_jsonschema import main;
+          schema = pathlib.Path('src/uhi/resources/histograms.schema.json');
+          main(['--base-uri', schema.resolve().as_uri(), '--schemafile',
+          str(schema), *sys.argv[1:]])"
+        files: ^tests/resources/valid/.*\.json
 
   - repo: https://github.com/rbubley/mirrors-prettier
     rev: "0ee178619d696787ca73d210cc191d720868c631"  # frozen: v3.9.6
@@ -74,10 +86,6 @@ repos:
       - id: check-github-workflows
       - id: check-metaschema
         files: ^src/uhi/resources/histograms?\.schema\.json$
-      - id: check-jsonschema
-        name: Validate Histogram examples
-        args: [--schemafile, src/uhi/resources/histograms.schema.json]
-        files: ^tests/resources/valid/.*\.json
       - id: check-jsonschema
         name: Validate single Histogram examples
         args: [--schemafile, src/uhi/resources/histogram.schema.json]

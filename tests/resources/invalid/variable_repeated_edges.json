@@ -1,0 +1,13 @@
+{
+  "uhi_schema": 1,
+  "axes": [
+    {
+      "type": "variable",
+      "edges": [1.0, 1.0],
+      "underflow": false,
+      "overflow": false,
+      "circular": false
+    }
+  ],
+  "storage": { "type": "int" }
+}

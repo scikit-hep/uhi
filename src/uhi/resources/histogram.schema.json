@@ -75,6 +75,24 @@
       },
       "description": "A ND (nested) array of numbers."
     },
+    "int_ndarray": {
+      "type": "array",
+      "items": {
+        "oneOf": [{ "type": "integer" }, { "$ref": "#/$defs/int_ndarray" }]
+      },
+      "description": "A ND (nested) array of integers."
+    },
+    "int_data_array": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "A path (similar to URI) to the integer bin data"
+        },
+        {
+          "$ref": "#/$defs/int_ndarray"
+        }
+      ]
+    },
     "data_array": {
       "oneOf": [
         {
@@ -155,7 +173,9 @@
           "oneOf": [
             {
               "type": "array",
-              "items": { "type": "number", "minItems": 2, "uniqueItems": true }
+              "items": { "type": "number" },
+              "minItems": 2,
+              "uniqueItems": true
             },
             {
               "type": "string",
@@ -228,7 +248,7 @@
       "properties": {
         "type": { "type": "string", "const": "int" },
         "index": { "$ref": "#/$defs/sparse_array" },
-        "values": { "$ref": "#/$defs/data_array" }
+        "values": { "$ref": "#/$defs/int_data_array" }
       },
       "oneOf": [
         { "required": ["type"], "maxProperties": 1 },
