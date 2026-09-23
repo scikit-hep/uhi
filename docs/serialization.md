@@ -194,24 +194,73 @@ sparse histogram to a dense one. UHI provides helpers `uhi.io.to_sparse` and
 sparse histograms. Scalar histograms (with no axes) are always dense.
 
 
+## Adding histograms
+
+`uhi.io.ops.add` sums histograms bin-by-bin, like ROOT's `hadd`. It works on the
+intermediate representation (or anything with `_to_uhi_`), so histograms from
+different libraries or files can be combined without a histogram library:
+
+```python
+import uhi.io.ops
+
+total = uhi.io.ops.add(h1, h2, h3)
+```
+
+All inputs must have identical axes (metadata and `writer_info` are ignored
+when comparing) and the same storage type. Empty (metadata-only) storages count
+as zero. `"mean"` and `"weighted_mean"` storages are merged correctly, not just
+summed. The metadata and `writer_info` of the first histogram are kept. The
+result is sparse if every input is sparse, and dense otherwise.
+
+```{versionadded} 1.2
+```
+
 ## CLI/API
 
-You can test a file against the schema with the `uhi` command (also
-`python -m uhi`). The format is selected by the file suffix: `.json`, `.zip`,
-`.h5`/`.hdf5`/`.hdf` (needs the `hdf5` extra), or `.root` (needs ROOT). Every
-histogram in a zip file (each `*.json` entry), HDF5 file (each group with a
-`uhi_schema` attribute), or ROOT file (each RNTuple, searched recursively) is
-checked:
+The `uhi` command (also `python -m uhi`) provides `add`, which sums the
+histograms in several files into one file, like `hadd`:
+
+```console
+$ uhi add total.zip run1.zip run2.zip run3.zip
+```
+
+Histograms are matched by name. A name that is only in some of the inputs is
+copied through. The format is chosen by the file extension: `.json` (a JSON
+object mapping names to histograms, or a single histogram), `.zip`,
+`.h5`/`.hdf5` (every group with a `uhi_schema` attribute, at any depth), or
+`.root` (every RNTuple, at any depth). The input and output formats do not
+have to match, so this also converts between formats. Pass `-f`/`--force` to
+overwrite an existing output file.
+
+Add `:path` to an input to select one histogram by name, or a directory or
+group of histograms. If every input is a single histogram, the result is a
+single histogram; add `:name` to the output to name it (this is required for
+the zip and ROOT formats). For named histograms, `:dir` on the output
+prefixes every name:
+
+```console
+$ uhi add total.json:h run1.json:h run2.zip:sub/h single.json
+$ uhi add out.root:merged run1.h5:results run2.h5:results
+```
+
+```{versionadded} 1.2
+```
+
+You can test a file against the schema with the same command. The format is
+selected by the file suffix: `.json`, `.zip`, `.h5`/`.hdf5`/`.hdf` (needs the
+`hdf5` extra), or `.root` (needs ROOT). Every histogram in a zip file (each
+`*.json` entry), HDF5 file (each group with a `uhi_schema` attribute), or ROOT
+file (each RNTuple, searched recursively) is checked:
 
 ```console
 $ uhi validate some/file.json some/other.zip some/data.h5 some/data.root
 ```
 
-For HDF5 and ROOT files, add `:path` to restrict the check to one group or
-directory inside the file, or to a single histogram:
+Add `:path` to restrict the check to one histogram by name, or to a group or
+directory inside a zip, HDF5, or ROOT file:
 
 ```console
-$ uhi validate some/data.h5:run1/results some/data.root:analysis/main
+$ uhi validate some/file.json:h some/data.h5:run1/results some/data.root:analysis/main
 ```
 
 ```{versionadded} 1.2
@@ -232,8 +281,9 @@ uhi.schema.validate(data)
 `uhi.schema.validate_histogram` to check a single histogram (the intermediate
 representation).
 
-`uhi.schema.load` reads any supported file into a JSON-compatible dict, with an
-optional `path` keyword for HDF5 and ROOT files:
+`uhi.schema.load` reads any supported file into a JSON-compatible dict (or a
+single histogram), with an optional `path` keyword to select a histogram,
+group, or directory inside the file:
 
 ```python
 uhi.schema.validate(uhi.schema.load("data.root", path="analysis"))
