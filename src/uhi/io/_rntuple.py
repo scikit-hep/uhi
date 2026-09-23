@@ -90,7 +90,7 @@ def from_fields(
     storage = output["storage"]
     if "index" in storage:
         storage["index"] = storage["index"].reshape(len(output["axes"]), -1)
-    elif output["axes"]:
+    else:
         shape = [_compute_axis_length(axis) for axis in output["axes"]]
         for key in ARRAY_KEYS & storage.keys():
             storage[key] = storage[key].reshape(shape)

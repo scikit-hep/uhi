@@ -3,9 +3,12 @@ from __future__ import annotations
 import dataclasses
 from typing import Any
 
+import numpy as np
+
 from uhi.io import from_sparse, remove_writer_info, to_sparse
 from uhi.io._common import _convert_input
-from uhi.typing.serialization import AnyStorageIR
+from uhi.io._rntuple import from_fields, to_fields
+from uhi.typing.serialization import AnyHistogramIR, AnyStorageIR
 
 
 def test_remove_writer_info() -> None:
@@ -166,3 +169,16 @@ def test_from_sparse_empty_storage() -> None:
     storage_result: AnyStorageIR = result["storage"]  # type: ignore[assignment]
     assert storage_result["type"] == "double"
     assert "values" not in storage_result
+
+
+def test_rntuple_fields_0d() -> None:
+    hist: AnyHistogramIR = {
+        "uhi_schema": 1,
+        "axes": [],
+        "storage": {"type": "double", "values": np.array(12.0)},
+    }
+    uhi, arrays = to_fields(hist)
+    rehist = from_fields(uhi, arrays.__getitem__)
+
+    assert rehist["storage"]["values"].shape == ()
+    assert rehist["storage"]["values"] == 12.0
