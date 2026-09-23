@@ -198,6 +198,21 @@ def test_cli_validate_path(
     assert capsys.readouterr().out.startswith("ERROR")
 
 
+def test_load_non_rntuple(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    from uhi.__main__ import main
+
+    tmp_file = tmp_path / "test.root"
+    with uproot.recreate(tmp_file) as root_file:
+        root_file["th1"] = np.histogram([1, 2, 3])
+
+    with pytest.raises(ValueError, match="not a histogram or directory"):
+        uhi.io._files.load(tmp_file, path="th1")
+
+    with pytest.raises(SystemExit):
+        main(["validate", f"{tmp_file}:th1"])
+    assert "not a histogram or directory" in capsys.readouterr().out
+
+
 @pytest.mark.parametrize("out_suffix", [".root", ".json"])
 def test_cli_add(resources: Path, tmp_path: Path, out_suffix: str) -> None:
     from uhi.__main__ import main

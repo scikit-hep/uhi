@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 import typing
 import zipfile
 from collections.abc import Mapping
@@ -419,3 +420,82 @@ def test_cli_add_mismatched_axes(tmp_path: Path) -> None:
                 str(tmp_path / "b.json"),
             ]
         )
+
+
+def test_cli_add_prefix_json_roundtrip(tmp_path: Path) -> None:
+    """``out.json:dir`` writes ``dir/name`` keys that ``load(path="dir")`` finds."""
+    files, expected = _make_files(tmp_path, ".json")
+    target = tmp_path / "out.json"
+
+    main(["add", f"{target}:run", *map(str, files)])
+
+    assert _read_file(target, "run").keys() == expected.keys()
+    assert _read_file(target, "run/").keys() == expected.keys()
+    assert _read_file(target, "run/sub").keys() == {"mean"}
+    assert _read_file(target, "run/h")["uhi_schema"] == 1
+    with pytest.raises(KeyError, match="'nope' not found"):
+        _read_file(target, "nope")
+
+
+@pytest.mark.parametrize(
+    ("content", "match"),
+    [
+        ("[1, 2]", "not a histogram or a dict of histograms"),
+        ('{"x": 1}', "'x' is not a histogram"),
+        ("{}", "no histograms found"),
+    ],
+)
+def test_cli_add_bad_source(tmp_path: Path, content: str, match: str) -> None:
+    src = tmp_path / "bad.json"
+    src.write_text(content, encoding="utf-8")
+    target = tmp_path / "out.json"
+    with pytest.raises(SystemExit, match=match):
+        main(["add", str(target), str(src)])
+    assert not target.exists()
+
+
+def test_cli_add_bad_uhi_schema(tmp_path: Path) -> None:
+    h = bh.Histogram(bh.axis.Regular(3, -1, 1))
+    data = json.loads(json.dumps({"h": h}, default=uhi.io.json.default))
+    data["h"]["uhi_schema"] = 2
+    src = tmp_path / "in.json"
+    src.write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(SystemExit, match="Only uhi_schema=1"):
+        main(["add", str(tmp_path / "out.json"), str(src)])
+
+
+def test_cli_add_missing_output_dir(tmp_path: Path) -> None:
+    files, _ = _make_files(tmp_path, ".json")
+    with pytest.raises(SystemExit, match="No such file or directory"):
+        main(["add", str(tmp_path / "nope" / "out.json"), *map(str, files)])
+
+
+def test_cli_add_missing_writer(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    files, _ = _make_files(tmp_path, ".json")
+    monkeypatch.setitem(sys.modules, "h5py", None)
+    with pytest.raises(SystemExit, match="h5py"):
+        main(["add", str(tmp_path / "out.h5"), *map(str, files)])
+
+
+def test_cli_add_empty_target_name(tmp_path: Path) -> None:
+    files, _ = _make_files(tmp_path, ".json")
+    with pytest.raises(SystemExit, match="Empty name"):
+        main(["add", f"{tmp_path / 'out.zip'}:", *map(str, files)])
+
+
+def test_cli_add_no_extension(tmp_path: Path) -> None:
+    files, _ = _make_files(tmp_path, ".json")
+    with pytest.raises(SystemExit, match="No file extension"):
+        main(["add", str(tmp_path / "out"), *map(str, files)])
+
+
+def test_cli_add_hdf5_errors(tmp_path: Path) -> None:
+    pytest.importorskip("h5py")
+    files, _ = _make_files(tmp_path, ".h5")
+    target = tmp_path / "out.json"
+    with pytest.raises(SystemExit, match="'nope' not found"):
+        main(["add", str(target), f"{files[0]}:nope"])
+    with pytest.raises(SystemExit, match="is not a histogram or group"):
+        main(["add", str(target), f"{files[0]}:h/storage/values"])

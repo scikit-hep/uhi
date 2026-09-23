@@ -257,7 +257,8 @@ $ uhi validate some/file.json some/other.zip some/data.h5 some/data.root
 ```
 
 Add `:path` to restrict the check to one histogram by name, or to a group or
-directory inside a zip, HDF5, or ROOT file:
+directory of histograms (in JSON and zip files, all names that start with
+`path/`):
 
 ```console
 $ uhi validate some/file.json:h some/data.h5:run1/results some/data.root:analysis/main

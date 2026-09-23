@@ -95,8 +95,8 @@ def main(*files: str) -> None:
     retval = 0
 
     for file in files:
-        filename, path = _files.split_spec(file)
         try:
+            filename, path = _files.split_spec(file)
             validate(load(filename, path=path))
         except fastjsonschema.JsonSchemaValueException as e:
             print(f"ERROR {file}: {e.message}")  # noqa: T201

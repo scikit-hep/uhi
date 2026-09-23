@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import re
+import sys
 import zipfile
 from pathlib import Path
 from typing import Any
@@ -238,3 +240,50 @@ def test_cli_validate_json_keeps_raw_types(
     with pytest.raises(SystemExit):
         main(["validate", str(tmp_file)])
     assert capsys.readouterr().out.startswith("ERROR")
+
+
+def test_cli_validate_no_fastjsonschema(
+    resources: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setitem(sys.modules, "fastjsonschema", None)
+    with pytest.raises(SystemExit, match=re.escape("uhi[schema]")):
+        main(["validate", str(resources / "valid" / "reg.json")])
+
+
+def test_cli_validate_empty_name(
+    resources: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    with pytest.raises(SystemExit):
+        main(["validate", f"{resources / 'valid' / 'reg.json'}:"])
+    assert "Empty name" in capsys.readouterr().out
+
+
+def test_split_spec_empty_name() -> None:
+    with pytest.raises(ValueError, match="Empty name"):
+        uhi.io._files.split_spec("out.zip:")
+
+
+def test_file_format_no_extension() -> None:
+    with pytest.raises(ValueError, match="No file extension"):
+        uhi.io._files.file_format(Path("out"))
+
+
+def test_cli_validate_hdf5_dataset(
+    resources: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    h5py = pytest.importorskip("h5py")
+    uhi_io_hdf5 = pytest.importorskip("uhi.io.hdf5")
+
+    hists = uhi.io._files.load(resources / "valid" / "reg.json")
+    tmp_file = tmp_path / "test.h5"
+    with h5py.File(tmp_file, "w") as h5_file:
+        uhi_io_hdf5.write(h5_file.create_group("one"), hists["one"])
+
+    with pytest.raises(ValueError, match="not a histogram or group"):
+        uhi.io._files.load(tmp_file, path="one/storage/values")
+    with pytest.raises(KeyError, match="'missing' not found in"):
+        uhi.io._files.load(tmp_file, path="missing")
+
+    with pytest.raises(SystemExit):
+        main(["validate", f"{tmp_file}:one/storage/values"])
+    assert "not a histogram or group" in capsys.readouterr().out
