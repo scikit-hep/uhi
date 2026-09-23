@@ -12,6 +12,7 @@ import importlib.metadata
 import json
 import re
 import zipfile
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
@@ -22,7 +23,7 @@ def __dir__() -> list[str]:
     return __all__
 
 
-_SPEC_RE = re.compile(r"^(.+?\.(?:json|zip|h5|hdf5|hdf|root)):(.+)$", re.IGNORECASE)
+_SPEC_RE = re.compile(r"^(.+?\.(?:json|zip|h5|hdf5|hdf|root)):(.*)$", re.IGNORECASE)
 _RNTUPLE_CLASSES = frozenset(["ROOT::RNTuple", "ROOT::Experimental::RNTuple"])
 _DIRECTORY_CLASSES = frozenset(["TDirectory", "TDirectoryFile"])
 _SUFFIXES = "expected .json, .zip, .h5/.hdf5/.hdf, or .root"
@@ -31,6 +32,9 @@ _SUFFIXES = "expected .json, .zip, .h5/.hdf5/.hdf, or .root"
 def split_spec(spec: str, /) -> tuple[str, str | None]:
     """Split ``file.root:dir/name`` into ``("file.root", "dir/name")``."""
     if match := _SPEC_RE.match(spec):
+        if not match[2]:
+            msg = f"Empty name after ':' in {spec!r}"
+            raise ValueError(msg)
         return match[1], match[2]
     return spec, None
 
@@ -45,6 +49,9 @@ def file_format(path: Path, /) -> str:
             return "hdf5"
         case ".root":
             return "root"
+        case "":
+            msg = f"No file extension in {str(path)!r}, {_SUFFIXES}"
+            raise ValueError(msg)
         case suffix:
             msg = f"Unknown file format {suffix!r}, {_SUFFIXES}"
             raise ValueError(msg)
@@ -52,7 +59,7 @@ def file_format(path: Path, /) -> str:
 
 def is_single(data: Any, /) -> bool:
     """True for a single histogram, False for a dict of named histograms."""
-    return "uhi_schema" in data
+    return isinstance(data, Mapping) and "uhi_schema" in data
 
 
 def _load_json(path: Path, subpath: str | None, *, raw: bool = False) -> Any:
@@ -62,10 +69,19 @@ def _load_json(path: Path, subpath: str | None, *, raw: bool = False) -> Any:
         data = json.load(f, object_hook=None if raw else object_hook)
     if subpath is None:
         return data
-    if is_single(data) or subpath not in data:
-        msg = f"{subpath!r} not found in {path}"
-        raise KeyError(msg)
-    return data[subpath]
+    subpath = subpath.strip("/")
+    if isinstance(data, Mapping) and not is_single(data):
+        if subpath in data:
+            return data[subpath]
+        # Flat "dir/name" keys, as written by write(..., path="dir")
+        prefix = f"{subpath}/"
+        found = {
+            k.removeprefix(prefix): v for k, v in data.items() if k.startswith(prefix)
+        }
+        if found:
+            return found
+    msg = f"{subpath!r} not found in {path}"
+    raise KeyError(msg)
 
 
 def _load_zip(path: Path, subpath: str | None) -> Any:
@@ -102,7 +118,14 @@ def _load_hdf5(path: Path, subpath: str | None) -> Any:
             hists[name] = hdf5.read(obj)
 
     with h5py.File(path, "r") as h5_file:
-        start = h5_file[subpath] if subpath else h5_file
+        try:
+            start = h5_file[subpath] if subpath else h5_file
+        except KeyError:
+            msg = f"{subpath!r} not found in {path}"
+            raise KeyError(msg) from None
+        if not isinstance(start, h5py.Group):
+            msg = f"{subpath!r} in {path} is not a histogram or group"
+            raise ValueError(msg)  # noqa: TRY004
         if "uhi_schema" in start.attrs:
             return hdf5.read(start)
         start.visititems(visit)
@@ -139,8 +162,12 @@ def _load_uproot(path: Path, subpath: str | None) -> Any:
         if subpath not in root_file:
             msg = f"{subpath!r} not found in {path}"
             raise KeyError(msg)
-        if root_file.classname_of(subpath) in _RNTUPLE_CLASSES:
+        classname = root_file.classname_of(subpath)
+        if classname in _RNTUPLE_CLASSES:
             return uhi_uproot.read(root_file, subpath)
+        if classname not in _DIRECTORY_CLASSES:
+            msg = f"{subpath!r} in {path} is not a histogram or directory"
+            raise ValueError(msg)
         return visit(root_file[subpath])
 
 
@@ -177,10 +204,13 @@ def _load_root(path: Path, subpath: str | None) -> Any:
         if not key:
             msg = f"{subpath!r} not found in {path}"
             raise KeyError(msg)
-        if key.GetClassName() in _DIRECTORY_CLASSES:
+        class_name = key.GetClassName()
+        if class_name in _DIRECTORY_CLASSES:
             visit(directory.Get(name), "")
             return hists
-        # A single RNTuple
+        if class_name not in _RNTUPLE_CLASSES:
+            msg = f"{subpath!r} in {path} is not a histogram or directory"
+            raise ValueError(msg)
         return root.read(directory, name)
 
 
