@@ -30,9 +30,7 @@ def _roundtrip(tmp_path: Path, hists: dict[str, Any]) -> dict[str, Any]:
 
 
 def test_valid_json(valid: Path, tmp_path: Path, sparse: bool) -> None:
-    hists = json.loads(
-        valid.read_text(encoding="utf-8"), object_hook=uhi.io.json.object_hook
-    )
+    hists = uhi.io._files.load(valid)
     if sparse:
         hists = {name: to_sparse(hist) for name, hist in hists.items()}
 
@@ -46,10 +44,7 @@ def test_valid_json(valid: Path, tmp_path: Path, sparse: bool) -> None:
 
 
 def test_reg_load(tmp_path: Path, resources: Path) -> None:
-    hists = json.loads(
-        (resources / "valid/reg.json").read_text(encoding="utf-8"),
-        object_hook=uhi.io.json.object_hook,
-    )
+    hists = uhi.io._files.load(resources / "valid/reg.json")
     rehists = _roundtrip(tmp_path, hists)
 
     # One single-entry RNTuple per histogram
@@ -101,10 +96,7 @@ def test_metadata_array_keys(tmp_path: Path, value: str) -> None:
 
 
 def test_subdirectory(tmp_path: Path, resources: Path) -> None:
-    hists = json.loads(
-        (resources / "valid/2d.json").read_text(encoding="utf-8"),
-        object_hook=uhi.io.json.object_hook,
-    )
+    hists = uhi.io._files.load(resources / "valid/2d.json")
     rehist = _roundtrip(tmp_path, {"sub/main": hists["main"]})["sub/main"]
 
     with uproot.open(tmp_path / "test.root") as root_file:
@@ -181,10 +173,7 @@ def test_cli_validate_path(
 ) -> None:
     from uhi.__main__ import main
 
-    hists = json.loads(
-        (resources / "valid" / "reg.json").read_text(encoding="utf-8"),
-        object_hook=uhi.io.json.object_hook,
-    )
+    hists = uhi.io._files.load(resources / "valid" / "reg.json")
 
     tmp_file = tmp_path / "test.root"
     with uproot.recreate(tmp_file) as root_file:
@@ -213,10 +202,7 @@ def test_cli_validate_path(
 def test_cli_add(resources: Path, tmp_path: Path, out_suffix: str) -> None:
     from uhi.__main__ import main
 
-    hists = json.loads(
-        (resources / "valid/reg.json").read_text(encoding="utf-8"),
-        object_hook=uhi.io.json.object_hook,
-    )
+    hists = uhi.io._files.load(resources / "valid/reg.json")
     files = [tmp_path / "in1.root", tmp_path / "in2.root"]
     for file in files:
         with uproot.recreate(file) as root_file:
@@ -272,4 +258,6 @@ def test_uproot_version_check(
     monkeypatch: pytest.MonkeyPatch, version: str, expected: bool
 ) -> None:
     monkeypatch.setattr("importlib.metadata.version", lambda _: version)
+    uhi.io._files._uproot_available.cache_clear()
     assert uhi.io._files._uproot_available() is expected
+    uhi.io._files._uproot_available.cache_clear()

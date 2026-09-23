@@ -92,9 +92,7 @@ def test_valid_json(valid: Path, tmp_path: Path, sparse: bool) -> None:
 
 def test_reg_load(tmp_path: Path, resources: Path) -> None:
     data = resources / "valid/reg.json"
-    hists = json.loads(
-        data.read_text(encoding="utf-8"), object_hook=uhi.io.json.object_hook
-    )
+    hists = uhi.io._files.load(data)
 
     tmp_file = tmp_path / "test.root"
     with ROOT.TFile.Open(str(tmp_file), "RECREATE") as root_file:
@@ -218,9 +216,7 @@ def test_two_variable_axes(tmp_path: Path) -> None:
 
 def test_subdirectory(tmp_path: Path, resources: Path) -> None:
     data = resources / "valid/2d.json"
-    hists = json.loads(
-        data.read_text(encoding="utf-8"), object_hook=uhi.io.json.object_hook
-    )
+    hists = uhi.io._files.load(data)
 
     tmp_file = tmp_path / "test.root"
     with ROOT.TFile.Open(str(tmp_file), "RECREATE") as root_file:
@@ -386,9 +382,7 @@ def test_uproot_compat(valid: Path, tmp_path: Path, sparse: bool, writer: str) -
     uproot = pytest.importorskip("uproot")
     import uhi.io.uproot
 
-    hists = json.loads(
-        valid.read_text(encoding="utf-8"), object_hook=uhi.io.json.object_hook
-    )
+    hists = uhi.io._files.load(valid)
     if sparse:
         hists = {name: to_sparse(hist) for name, hist in hists.items()}
 
@@ -432,9 +426,7 @@ def test_cli_validate_root(
 ) -> None:
     from uhi.__main__ import main
 
-    hists = json.loads(
-        valid.read_text(encoding="utf-8"), object_hook=uhi.io.json.object_hook
-    )
+    hists = uhi.io._files.load(valid)
 
     tmp_file = tmp_path / "test.root"
     with ROOT.TFile.Open(str(tmp_file), "RECREATE") as root_file:
@@ -453,10 +445,7 @@ def test_cli_validate_root_invalid(
 ) -> None:
     from uhi.__main__ import main
 
-    hists = json.loads(
-        (resources / "valid" / "reg.json").read_text(encoding="utf-8"),
-        object_hook=uhi.io.json.object_hook,
-    )
+    hists = uhi.io._files.load(resources / "valid" / "reg.json")
 
     tmp_file = tmp_path / "test.root"
     with ROOT.TFile.Open(str(tmp_file), "RECREATE") as root_file:
@@ -476,10 +465,7 @@ def test_cli_validate_root_path(
 ) -> None:
     from uhi.__main__ import main
 
-    hists = json.loads(
-        (resources / "valid" / "reg.json").read_text(encoding="utf-8"),
-        object_hook=uhi.io.json.object_hook,
-    )
+    hists = uhi.io._files.load(resources / "valid" / "reg.json")
 
     tmp_file = tmp_path / "test.root"
     with ROOT.TFile.Open(str(tmp_file), "RECREATE") as root_file:
@@ -509,10 +495,7 @@ def test_cli_validate_root_path(
 
 def _root_add_inputs(resources: Path, tmp_path: Path) -> tuple[list[Path], list[Any]]:
     """Write the same histograms to two ROOT files, nested one level deep."""
-    hists = json.loads(
-        (resources / "valid/reg.json").read_text(encoding="utf-8"),
-        object_hook=uhi.io.json.object_hook,
-    )
+    hists = uhi.io._files.load(resources / "valid/reg.json")
     files = [tmp_path / "in1.root", tmp_path / "in2.root"]
     for file in files:
         with ROOT.TFile.Open(str(file), "RECREATE") as root_file:

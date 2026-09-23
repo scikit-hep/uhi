@@ -37,5 +37,5 @@ def read(directory: uproot.ReadOnlyDirectory, /, name: str) -> dict[str, Any]:
     """
     Read a histogram from an uproot directory.
     """
-    entry = directory[name].arrays()[0]
+    entry = directory[name].arrays(entry_stop=1)[0]
     return from_fields(entry["uhi"], lambda field: np.asarray(entry[field]))

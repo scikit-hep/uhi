@@ -6,23 +6,13 @@ import numpy as np
 import ROOT
 
 from ..typing.serialization import AnyHistogramIR, ToUHIHistogram
-from ._rntuple import from_fields, to_fields
+from ._rntuple import FIELD_TYPES, from_fields, to_fields
 
 __all__ = ["read", "write"]
 
 
 def __dir__() -> list[str]:
     return __all__
-
-
-_FIELD_TYPES = {
-    "float64": "double",
-    "float32": "float",
-    "int64": "std::int64_t",
-    "int32": "std::int32_t",
-    "uint64": "std::uint64_t",
-    "uint32": "std::uint32_t",
-}
 
 
 def write(
@@ -42,7 +32,7 @@ def write(
     model.MakeField["std::string"]("uhi")
     vectors = {}
     for field, array in arrays.items():
-        ctype = _FIELD_TYPES[array.dtype.name]
+        ctype = FIELD_TYPES[array.dtype.name]
         model.MakeField[f"std::vector<{ctype}>"](field)
         vectors[field] = ROOT.std.vector[ctype](array)
 

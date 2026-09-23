@@ -16,14 +16,22 @@ from ..typing.serialization import AnyHistogramIR, ToUHIHistogram
 from . import ARRAY_KEYS, _compute_axis_length
 from ._common import _check_uhi_schema_version, _convert_input
 
-__all__ = ["DTYPES", "from_fields", "to_fields"]
+__all__ = ["FIELD_TYPES", "from_fields", "to_fields"]
 
 
 def __dir__() -> list[str]:
     return __all__
 
 
-DTYPES = frozenset(["float64", "float32", "int64", "int32", "uint64", "uint32"])
+# Supported array dtypes and their C++ RNTuple field types
+FIELD_TYPES = {
+    "float64": "double",
+    "float32": "float",
+    "int64": "std::int64_t",
+    "int32": "std::int32_t",
+    "uint64": "std::uint64_t",
+    "uint32": "std::uint32_t",
+}
 
 
 def to_fields(
@@ -53,7 +61,7 @@ def to_fields(
             axis[key] = field  # type: ignore[literal-required]
 
     for field, array in arrays.items():
-        if array.dtype.name not in DTYPES:
+        if array.dtype.name not in FIELD_TYPES:
             msg = f"Unsupported array dtype {array.dtype} for {field}"
             raise TypeError(msg)
         # Awkward and RNTuple need native byte order

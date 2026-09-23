@@ -7,6 +7,7 @@ like ``file.h5:path`` selects a group, directory, or histogram inside the file.
 
 from __future__ import annotations
 
+import functools
 import importlib.metadata
 import json
 import re
@@ -108,6 +109,7 @@ def _load_hdf5(path: Path, subpath: str | None) -> Any:
     return hists
 
 
+@functools.cache
 def _uproot_available() -> bool:
     """Uproot 5.7+ is preferred for ROOT files; PyROOT is the fallback."""
     try:
