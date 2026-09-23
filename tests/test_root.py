@@ -523,3 +523,24 @@ def test_cli_add_root(resources: Path, tmp_path: Path, out_suffix: str) -> None:
         assert result[name]["storage"]["values"] == approx(
             expected["storage"]["values"]
         )
+
+
+@pytest.mark.usefixtures("files_backend")
+def test_cli_validate_root_non_rntuple(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    from uhi.__main__ import main
+
+    tmp_file = tmp_path / "test.root"
+    with ROOT.TFile.Open(str(tmp_file), "RECREATE") as root_file:
+        th = ROOT.TH1D("th1", "th1", 3, 0, 3)
+        root_file.WriteObject(th, "th1")
+        root_file.mkdir("sub").WriteObject(th, "th1")
+
+    for path in ("th1", "sub/th1"):
+        with pytest.raises(ValueError, match="not a histogram or directory"):
+            uhi.io._files.load(tmp_file, path=path)
+
+    with pytest.raises(SystemExit):
+        main(["validate", f"{tmp_file}:th1"])
+    assert "not a histogram or directory" in capsys.readouterr().out
