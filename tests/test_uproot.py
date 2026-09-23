@@ -151,9 +151,10 @@ def test_convert_bh_32bit(tmp_path: Path, storage_type: str) -> None:
     uhi_32bit = convert_histogram_to_32bit(h._to_uhi_())
     rehist = _roundtrip(tmp_path, {"h": uhi_32bit})["h"]
 
-    for key in ARRAY_KEYS & uhi_32bit["storage"].keys():
-        assert rehist["storage"][key].dtype == uhi_32bit["storage"][key].dtype
-        np.testing.assert_array_equal(rehist["storage"][key], uhi_32bit["storage"][key])
+    storage: dict[str, Any] = dict(uhi_32bit["storage"])
+    for key in ARRAY_KEYS & storage.keys():
+        assert rehist["storage"][key].dtype == storage[key].dtype
+        np.testing.assert_array_equal(rehist["storage"][key], storage[key])
 
 
 def test_convert_hist(tmp_path: Path) -> None:
@@ -234,3 +235,41 @@ def test_cli_add(resources: Path, tmp_path: Path, out_suffix: str) -> None:
         assert result[name]["storage"]["values"] == approx(
             expected["storage"]["values"]
         )
+
+
+def test_write_non_native_byte_order(tmp_path: Path) -> None:
+    swapped = np.dtype("f8").newbyteorder()
+    hist = {
+        "uhi_schema": 1,
+        "axes": [
+            {
+                "type": "regular",
+                "lower": 0.0,
+                "upper": 1.0,
+                "bins": 2,
+                "underflow": False,
+                "overflow": False,
+                "circular": False,
+            }
+        ],
+        "storage": {"type": "double", "values": np.array([1.0, 2.0], dtype=swapped)},
+    }
+    rehist = _roundtrip(tmp_path, {"h": hist})["h"]
+    assert rehist["storage"]["values"] == approx([1.0, 2.0])
+
+
+@pytest.mark.parametrize(
+    ("version", "expected"),
+    [
+        ("5.7.0", True),
+        ("5.7.0rc1", True),
+        ("6.0.0", True),
+        ("5.6.3", False),
+        ("4.3.7", False),
+    ],
+)
+def test_uproot_version_check(
+    monkeypatch: pytest.MonkeyPatch, version: str, expected: bool
+) -> None:
+    monkeypatch.setattr("importlib.metadata.version", lambda _: version)
+    assert uhi.io._files._uproot_available() is expected

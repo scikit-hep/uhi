@@ -7,7 +7,7 @@ like ``file.h5:path`` selects a group, directory, or histogram inside the file.
 
 from __future__ import annotations
 
-import importlib.util
+import importlib.metadata
 import json
 import re
 import zipfile
@@ -109,8 +109,12 @@ def _load_hdf5(path: Path, subpath: str | None) -> Any:
 
 
 def _uproot_available() -> bool:
-    """Uproot is preferred for ROOT files; PyROOT is the fallback."""
-    return importlib.util.find_spec("uproot") is not None
+    """Uproot 5.7+ is preferred for ROOT files; PyROOT is the fallback."""
+    try:
+        version = importlib.metadata.version("uproot")
+    except importlib.metadata.PackageNotFoundError:
+        return False
+    return tuple(int(v) for v in re.findall(r"\d+", version)[:2]) >= (5, 7)
 
 
 def _load_uproot(path: Path, subpath: str | None) -> Any:

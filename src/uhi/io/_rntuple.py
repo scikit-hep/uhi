@@ -56,7 +56,8 @@ def to_fields(
         if array.dtype.name not in DTYPES:
             msg = f"Unsupported array dtype {array.dtype} for {field}"
             raise TypeError(msg)
-        arrays[field] = array.ravel()
+        # Awkward and RNTuple need native byte order
+        arrays[field] = array.astype(array.dtype.newbyteorder("="), copy=False).ravel()
 
     return json.dumps(histogram), arrays
 
