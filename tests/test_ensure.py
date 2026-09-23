@@ -4,7 +4,8 @@ import numpy as np
 import pytest
 from pytest import approx
 
-from uhi.numpy_plottable import ensure_plottable_histogram
+from uhi.numpy_plottable import NumPyPlottableHistogram, ensure_plottable_histogram
+from uhi.typing.plottable import PlottableHistogram
 
 
 def test_from_numpy() -> None:
@@ -210,3 +211,29 @@ def test_from_bh_str_cat() -> None:
 
     assert h.axes[0][0] == "hi"
     assert h.axes[0][1] == "ho"
+
+
+def test_0d_plottable() -> None:
+    h = NumPyPlottableHistogram(np.array(3.0), variances=np.array(2.0))
+
+    assert isinstance(h, PlottableHistogram)
+    assert ensure_plottable_histogram(h) is h
+    assert len(h.axes) == 0
+    assert h.values().shape == ()
+    assert h.values() == approx(3.0)
+    assert h.variances() == approx(2.0)
+
+
+def test_0d_from_bh() -> None:
+    bh = pytest.importorskip("boost_histogram")
+
+    h = bh.Histogram()
+    h.fill()
+    h.fill()
+
+    ph = ensure_plottable_histogram(h)
+
+    assert isinstance(ph, PlottableHistogram)
+    assert len(ph.axes) == 0
+    assert np.asarray(ph.values()).shape == ()
+    assert ph.values() == approx(2.0)
