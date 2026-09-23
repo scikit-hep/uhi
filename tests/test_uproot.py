@@ -6,7 +6,7 @@ from typing import Any
 
 import numpy as np
 import pytest
-from helpers import convert_histogram_to_32bit
+from helpers import convert_histogram_to_32bit, scalar_no_axis_storage
 from pytest import approx
 
 import uhi.io._files
@@ -38,12 +38,7 @@ def test_valid_json(valid: Path, tmp_path: Path, sparse: bool) -> None:
 
     assert hists.keys() == rehists.keys()
     for name, hist in hists.items():
-        # RNTuple fields are flat; the shape comes from the axes, so a
-        # no-axis storage of length 1 reads back as a scalar
-        if not hist["axes"]:
-            storage = hist["storage"]
-            for key in ARRAY_KEYS & storage.keys():
-                storage[key] = np.reshape(storage[key], ())
+        scalar_no_axis_storage(hist)
         data = json.dumps(hist, default=uhi.io.json.default, sort_keys=True)
         redata = json.dumps(rehists[name], default=uhi.io.json.default, sort_keys=True)
         assert redata == data

@@ -1,0 +1,7 @@
+{
+  "one": {
+    "uhi_schema": 1,
+    "axes": [],
+    "storage": { "type": "weighted", "values": 2.5, "variances": 3.0 }
+  }
+}
