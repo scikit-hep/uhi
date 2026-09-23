@@ -78,4 +78,4 @@ jobs:
       run: pip install .
 
     - name: Test root
-      run: pytest -ra tests/test_root.py
+      run: pytest -ra tests/test_root.py tests/test_uproot.py

@@ -32,7 +32,8 @@ To assist plotting libraries in accepting Histograms from classic sources, see
 `uhi.numpy_plottable.ensure_plottable_histogram`, which will adapt NumPy style
 tuples into a simple PlottableHistogram.
 
-The `uhi.io` module can read and write histograms in JSON, ZIP, HDF5, and ROOT,
+The `uhi.io` module can read and write histograms in JSON, ZIP, HDF5, and ROOT
+(with uproot or PyROOT),
 and `uhi.io.ops.add` sums histograms bin-by-bin. The `uhi add` command does the
 same for files, like ROOT's `hadd`.
 

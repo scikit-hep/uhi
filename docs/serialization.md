@@ -248,7 +248,7 @@ $ uhi add out.root:merged run1.h5:results run2.h5:results
 
 You can test a file against the schema with the same command. The format is
 selected by the file suffix: `.json`, `.zip`, `.h5`/`.hdf5`/`.hdf` (needs the
-`hdf5` extra), or `.root` (needs ROOT). Every histogram in a zip file (each
+`hdf5` extra), or `.root` (needs the `uproot` extra or PyROOT). Every histogram in a zip file (each
 `*.json` entry), HDF5 file (each group with a `uhi_schema` attribute), or ROOT
 file (each RNTuple, searched recursively) is checked:
 
@@ -401,9 +401,10 @@ currently (as of 3.14rc2) doesn't provide 3.14 wheels either.
 ### ROOT
 
 The ROOT format stores each histogram as a single-entry
-[RNTuple](https://root.cern/doc/master/classROOT_1_1RNTuple.html). You need
-[ROOT](https://root.cern) installed to use this format (`conda install -c
-conda-forge root`). The RNTuple has a `"uhi"` string
+[RNTuple](https://root.cern/doc/master/classROOT_1_1RNTuple.html). You can use
+[uproot](https://uproot.readthedocs.io) 5.7+ (`pip install uhi[uproot]`) or
+[ROOT](https://root.cern) (`conda install -c conda-forge root`) for this format;
+both write the same files. The RNTuple has a `"uhi"` string
 field holding the IR as a string and arrays are replaced
 by the name of the field holding them. Storage arrays are stored flattened in
 `std::vector` fields named after their key (`"values"`, `"variances"`, ...). The shape of these arrays is recovered from the axes when reading.
@@ -430,6 +431,22 @@ you can pass it to `ROOT.TH1*` or `boost_histogram.Histogram` or `hist.Hist`.
 
 ```{versionadded} 1.2
 ```
+
+With uproot, use `uhi.io.uproot.read` and `uhi.io.uproot.write` with an open
+uproot file or directory. Names can include a directory, like `"dir/histogram"`.
+
+```python
+import uproot
+import uhi.io.uproot
+
+with uproot.recreate("myfile.root") as root_file:
+    uhi.io.uproot.write(root_file, "histogram", h)
+
+with uproot.open("myfile.root") as root_file:
+    h2 = uhi.io.uproot.read(root_file, "histogram")
+```
+
+The `uhi` command uses uproot if it is installed, and PyROOT otherwise.
 
 ## Schema
 
