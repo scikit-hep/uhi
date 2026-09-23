@@ -132,6 +132,19 @@ def _load_hdf5(path: Path, subpath: str | None) -> Any:
     return hists
 
 
+def _import_root() -> Any:
+    """Import PyROOT, the fallback when uproot 5.7+ is not installed."""
+    try:
+        import ROOT  # noqa: PLC0415
+    except ModuleNotFoundError as err:
+        msg = (
+            "ROOT files need uproot 5.7+ (pip install 'uhi[uproot]') or "
+            "PyROOT (conda install -c conda-forge root)"
+        )
+        raise ModuleNotFoundError(msg, name=err.name) from err
+    return ROOT
+
+
 @functools.cache
 def _uproot_available() -> bool:
     """Uproot 5.7+ is preferred for ROOT files; PyROOT is the fallback."""
@@ -175,7 +188,7 @@ def _load_root(path: Path, subpath: str | None) -> Any:
     if _uproot_available():
         return _load_uproot(path, subpath)
 
-    import ROOT  # noqa: PLC0415
+    ROOT = _import_root()
 
     from . import root  # noqa: PLC0415
 
@@ -284,7 +297,7 @@ def write(file: str | Path, data: Any, /, *, path: str | None = None) -> None:
                 for name, hist in data.items():
                     uhi_uproot.write(root_file, name, hist)
         case _:
-            import ROOT  # noqa: PLC0415
+            ROOT = _import_root()
 
             from . import root  # noqa: PLC0415
 

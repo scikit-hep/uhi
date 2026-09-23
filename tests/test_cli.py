@@ -287,3 +287,16 @@ def test_cli_validate_hdf5_dataset(
     with pytest.raises(SystemExit):
         main(["validate", f"{tmp_file}:one/storage/values"])
     assert "not a histogram or group" in capsys.readouterr().out
+
+
+def test_root_without_backend(
+    resources: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(uhi.io._files, "_uproot_available", lambda: False)
+    monkeypatch.setitem(sys.modules, "ROOT", None)
+    hists = uhi.io._files.load(resources / "valid" / "reg.json")
+
+    with pytest.raises(ModuleNotFoundError, match=r"uhi\[uproot\]"):
+        uhi.io._files.write(tmp_path / "test.root", hists)
+    with pytest.raises(ModuleNotFoundError, match=r"uhi\[uproot\]"):
+        uhi.io._files.load(tmp_path / "test.root")

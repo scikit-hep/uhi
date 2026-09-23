@@ -120,6 +120,37 @@ def test_unsupported_dtype(tmp_path: Path) -> None:
         uhi_io_uproot.write(root_file, "h", hist)
 
 
+@pytest.mark.parametrize(
+    ("dtype", "expected"),
+    [
+        (np.int8, np.int64),
+        (np.int16, np.int64),
+        (np.uint8, np.uint64),
+        (np.uint16, np.uint64),
+        (np.bool_, np.int64),
+    ],
+)
+def test_small_int_dtype(tmp_path: Path, dtype: type, expected: type) -> None:
+    hist: dict[str, Any] = {
+        "uhi_schema": 1,
+        "axes": [
+            {
+                "type": "regular",
+                "lower": 0.0,
+                "upper": 1.0,
+                "bins": 2,
+                "underflow": False,
+                "overflow": False,
+                "circular": False,
+            }
+        ],
+        "storage": {"type": "int", "values": np.array([1, 0], dtype=dtype)},
+    }
+    values = _roundtrip(tmp_path, {"h": hist})["h"]["storage"]["values"]
+    assert values.dtype == expected
+    assert values.tolist() == [1, 0]
+
+
 @pytest.mark.parametrize("storage_type", ["int", "double", "weighted", "mean"])
 def test_convert_bh_32bit(tmp_path: Path, storage_type: str) -> None:
     bh = pytest.importorskip("boost_histogram")

@@ -34,5 +34,7 @@ class TestAccess3D(uhi.testing.indexing.Indexing3D[my.Histogram]):
 If you don't support serialization, then you can manually set the values with
 the UHI item, or check the docstrings to see what the correct parameters are.
 
-Make sure you don't import from `uhi.testing.indexing`, as some runners (unittest)
-will pick the base classes up and try to run those too.
+Import the module (`import uhi.testing.indexing`), as in the example above. Do
+not use `from uhi.testing.indexing import Indexing1D`: this puts the base classes
+in your test module, and some runners (such as unittest) then try to run them as
+tests too.

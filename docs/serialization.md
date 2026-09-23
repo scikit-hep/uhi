@@ -406,9 +406,8 @@ The ROOT format stores each histogram as a single-entry
 [RNTuple](https://root.cern/doc/master/classROOT_1_1RNTuple.html). You can use
 [uproot](https://uproot.readthedocs.io) 5.7+ (`pip install uhi[uproot]`) or
 [ROOT](https://root.cern) 6.36+ (`conda install -c conda-forge root`) for this
-format; both write the same files. The `root` extra installs the `ROOT` package
-from PyPI, which is a prerelease and only has Linux wheels. We recommend ROOT
-from conda-forge, or uproot. The RNTuple has a `"uhi"` string
+format; both write the same files. Install ROOT from conda-forge; the `ROOT`
+package on PyPI is not ready yet. The RNTuple has a `"uhi"` string
 field holding the IR as a string and arrays are replaced
 by the name of the field holding them. Storage arrays are stored flattened in
 `std::vector` fields named after their key (`"values"`, `"variances"`, ...). The shape of these arrays is recovered from the axes when reading.
