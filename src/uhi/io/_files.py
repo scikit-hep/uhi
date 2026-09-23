@@ -7,6 +7,7 @@ like ``file.h5:path`` selects a group, directory, or histogram inside the file.
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import re
 import zipfile
@@ -21,6 +22,8 @@ def __dir__() -> list[str]:
 
 
 _SPEC_RE = re.compile(r"^(.+?\.(?:json|zip|h5|hdf5|hdf|root)):(.+)$", re.IGNORECASE)
+_RNTUPLE_CLASSES = frozenset(["ROOT::RNTuple", "ROOT::Experimental::RNTuple"])
+_DIRECTORY_CLASSES = frozenset(["TDirectory", "TDirectoryFile"])
 _SUFFIXES = "expected .json, .zip, .h5/.hdf5/.hdf, or .root"
 
 
@@ -105,7 +108,40 @@ def _load_hdf5(path: Path, subpath: str | None) -> Any:
     return hists
 
 
+def _uproot_available() -> bool:
+    """Uproot is preferred for ROOT files; PyROOT is the fallback."""
+    return importlib.util.find_spec("uproot") is not None
+
+
+def _load_uproot(path: Path, subpath: str | None) -> Any:
+    import uproot  # noqa: PLC0415
+
+    from . import uproot as uhi_uproot  # noqa: PLC0415
+
+    def visit(directory: Any) -> dict[str, Any]:
+        return {
+            name: uhi_uproot.read(directory, name)
+            for name in directory.keys(
+                recursive=True, cycle=False, filter_classname=_RNTUPLE_CLASSES
+            )
+        }
+
+    with uproot.open(path) as root_file:
+        if not subpath:
+            return visit(root_file)
+        subpath = subpath.strip("/")
+        if subpath not in root_file:
+            msg = f"{subpath!r} not found in {path}"
+            raise KeyError(msg)
+        if root_file.classname_of(subpath) in _RNTUPLE_CLASSES:
+            return uhi_uproot.read(root_file, subpath)
+        return visit(root_file[subpath])
+
+
 def _load_root(path: Path, subpath: str | None) -> Any:
+    if _uproot_available():
+        return _load_uproot(path, subpath)
+
     import ROOT  # noqa: PLC0415
 
     from . import root  # noqa: PLC0415
@@ -115,11 +151,11 @@ def _load_root(path: Path, subpath: str | None) -> Any:
     def visit(directory: Any, prefix: str) -> None:
         for key in directory.GetListOfKeys():
             name = key.GetName()
-            match key.GetClassName():
-                case "ROOT::RNTuple" | "ROOT::Experimental::RNTuple":
-                    hists[f"{prefix}{name}"] = root.read(directory, name)
-                case "TDirectory" | "TDirectoryFile":
-                    visit(directory.Get(name), f"{prefix}{name}/")
+            class_name = key.GetClassName()
+            if class_name in _RNTUPLE_CLASSES:
+                hists[f"{prefix}{name}"] = root.read(directory, name)
+            elif class_name in _DIRECTORY_CLASSES:
+                visit(directory.Get(name), f"{prefix}{name}/")
 
     root_file = ROOT.TFile.Open(str(path))
     if not root_file:
@@ -135,7 +171,7 @@ def _load_root(path: Path, subpath: str | None) -> Any:
         if not key:
             msg = f"{subpath!r} not found in {path}"
             raise KeyError(msg)
-        if key.GetClassName() in {"TDirectory", "TDirectoryFile"}:
+        if key.GetClassName() in _DIRECTORY_CLASSES:
             visit(directory.Get(name), "")
             return hists
         # A single RNTuple
@@ -203,6 +239,14 @@ def write(file: str | Path, data: Any, /, *, path: str | None = None) -> None:
                 else:
                     for name, hist in data.items():
                         hdf5.write(h5_file.create_group(name), hist)
+        case _ if _uproot_available():
+            import uproot  # noqa: PLC0415
+
+            from . import uproot as uhi_uproot  # noqa: PLC0415
+
+            with uproot.recreate(filepath) as root_file:
+                for name, hist in data.items():
+                    uhi_uproot.write(root_file, name, hist)
         case _:
             import ROOT  # noqa: PLC0415
 

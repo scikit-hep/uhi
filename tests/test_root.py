@@ -380,9 +380,53 @@ def test_convert_bh_32bit_root(tmp_path: Path, storage_type: str) -> None:
     )
 
 
+@pytest.mark.parametrize("writer", ["root", "uproot"])
+def test_uproot_compat(valid: Path, tmp_path: Path, sparse: bool, writer: str) -> None:
+    """Files written by ROOT read with uproot, and the reverse."""
+    uproot = pytest.importorskip("uproot")
+    import uhi.io.uproot
+
+    hists = json.loads(
+        valid.read_text(encoding="utf-8"), object_hook=uhi.io.json.object_hook
+    )
+    if sparse:
+        hists = {name: to_sparse(hist) for name, hist in hists.items()}
+
+    tmp_file = tmp_path / "test.root"
+    if writer == "root":
+        with ROOT.TFile.Open(str(tmp_file), "RECREATE") as root_file:
+            for name, hist in hists.items():
+                uhi_io_root.write(root_file, name, hist)
+        with uproot.open(tmp_file) as root_file:
+            rehists = {name: uhi.io.uproot.read(root_file, name) for name in hists}
+    else:
+        with uproot.recreate(tmp_file) as root_file:
+            for name, hist in hists.items():
+                uhi.io.uproot.write(root_file, name, hist)
+        with ROOT.TFile.Open(str(tmp_file)) as root_file:
+            rehists = {name: uhi_io_root.read(root_file, name) for name in hists}
+
+    for name, hist in hists.items():
+        data = json.dumps(hist, default=uhi.io.json.default, sort_keys=True)
+        redata = json.dumps(rehists[name], default=uhi.io.json.default, sort_keys=True)
+        assert redata == data
+
+
 # CLI
 
 
+@pytest.fixture(params=["pyroot", "uproot"])
+def files_backend(
+    request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Run the file-level helpers with each backend."""
+    if request.param == "uproot":
+        pytest.importorskip("uproot")
+    else:
+        monkeypatch.setattr(uhi.io._files, "_uproot_available", lambda: False)
+
+
+@pytest.mark.usefixtures("files_backend")
 def test_cli_validate_root(
     valid: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
@@ -403,6 +447,7 @@ def test_cli_validate_root(
     assert capsys.readouterr().out.startswith("OK")
 
 
+@pytest.mark.usefixtures("files_backend")
 def test_cli_validate_root_invalid(
     resources: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
@@ -425,6 +470,7 @@ def test_cli_validate_root_invalid(
     assert capsys.readouterr().out.startswith("ERROR")
 
 
+@pytest.mark.usefixtures("files_backend")
 def test_cli_validate_root_path(
     resources: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
@@ -476,6 +522,7 @@ def _root_add_inputs(resources: Path, tmp_path: Path) -> tuple[list[Path], list[
     return files, [f"sub/{name}" for name in hists]
 
 
+@pytest.mark.usefixtures("files_backend")
 @pytest.mark.parametrize("out_suffix", [".root", ".json"])
 def test_cli_add_root(resources: Path, tmp_path: Path, out_suffix: str) -> None:
     from uhi.__main__ import main

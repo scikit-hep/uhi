@@ -92,9 +92,11 @@ def root_tests(session):
     Test against ROOT.
     """
 
-    session.conda_install("--channel=conda-forge", "ROOT", "pytest", "boost-histogram")
+    session.conda_install(
+        "--channel=conda-forge", "ROOT", "uproot>=5.7", "pytest", "boost-histogram"
+    )
     session.install("-e.")
-    session.run("pytest", "tests/test_root.py")
+    session.run("pytest", "tests/test_root.py", "tests/test_uproot.py")
 
 
 if __name__ == "__main__":

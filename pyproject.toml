@@ -56,6 +56,9 @@ hdf5 = [
 root = [
   "ROOT",
 ]
+uproot = [
+  "uproot>=5.7",
+]
 
 [dependency-groups]
 docs = [
@@ -79,6 +82,7 @@ test-core = [
 test = [
   { include-group = "test-core" },
   "h5py; platform_python_implementation == 'CPython' and python_version<'3.14'",  # Doesn't support free-threaded Python currently
+  "uproot>=5.7; platform_python_implementation == 'CPython'",  # No PyPy wheels for awkward-cpp
 ]
 dev = [{ include-group = "test" }]
 
@@ -112,7 +116,7 @@ warn_unreachable = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 
 [[tool.mypy.overrides]]
-module = ["fastjsonschema", "h5py", "ROOT"]
+module = ["awkward", "fastjsonschema", "h5py", "ROOT", "uproot"]
 ignore_missing_imports = true
 
 
