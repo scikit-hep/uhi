@@ -90,6 +90,10 @@
         },
         {
           "$ref": "#/$defs/int_ndarray"
+        },
+        {
+          "type": "integer",
+          "description": "A single integer, for a histogram with no axes"
         }
       ]
     },
@@ -101,6 +105,10 @@
         },
         {
           "$ref": "#/$defs/ndarray"
+        },
+        {
+          "type": "number",
+          "description": "A single number, for a histogram with no axes"
         }
       ]
     },

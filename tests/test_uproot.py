@@ -6,7 +6,7 @@ from typing import Any
 
 import numpy as np
 import pytest
-from helpers import convert_histogram_to_32bit
+from helpers import convert_histogram_to_32bit, scalar_no_axis_storage
 from pytest import approx
 
 import uhi.io._files
@@ -38,6 +38,7 @@ def test_valid_json(valid: Path, tmp_path: Path, sparse: bool) -> None:
 
     assert hists.keys() == rehists.keys()
     for name, hist in hists.items():
+        scalar_no_axis_storage(hist)
         data = json.dumps(hist, default=uhi.io.json.default, sort_keys=True)
         redata = json.dumps(rehists[name], default=uhi.io.json.default, sort_keys=True)
         assert redata == data
@@ -105,6 +106,23 @@ def test_subdirectory(tmp_path: Path, resources: Path) -> None:
 
     for h in (rehist, rehist_sub):
         assert h["storage"]["values"] == approx(hists["main"]["storage"]["values"])
+
+
+def test_0d_scalar_storage(tmp_path: Path) -> None:
+    hist: dict[str, Any] = {
+        "uhi_schema": 1,
+        "axes": [],
+        "storage": {
+            "type": "weighted",
+            "values": np.array(6.0),
+            "variances": np.array(8.0),
+        },
+    }
+    rehist = _roundtrip(tmp_path, {"h": hist})["h"]
+
+    for key in ("values", "variances"):
+        assert rehist["storage"][key].shape == ()
+        assert rehist["storage"][key] == hist["storage"][key]
 
 
 def test_unsupported_dtype(tmp_path: Path) -> None:

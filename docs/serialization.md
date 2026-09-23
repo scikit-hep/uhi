@@ -78,6 +78,14 @@ The following storages are supported:
   values, `"sum_of_weights"`, `"sum_of_weights_squared"`, `"values"`, and
   `"variances"`. Boost-histogram's `WeightedMean` storage maps to this.
 
+A histogram with no axes holds one bin. Its storage values can be a single
+number or an array of length 1. Readers must accept both forms.
+
+```{versionchanged} 1.2
+
+Storage values can be a single number for a histogram with no axes.
+```
+
 All storage types support **empty (metadata-only) histograms**, where the storage
 contains only the `"type"` field and no data arrays. This is useful for creating
 histograms that contain axes and metadata but no actual bin data. Empty storages

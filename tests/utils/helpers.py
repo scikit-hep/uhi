@@ -16,7 +16,7 @@ else:
 
 from uhi.typing.serialization import AnyHistogramIR, AnyStorageIR
 
-__all__ = ["convert_histogram_to_32bit"]
+__all__ = ["convert_histogram_to_32bit", "scalar_no_axis_storage"]
 
 # Type alias for arrays that can be converted
 ArrayLike: TypeAlias = (
@@ -150,3 +150,17 @@ def convert_histogram_to_32bit(hist: Mapping[str, Any]) -> AnyHistogramIR:
         hist_copy["storage"] = storage
 
     return hist_copy
+
+
+def scalar_no_axis_storage(hist: dict[str, Any]) -> None:
+    """Make storage arrays scalars in place if the histogram has no axes.
+
+    RNTuple fields are flat and the shape comes from the axes, so a no-axis
+    storage of length 1 reads back from ROOT files as a scalar.
+    """
+    from uhi.io import ARRAY_KEYS
+
+    if not hist["axes"]:
+        storage = hist["storage"]
+        for key in ARRAY_KEYS & storage.keys():
+            storage[key] = np.reshape(storage[key], ())
