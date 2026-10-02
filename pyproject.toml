@@ -100,7 +100,11 @@ minversion = "7.0"
 pythonpath = ["tests/utils"]
 addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
 xfail_strict = true
-filterwarnings = ["error"]
+filterwarnings = [
+  "error",
+  # NumPy's PyPy wheels warn on import of numpy.random
+  "ignore:cython.collection_type only works on PyPy:RuntimeWarning",
+]
 testpaths = ["tests"]
 log_level = "INFO"
 
