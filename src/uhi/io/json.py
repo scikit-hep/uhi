@@ -19,6 +19,8 @@ def default(obj: Any, /) -> Any:
         return _convert_input(obj)
     if isinstance(obj, np.ndarray):
         return obj.tolist()  # Convert ndarray to list
+    if isinstance(obj, np.generic):
+        return obj.item()
     msg = f"Object of type {type(obj)} is not JSON serializable"
     raise TypeError(msg)
 

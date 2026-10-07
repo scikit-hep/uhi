@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import packaging.version
 import pytest
 from helpers import convert_histogram_to_32bit
@@ -257,3 +258,11 @@ def test_named_round_trip() -> None:
     assert rehists.keys() == {"a", "b"}
     assert bh.Histogram(rehists["a"]) == h1
     assert bh.Histogram(rehists["b"]) == h2
+
+
+@pytest.mark.parametrize("value", [np.int64(5), np.float32(5.0)])
+def test_numpy_scalar_storage(value: Any) -> None:
+    hist = {"uhi_schema": 1, "axes": [], "storage": {"type": "double", "values": value}}
+    text = json.dumps(hist, default=uhi.io.json.default)
+    rehist = json.loads(text, object_hook=uhi.io.json.object_hook)
+    assert rehist["storage"]["values"] == 5

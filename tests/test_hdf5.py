@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import packaging.version
 import pytest
 from helpers import convert_histogram_to_32bit
@@ -97,6 +98,43 @@ def test_scalar_storage(tmp_path: Path) -> None:
     assert rehist["storage"]["values"] == pytest.approx(3.0)
 
 
+def test_scalar_storage_compress_all(tmp_path: Path) -> None:
+    hist: dict[str, Any] = {
+        "uhi_schema": 1,
+        "axes": [],
+        "storage": {"type": "int", "values": 5},
+    }
+
+    tmp_file = tmp_path / "test.h5"
+    with h5py.File(tmp_file, "w") as h5_file:
+        uhi_io_hdf5.write(h5_file.create_group("h"), hist, min_compress_elements=0)
+
+    with h5py.File(tmp_file, "r") as h5_file:
+        rehist = uhi_io_hdf5.read(h5_file["h"])
+
+    assert rehist["storage"]["values"] == 5
+
+
+def test_fixed_length_storage_type(tmp_path: Path) -> None:
+    hist: dict[str, Any] = {
+        "uhi_schema": 1,
+        "axes": [],
+        "storage": {"type": "int", "values": 5},
+    }
+
+    tmp_file = tmp_path / "test.h5"
+    with h5py.File(tmp_file, "w") as h5_file:
+        uhi_io_hdf5.write(h5_file.create_group("h"), hist)
+        # C and Fortran writers often use fixed-length strings
+        h5_file["h/storage"].attrs["type"] = np.bytes_("int")
+
+    with h5py.File(tmp_file, "r") as h5_file:
+        rehist = uhi_io_hdf5.read(h5_file["h"])
+
+    assert rehist["storage"]["type"] == "int"
+    assert isinstance(rehist["storage"]["type"], str)
+
+
 def test_create_dataset_nested_list_size(tmp_path: Path) -> None:
     with h5py.File(tmp_path / "test.h5", "w") as h5_file:
         uhi_io_hdf5._create_dataset(
@@ -116,8 +154,6 @@ def test_axis_order_many_axes(tmp_path: Path) -> None:
     h5py yields group members alphabetically (axis_0, axis_1, axis_10, axis_11,
     axis_2, ...), so reading must dereference the ordered ``axes`` dataset.
     """
-    import numpy as np
-
     n_axes = 12
     uppers = [float(i + 1) for i in range(n_axes)]
     hist = {

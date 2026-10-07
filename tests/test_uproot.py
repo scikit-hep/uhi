@@ -129,11 +129,11 @@ def test_unsupported_dtype(tmp_path: Path) -> None:
     hist: dict[str, Any] = {
         "uhi_schema": 1,
         "axes": [],
-        "storage": {"type": "double", "values": np.array(1.0, dtype=np.float16)},
+        "storage": {"type": "double", "values": np.array(1.0, dtype=np.complex64)},
     }
     with (
         uproot.recreate(tmp_path / "test.root") as root_file,
-        pytest.raises(TypeError, match="float16"),
+        pytest.raises(TypeError, match="complex64"),
     ):
         uhi_io_uproot.write(root_file, "h", hist)
 
@@ -167,6 +167,17 @@ def test_small_int_dtype(tmp_path: Path, dtype: type, expected: type) -> None:
     values = _roundtrip(tmp_path, {"h": hist})["h"]["storage"]["values"]
     assert values.dtype == expected
     assert values.tolist() == [1, 0]
+
+
+def test_float16_dtype(tmp_path: Path) -> None:
+    hist: dict[str, Any] = {
+        "uhi_schema": 1,
+        "axes": [],
+        "storage": {"type": "double", "values": np.array(1.5, dtype=np.float16)},
+    }
+    values = _roundtrip(tmp_path, {"h": hist})["h"]["storage"]["values"]
+    assert values.dtype == np.float32
+    assert values == 1.5
 
 
 @pytest.mark.parametrize("storage_type", ["int", "double", "weighted", "mean"])
