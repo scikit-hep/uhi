@@ -231,7 +231,8 @@ class ROOTAxis(abc.ABC):
 
     @staticmethod
     def create(tAx: Any) -> DiscreteROOTAxis | ContinuousROOTAxis:
-        if all(tAx.GetBinLabel(i + 1) for i in range(tAx.GetNbins())):
+        nbins = tAx.GetNbins()
+        if nbins and all(tAx.GetBinLabel(i + 1) for i in range(nbins)):
             return DiscreteROOTAxis(tAx)
         return ContinuousROOTAxis(tAx)
 

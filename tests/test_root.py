@@ -16,7 +16,12 @@ import uhi.io.json
 import uhi.io.ops
 import uhi.schema
 from uhi.io import ARRAY_KEYS, to_sparse
-from uhi.numpy_plottable import ROOTPlottableProfile, ensure_plottable_histogram
+from uhi.numpy_plottable import (
+    ContinuousROOTAxis,
+    ROOTAxis,
+    ROOTPlottableProfile,
+    ensure_plottable_histogram,
+)
 
 ROOT = pytest.importorskip("ROOT")
 uhi_io_root = pytest.importorskip("uhi.io.root")
@@ -86,6 +91,10 @@ def test_root_profile_adapter_weighted() -> None:
 
     tp.SetErrorOption("s")
     assert h.variances() == approx([1, 8 / 9])
+
+
+def test_root_axis_zero_bins() -> None:
+    assert isinstance(ROOTAxis.create(ROOT.TAxis(0, 0, 1)), ContinuousROOTAxis)
 
 
 # Serialization
