@@ -9,7 +9,7 @@ from uhi.typing.plottable import PlottableHistogram
 
 
 def test_from_numpy() -> None:
-    hist1 = ((1, 2, 3, 4, 1, 2), (0, 1, 2, 3))
+    hist1 = ((1, 2, 3), (0, 1, 2, 3))
 
     h = ensure_plottable_histogram(hist1)
 
@@ -237,3 +237,41 @@ def test_0d_from_bh() -> None:
     assert len(ph.axes) == 0
     assert np.asarray(ph.values()).shape == ()
     assert ph.values() == approx(2.0)
+
+
+def test_0d_from_tuple() -> None:
+    # boost-histogram's to_numpy() returns a 1-tuple for a 0D histogram
+    ph = ensure_plottable_histogram((np.array(5.0),))
+
+    assert isinstance(ph, PlottableHistogram)
+    assert len(ph.axes) == 0
+    assert ph.values() == approx(5.0)
+
+
+def test_1_tuple_with_axes_raises() -> None:
+    with pytest.raises(TypeError, match="less than 2D tuple"):
+        ensure_plottable_histogram((np.zeros(3),))
+
+
+@pytest.mark.parametrize(
+    "hist",
+    [
+        (np.zeros(3), np.arange(10.0)),
+        (np.zeros(3), np.arange(3.0)),
+        (np.zeros((3, 4)), np.arange(4.0), np.arange(4.0)),
+        (np.zeros(3), (np.arange(5.0),)),
+        (np.zeros(3), np.zeros((4, 2))),
+        (np.zeros(3), np.zeros((3, 3))),
+    ],
+)
+def test_edges_mismatch_raises(hist: tuple[object, ...]) -> None:
+    with pytest.raises(ValueError, match="bins"):
+        ensure_plottable_histogram(hist)
+
+
+def test_2d_edges() -> None:
+    edges = np.array([[0.0, 1.0], [1.0, 3.0], [5.0, 6.0]])
+    h = NumPyPlottableHistogram(np.zeros(3), edges)
+
+    assert len(h.axes[0]) == 3
+    assert h.axes[0][1] == approx((1.0, 3.0))

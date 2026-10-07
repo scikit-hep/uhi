@@ -124,8 +124,14 @@ def _bin_helper(shape: int, bins: np.typing.NDArray[Any] | None) -> NumPyPlottab
             np.column_stack([np.arange(0, shape), np.arange(1, shape + 1)])
         )
     if bins.ndim == 2:
+        if bins.shape != (shape, 2):
+            msg = f"2D bins must have shape ({shape}, 2) to match the values, not {bins.shape}"
+            raise ValueError(msg)
         return NumPyPlottableAxis(bins)
     if bins.ndim == 1:
+        if len(bins) != shape + 1:
+            msg = f"1D bins must have {shape + 1} edges to match {shape} values, not {len(bins)}"
+            raise ValueError(msg)
         return NumPyPlottableAxis(np.column_stack([bins[:-1], bins[1:]]))
     msg = "Bins not understood, should be 2d array of min/max edges or 1D array of edges or None"
     raise ValueError(msg)
@@ -389,6 +395,9 @@ def ensure_plottable_histogram(hist: Any) -> PlottableHistogram:
 
     if isinstance(hist, tuple):
         # NumPy histogram tuple
+        if len(hist) == 1 and np.ndim(hist[0]) == 0:
+            # 0D histogram, like boost-histogram's to_numpy() with no axes
+            return NumPyPlottableHistogram(np.asarray(hist[0]))
         if len(hist) < 2:
             msg = "Can't be applied to less than 2D tuple"
             raise TypeError(msg)
