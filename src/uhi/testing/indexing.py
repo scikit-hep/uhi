@@ -766,13 +766,13 @@ class Indexing3D(Indexing, typing.Generic[T]):
 
     def test_setting_single_value(self) -> None:
         h = self.make_histogram()
-        h[0, 0, 0] = 42
+        h[0, 0, 0] = self.value_to_bin(42)
         self.assertEqualBinValue(h[0, 0, 0], 42)
         self.assertEqualBinValue(h[1, 1, 1], 6)
 
     def test_setting_underflow(self) -> None:
         h = self.make_histogram()
-        h[self.tag.underflow, ...] = 42
+        h[self.tag.underflow, ...] = self.value_to_bin(42)
         self.assertEqualBinValue(h[self.tag.underflow, 0, 0], 42)
 
     def test_setting_array(self) -> None:
