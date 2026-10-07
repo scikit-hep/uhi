@@ -16,7 +16,7 @@ import uhi.io.json
 import uhi.io.ops
 import uhi.schema
 from uhi.io import ARRAY_KEYS, to_sparse
-from uhi.numpy_plottable import ensure_plottable_histogram
+from uhi.numpy_plottable import ROOTPlottableProfile, ensure_plottable_histogram
 
 ROOT = pytest.importorskip("ROOT")
 uhi_io_root = pytest.importorskip("uhi.io.root")
@@ -55,6 +55,37 @@ def test_root_th2f_convert() -> None:
         for i, row in enumerate(np.sqrt(var))
         for j, ie in enumerate(row)
     )
+
+
+# Newer ROOT supports the Protocol natively, so use the adapter directly
+def test_root_profile_adapter_unweighted() -> None:
+    tp = ROOT.TProfile("p1", "p1", 1, 0, 1)
+    for y in (1, 2, 3, 6):
+        tp.Fill(0.5, y)
+    h = ROOTPlottableProfile(tp)
+    assert h.values() == approx([3])
+    assert h.counts() == approx([4])
+    assert h.variances() == approx([np.var([1, 2, 3, 6])])
+
+
+def test_root_profile_adapter_weighted() -> None:
+    tp = ROOT.TProfile("p2", "p2", 2, 0, 2)
+    tp.Fill(0.5, 1, 1)
+    tp.Fill(0.5, 3, 1)
+    tp.Fill(1.5, 2, 2)
+    tp.Fill(1.5, 4, 1)
+    h = ROOTPlottableProfile(tp)
+    assert h.values() == approx([2, 8 / 3])
+    # Effective entries: sum(w)**2 / sum(w**2)
+    assert h.counts() == approx([2, 9 / 5])
+    assert h.variances() == approx([1, 8 / 9])
+    # Error on the mean
+    assert np.sqrt(h.variances() / h.counts()) == approx(
+        [tp.GetBinError(1), tp.GetBinError(2)]
+    )
+
+    tp.SetErrorOption("s")
+    assert h.variances() == approx([1, 8 / 9])
 
 
 # Serialization

@@ -329,35 +329,29 @@ class ROOTPlottableProfile(ROOTPlottableHistBase):
     def kind(self) -> str:
         return Kind.MEAN
 
+    def _per_cell(self, method: str) -> np.typing.NDArray[Any]:
+        func = getattr(self.thist, method)
+        return np.array([func(i) for i in range(self.thist.GetNcells())]).reshape(
+            self._shape, order="F"
+        )[tuple([slice(1, -1)] * len(self._shape))]
+
     def values(self) -> np.typing.NDArray[Any]:
-        return np.array(
-            [self.thist.GetBinContent(i) for i in range(self.thist.GetNcells())]
-        ).reshape(self._shape, order="F")[tuple([slice(1, -1)] * len(self._shape))]
+        return self._per_cell("GetBinContent")
 
     def variances(self) -> np.typing.NDArray[Any]:
-        return (
-            np.array([self.thist.GetBinError(i) for i in range(self.thist.GetNcells())])
-            ** 2
-        ).reshape(self._shape, order="F")[tuple([slice(1, -1)] * len(self._shape))]
+        # Computed from the sums, so the TProfile error option does not matter.
+        # The sum of w*y**2 is stored in the Sumw2 array.
+        sumw = self._per_cell("GetBinEntries")
+        sumwy2 = _roottarray_asnumpy(self.thist.GetSumw2(), shape=self._shape)[
+            tuple([slice(1, -1)] * len(self._shape))
+        ]
+        result = np.full_like(sumw, np.nan, dtype=np.float64)
+        np.divide(sumwy2, sumw, out=result, where=sumw != 0)
+        variances: np.typing.NDArray[Any] = result - self.values() ** 2
+        return variances
 
     def counts(self) -> np.typing.NDArray[Any]:
-        sumw = _roottarray_asnumpy(self.thist, shape=self._shape)[
-            tuple([slice(1, -1)] * len(self._shape))
-        ]
-        if not (self.thist.GetSumw2() and self.thist.GetSumw2N()):
-            return sumw
-
-        sumw2 = _roottarray_asnumpy(self.thist.GetSumw2(), shape=self._shape)[
-            tuple([slice(1, -1)] * len(self._shape))
-        ]
-        result = np.zeros_like(sumw, dtype=np.float64)
-        np.divide(
-            sumw**2,
-            sumw2,
-            out=result,
-            where=sumw != 0,
-        )
-        return result
+        return self._per_cell("GetBinEffectiveEntries")
 
 
 if TYPE_CHECKING:
