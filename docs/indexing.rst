@@ -140,7 +140,7 @@ coordinates into bin number.
 
 The final argument, ``action``, is special. A general API is being
 worked on, but for now, ``bh.sum`` will “project out” or “integrate
-over” an axes, and ``bh.rebin(n)`` will rebin by an integral factor.
+over” an axes, and ``bh.rebin(n)`` will rebin by a positive integral factor.
 Both work correctly with limits; ``bh.sum`` will remove flow bins if
 given a range. ``h[0:len:bh.sum]`` will sum without the flow bins.
 

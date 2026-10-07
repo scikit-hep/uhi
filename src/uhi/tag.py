@@ -31,11 +31,15 @@ class Locator:
         self.offset = offset
 
     def __add__(self, offset: int) -> Self:
+        if not isinstance(offset, int):
+            return NotImplemented
         other = copy.copy(self)
         other.offset += offset
         return other
 
     def __sub__(self, offset: int) -> Self:
+        if not isinstance(offset, int):
+            return NotImplemented
         other = copy.copy(self)
         other.offset -= offset
         return other
@@ -108,7 +112,8 @@ class rebin:
     """
     When used in the step of a Histogram's slice, rebin(n) combines bins,
     scaling their widths by a factor of n. If the number of bins is not
-    divisible by n, the remainder is added to the overflow bin.
+    divisible by n, the remainder is added to the overflow bin. The factor
+    must be a positive integer.
     """
 
     __slots__ = ("factor",)
@@ -117,6 +122,9 @@ class rebin:
         if not isinstance(factor, int):
             msg = "The factor must be an integer"  # type: ignore[unreachable]
             raise TypeError(msg)
+        if factor < 1:
+            msg = f"The factor must be positive, got {factor}"
+            raise ValueError(msg)
         # Items with .factor are specially treated in boost-histogram,
         # performing a high performance rebinning
         self.factor = factor
