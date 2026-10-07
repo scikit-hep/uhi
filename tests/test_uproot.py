@@ -336,3 +336,12 @@ def test_uproot_version_check(
     uhi.io._files._uproot_available.cache_clear()
     assert uhi.io._files._uproot_available() is expected
     uhi.io._files._uproot_available.cache_clear()
+
+
+def test_load_nested_directory(tmp_path: Path, resources: Path) -> None:
+    hist = uhi.io._files.load(resources / "valid" / "reg.json")["one"]
+    tmp_file = tmp_path / "test.root"
+    uhi.io._files.write(tmp_file, {"a/b/h": hist})
+
+    assert set(uhi.io._files.load(tmp_file, path="a/b")) == {"h"}
+    assert uhi.io._files.load(tmp_file, path="a/b/h")["uhi_schema"] == 1

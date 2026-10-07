@@ -199,3 +199,13 @@ def test_from_sparse_empty_keeps_dtype(storage_type: str, dtype: type) -> None:
     }
     values = from_sparse(to_sparse(hist))["storage"]["values"]
     assert values.dtype == dtype
+
+
+def test_from_sparse_unknown_axis() -> None:
+    hist: Any = {
+        "uhi_schema": 1,
+        "axes": [{"type": "integer"}],
+        "storage": {"type": "int", "index": [[0]], "values": [3]},
+    }
+    with pytest.raises(ValueError, match="Unknown axis type 'integer'"):
+        from_sparse(hist)

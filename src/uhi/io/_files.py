@@ -87,7 +87,13 @@ def _load_json(path: Path, subpath: str | None, *, raw: bool = False) -> Any:
 def _load_zip(path: Path, subpath: str | None) -> Any:
     from . import zip as uhi_zip  # noqa: PLC0415
 
-    with zipfile.ZipFile(path) as zip_file:
+    try:
+        zip_file = zipfile.ZipFile(path)
+    except zipfile.BadZipFile as e:
+        msg = f"{path}: {e}"
+        raise ValueError(msg) from e
+
+    with zip_file:
         names = [n[:-5] for n in zip_file.namelist() if n.endswith(".json")]
         if subpath is None:
             return {name: uhi_zip.read(zip_file, name) for name in names}
@@ -175,7 +181,8 @@ def _load_uproot(path: Path, subpath: str | None) -> Any:
         if subpath not in root_file:
             msg = f"{subpath!r} not found in {path}"
             raise KeyError(msg)
-        classname = root_file.classname_of(subpath)
+        # classname_of fails for nested directories
+        classname = root_file.key(subpath).fClassName
         if classname in _RNTUPLE_CLASSES:
             return uhi_uproot.read(root_file, subpath)
         if classname not in _DIRECTORY_CLASSES:

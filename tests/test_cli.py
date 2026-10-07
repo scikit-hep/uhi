@@ -300,3 +300,13 @@ def test_root_without_backend(
         uhi.io._files.write(tmp_path / "test.root", hists)
     with pytest.raises(ModuleNotFoundError, match=r"uhi\[uproot\]"):
         uhi.io._files.load(tmp_path / "test.root")
+
+
+def test_cli_validate_bad_zip(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    bad = tmp_path / "bad.zip"
+    bad.write_text("x", encoding="utf-8")
+    with pytest.raises(SystemExit):
+        main(["validate", str(bad)])
+    assert "not a zip file" in capsys.readouterr().out
