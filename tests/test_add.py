@@ -523,3 +523,22 @@ def test_cli_add_hdf5_errors(tmp_path: Path) -> None:
         main(["add", str(target), f"{files[0]}:nope"])
     with pytest.raises(SystemExit, match="is not a histogram or group"):
         main(["add", str(target), f"{files[0]}:h/storage/values"])
+
+
+def test_cli_add_bad_zip(tmp_path: Path) -> None:
+    bad = tmp_path / "bad.zip"
+    bad.write_text("x", encoding="utf-8")
+    with pytest.raises(SystemExit, match="not a zip file"):
+        main(["add", str(tmp_path / "out.json"), str(bad)])
+
+
+def test_cli_add_unknown_storage(tmp_path: Path) -> None:
+    src = tmp_path / "in.json"
+    src.write_text(
+        json.dumps(
+            {"uhi_schema": 1, "axes": [], "storage": {"type": "unlimited", "values": 3}}
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(SystemExit, match="Unknown storage type 'unlimited'"):
+        main(["add", str(tmp_path / "out.json"), str(src), str(src)])

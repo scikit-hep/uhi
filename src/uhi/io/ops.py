@@ -6,7 +6,6 @@ from __future__ import annotations
 
 import copy
 import functools
-import sys
 from typing import Any
 
 import numpy as np
@@ -19,11 +18,6 @@ from ..typing.serialization import (
 )
 from . import from_sparse, to_sparse
 from ._common import _convert_input
-
-if sys.version_info < (3, 11):
-    from typing_extensions import assert_never
-else:
-    from typing import assert_never
 
 __all__ = ["add"]
 
@@ -158,8 +152,10 @@ def _add_storage(a: AnyStorageIR, b: AnyStorageIR, /) -> AnyStorageIR:
             return _add_mean(a, b)
         case "weighted_mean":
             return _add_weighted_mean(a, b)
-        case unreachable:
-            assert_never(unreachable)
+        case unknown:
+            # Reachable with input that does not match the schema
+            msg = f"Unknown storage type {unknown!r}"  # type: ignore[unreachable]
+            raise ValueError(msg)
 
 
 def add(
