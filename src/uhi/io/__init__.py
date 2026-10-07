@@ -157,9 +157,9 @@ def from_sparse(sparse: H, /) -> H:
         arr1dnp = np.asarray(arr1d)
         empty_is_zero = _empty_is_zero(storage_type, k)
         dtype = arr1dnp.dtype
-        if arr1dnp.size == 0:
-            # Empty JSON arrays read as float; the dtype only comes from the type
-            dtype = np.dtype(np.int64 if storage_type == "int" else np.float64)
+        if arr1dnp.size == 0 and storage_type == "int" and dtype.kind == "f":
+            # Empty JSON arrays read as float
+            dtype = np.dtype(np.int64)
         elif not empty_is_zero and dtype.kind != "f":
             # NaN fill needs a float dtype
             dtype = np.dtype(np.float64)

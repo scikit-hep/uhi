@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pytest
@@ -174,3 +175,27 @@ def test_from_sparse_empty_json_dtype(storage_type: str, dtype: type) -> None:
     values = from_sparse(hist)["storage"]["values"]
     assert values.dtype == dtype
     np.testing.assert_array_equal(values, [0, 0])
+
+
+@pytest.mark.parametrize(
+    ("storage_type", "dtype"),
+    [("int", np.uint64), ("int", np.int32), ("double", np.float32)],
+)
+def test_from_sparse_empty_keeps_dtype(storage_type: str, dtype: type) -> None:
+    hist: Any = {
+        "uhi_schema": 1,
+        "axes": [
+            {
+                "type": "regular",
+                "lower": 0,
+                "upper": 1,
+                "bins": 2,
+                "underflow": False,
+                "overflow": False,
+                "circular": False,
+            }
+        ],
+        "storage": {"type": storage_type, "values": np.zeros(2, dtype=dtype)},
+    }
+    values = from_sparse(to_sparse(hist))["storage"]["values"]
+    assert values.dtype == dtype
