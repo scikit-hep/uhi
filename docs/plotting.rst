@@ -87,7 +87,7 @@ simplifying your code.
 The full protocol version 1.2 follows:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-(Also available as ``uhi.typing.plottable.PlottableProtocol``, for use in tests, etc.
+(Also available as ``uhi.typing.plottable.PlottableHistogram``, for use in tests, etc.)
 
 .. literalinclude:: ../src/uhi/typing/plottable.py
    :language: python
