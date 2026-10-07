@@ -66,6 +66,8 @@ def to_fields(
             array = array.astype(np.int64)  # noqa: PLW2901
         elif array.dtype.kind == "u" and array.dtype.itemsize < 4:
             array = array.astype(np.uint64)  # noqa: PLW2901
+        elif array.dtype == np.float16:
+            array = array.astype(np.float32)  # noqa: PLW2901
         if array.dtype.name not in FIELD_TYPES:
             msg = f"Unsupported array dtype {array.dtype} for {field}"
             raise TypeError(msg)

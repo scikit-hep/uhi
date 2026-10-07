@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pytest
@@ -139,3 +140,62 @@ def test_from_sparse_empty_index_json_roundtrip() -> None:
 
     dense = from_sparse(shist)
     np.testing.assert_array_equal(dense["storage"]["values"], np.zeros(3))
+
+
+def test_from_sparse_weighted_mean_int_variances() -> None:
+    hist = json.loads(
+        """{
+        "uhi_schema": 1,
+        "axes": [{"type": "regular", "lower": 0, "upper": 1, "bins": 2,
+                  "underflow": false, "overflow": false, "circular": false}],
+        "storage": {"type": "weighted_mean", "index": [[1]],
+                    "sum_of_weights": [1], "sum_of_weights_squared": [1],
+                    "values": [1], "variances": [1]}
+        }""",
+        object_hook=uhi.io.json.object_hook,
+    )
+    dense = from_sparse(hist)
+    np.testing.assert_array_equal(dense["storage"]["variances"], [np.nan, 1.0])
+    np.testing.assert_array_equal(dense["storage"]["values"], [0, 1])
+
+
+@pytest.mark.parametrize(
+    ("storage_type", "dtype"), [("int", np.int64), ("double", np.float64)]
+)
+def test_from_sparse_empty_json_dtype(storage_type: str, dtype: type) -> None:
+    hist = json.loads(
+        f"""{{
+        "uhi_schema": 1,
+        "axes": [{{"type": "regular", "lower": 0, "upper": 1, "bins": 2,
+                  "underflow": false, "overflow": false, "circular": false}}],
+        "storage": {{"type": "{storage_type}", "index": [[]], "values": []}}
+        }}""",
+        object_hook=uhi.io.json.object_hook,
+    )
+    values = from_sparse(hist)["storage"]["values"]
+    assert values.dtype == dtype
+    np.testing.assert_array_equal(values, [0, 0])
+
+
+@pytest.mark.parametrize(
+    ("storage_type", "dtype"),
+    [("int", np.uint64), ("int", np.int32), ("double", np.float32)],
+)
+def test_from_sparse_empty_keeps_dtype(storage_type: str, dtype: type) -> None:
+    hist: Any = {
+        "uhi_schema": 1,
+        "axes": [
+            {
+                "type": "regular",
+                "lower": 0,
+                "upper": 1,
+                "bins": 2,
+                "underflow": False,
+                "overflow": False,
+                "circular": False,
+            }
+        ],
+        "storage": {"type": storage_type, "values": np.zeros(2, dtype=dtype)},
+    }
+    values = from_sparse(to_sparse(hist))["storage"]["values"]
+    assert values.dtype == dtype

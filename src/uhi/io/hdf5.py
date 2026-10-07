@@ -62,8 +62,9 @@ def _create_dataset(
     ``np.asarray(data).size``, but the original ``data`` goes to h5py
     unchanged.
     """
-    size = np.asarray(data).size
-    if size < min_compress_elements:
+    arr = np.asarray(data)
+    # h5py cannot compress scalar (0-d) datasets
+    if arr.ndim == 0 or arr.size < min_compress_elements:
         group.create_dataset(name, data=data)
     else:
         group.create_dataset(
@@ -224,7 +225,7 @@ def read(grp: h5py.Group, /) -> HistogramIR:
 
     storage_grp = grp["storage"]
     assert isinstance(storage_grp, h5py.Group)
-    storage = AnyStorageIR(type=storage_grp.attrs["type"])
+    storage = AnyStorageIR(type=_convert_item("", storage_grp.attrs["type"]))
     for key in storage_grp:
         storage[key] = np.asarray(storage_grp[key])  # type: ignore[literal-required]
 
