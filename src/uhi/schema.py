@@ -79,7 +79,7 @@ def load(file: str | Path, /, *, path: str | None = None) -> dict[str, Any]:
     """
     Load all histograms from a file as a ``{name: histogram}`` dict with
     JSON-compatible values. The format is selected by suffix: ``.json``,
-    ``.zip``, ``.h5``/``.hdf5``/``.hdf``, or ``.root``.
+    ``.zip``, ``.h5``/``.hdf5``/``.hdf``, ``.zarr``, or ``.root``.
 
     ``path`` restricts the search to a group or directory inside the file, or
     to a single histogram by name. If the file or ``path`` holds a single
