@@ -1,12 +1,19 @@
 from __future__ import annotations
 
+import typing
 from typing import Any
 
 import numpy as np
 import zarr
 
-from ..typing.serialization import AnyAxis, AnyHistogram, AnyStorage, Histogram
-from . import ARRAY_KEYS
+from ..typing.serialization import (
+    AnyAxisIR,
+    AnyHistogramIR,
+    AnyStorageIR,
+    HistogramIR,
+    ToUHIHistogram,
+)
+from ._common import _check_uhi_schema_version, _convert_input
 
 __all__ = ["read", "write"]
 
@@ -15,107 +22,91 @@ def __dir__() -> list[str]:
     return __all__
 
 
-def write(grp: zarr.Group, /, histogram: AnyHistogram) -> None:
+def _create_array(group: zarr.Group, name: str, data: Any) -> None:
     """
-    Write a histogram to a Zarr group.
+    Create an array stored as a single chunk, so the layout on disk only
+    depends on the data. Strings use the variable-length UTF-8 type.
     """
-    # All referenced objects will be stored inside of /{name}/axes
-    hist_folder_storage = grp.create_group("axes")
+    arr = np.asarray(data)
+    if arr.dtype.kind == "U":
+        arr = arr.astype(np.dtypes.StringDType())
+    # Zarr does not allow zero-length chunks
+    chunks = tuple(max(s, 1) for s in arr.shape)
+    group.create_array(name, data=arr, chunks=chunks)
 
-    # Metadata
 
+def write(grp: zarr.Group, /, histogram: AnyHistogramIR | ToUHIHistogram) -> None:
+    """
+    Write a histogram to a Zarr group. Each array is one chunk.
+    """
+    histogram = _convert_input(histogram)
+
+    # Zarr attributes are JSON, so metadata and writer_info are stored as-is
+    grp.attrs["uhi_schema"] = histogram["uhi_schema"]
     if "metadata" in histogram:
-        metadata_grp = grp.create_group("metadata")
-        for key, val1 in histogram["metadata"].items():
-            metadata_grp.attrs[key] = val1
+        grp.attrs["metadata"] = histogram["metadata"]
+    if "writer_info" in histogram:
+        grp.attrs["writer_info"] = histogram["writer_info"]
 
     # Axes
+    axes_grp = grp.create_group("axes")
     for i, axis in enumerate(histogram["axes"]):
-        # Iterating through the axes, calling `create_axes_object` for each of them,
-        # creating references to new groups and appending it to the `items` dataset defined above
-        ax_group = hist_folder_storage.create_group(f"axis_{i}")
-        ax_info = axis.copy()
-        ax_metadata = ax_info.pop("metadata", None)
-        ax_edges_raw = ax_info.pop("edges", None)
-        ax_edges = np.asarray(ax_edges_raw) if ax_edges_raw is not None else None
-        ax_cats: list[int] | list[str] | None = ax_info.pop("categories", None)
-        for key, val2 in ax_info.items():
-            ax_group.attrs[key] = val2
-        if ax_metadata is not None:
-            ax_metadata_grp = ax_group.create_group("metadata")
-            for k, v in ax_metadata.items():
-                ax_metadata_grp.attrs[k] = v
+        ax_group = axes_grp.create_group(f"axis_{i}")
+        ax_info = dict(axis)
+        ax_edges = ax_info.pop("edges", None)
+        ax_cats = ax_info.pop("categories", None)
+        ax_group.attrs.update(ax_info)  # type: ignore[arg-type]
         if ax_edges is not None:
-            arr = ax_group.create_array(
-                "edges", shape=ax_edges.shape, dtype=ax_edges.dtype
-            )
-            arr[:] = ax_edges
+            _create_array(ax_group, "edges", ax_edges)
         if ax_cats is not None:
-            # zarr v3 doesn't support str dtype yet, so we attach it to attrs (which should be ok in general)
-            ax_group.attrs["categories"] = ax_cats
+            _create_array(ax_group, "categories", ax_cats)
 
     # Storage
     storage_grp = grp.create_group("storage")
-    storage_type = histogram["storage"]["type"]
-
-    storage_grp.attrs["type"] = storage_type
-
-    for key, val3 in histogram["storage"].items():
-        if key == "type":
-            continue
-        npvalue = np.asarray(val3)
-        arr = storage_grp.create_array(key, shape=npvalue.shape, dtype=npvalue.dtype)
-        arr[:] = npvalue
+    storage_grp.attrs["type"] = histogram["storage"]["type"]
+    for key, value in histogram["storage"].items():
+        if key != "type":
+            _create_array(storage_grp, key, value)
 
 
-def _convert_axes(group: zarr.Group | zarr.Dataset | zarr.Datatype) -> AnyAxis:
+def _convert_axis(group: zarr.Group) -> AnyAxisIR:
     """
-    Convert a Zarr axis reference to a dictionary.
+    Convert a Zarr axis group to a dictionary.
     """
-    axis = {k: _convert_item(k, v) for k, v in group.attrs.items()}
+    axis = typing.cast(AnyAxisIR, dict(group.attrs))
     if "edges" in group:
-        edges = group["edges"]
-        assert isinstance(edges, zarr.Array)
-        axis["edges"] = np.asarray(edges)
-    if "categories" in group.attrs:
-        categories = group.attrs["categories"]
-        axis["categories"] = [_convert_item("", c) for c in categories]
-
-    return axis  # type: ignore[return-value]
+        axis["edges"] = np.asarray(group["edges"])
+    if "categories" in group:
+        axis["categories"] = np.asarray(group["categories"]).tolist()
+    return axis
 
 
-def _convert_item(name: str, item: Any, /) -> Any:
-    """
-    Convert an HDF5 item to a native Python type.
-    """
-    if isinstance(item, bytes):
-        return item.decode("utf-8")
-    if name == "metadata":
-        return {k: _convert_item("", v) for k, v in item.items()}
-    if name in ARRAY_KEYS:
-        return item
-    if isinstance(item, np.generic):
-        return item.item()
-    return item
-
-
-def read(grp: zarr.Group, /) -> Histogram:
+def read(grp: zarr.Group, /) -> HistogramIR:
     """
     Read a histogram from a Zarr group.
     """
+    uhi_schema = grp.attrs["uhi_schema"]
+    assert isinstance(uhi_schema, int)
+    _check_uhi_schema_version(uhi_schema)
+
     axes_grp = grp["axes"]
     assert isinstance(axes_grp, zarr.Group)
-
-    axes = [_convert_axes(axes_grp[ax]) for ax in sorted(axes_grp)]
+    # Group members are not ordered, so look up each axis by index
+    axes = [
+        _convert_axis(typing.cast(zarr.Group, axes_grp[f"axis_{i}"]))
+        for i in range(len(axes_grp))
+    ]
 
     storage_grp = grp["storage"]
     assert isinstance(storage_grp, zarr.Group)
-    storage = AnyStorage(type=storage_grp.attrs["type"])
+    storage = AnyStorageIR(type=storage_grp.attrs["type"])  # type: ignore[typeddict-item]
     for key in storage_grp:
         storage[key] = np.asarray(storage_grp[key])  # type: ignore[literal-required]
 
-    histogram_dict = AnyHistogram(axes=axes, storage=storage)
-    if "metadata" in grp:
-        histogram_dict["metadata"] = _convert_item("metadata", grp["metadata"].attrs)
+    histogram_dict = AnyHistogramIR(uhi_schema=uhi_schema, axes=axes, storage=storage)
+    if "metadata" in grp.attrs:
+        histogram_dict["metadata"] = grp.attrs["metadata"]  # type: ignore[typeddict-item]
+    if "writer_info" in grp.attrs:
+        histogram_dict["writer_info"] = grp.attrs["writer_info"]  # type: ignore[typeddict-item]
 
     return histogram_dict  # type: ignore[return-value]

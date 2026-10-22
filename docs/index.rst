@@ -22,7 +22,7 @@ requirements for a source library to produce and a plotting library to consume
 to plot a histogram, including error bars.
 
 The serialization format, which describes how to store histograms in JSON, ZIP,
-HDF5, and ROOT files, with a JSON schema and reference readers and writers in
+HDF5, Zarr, and ROOT files, with a JSON schema and reference readers and writers in
 ``uhi.io``.
 
 The ``uhi`` command line tool, which can add histograms from several files
