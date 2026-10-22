@@ -233,8 +233,8 @@ $ uhi add total.zip run1.zip run2.zip run3.zip
 Histograms are matched by name. A name that is only in some of the inputs is
 copied through. The format is chosen by the file extension: `.json` (a JSON
 object mapping names to histograms, or a single histogram), `.zip`,
-`.h5`/`.hdf5`/`.hdf` (every group with a `uhi_schema` attribute, at any depth), or
-`.root` (every RNTuple, at any depth). The input and output formats do not
+`.h5`/`.hdf5`/`.hdf` and `.zarr` (every group with a `uhi_schema` attribute, at
+any depth), or `.root` (every RNTuple, at any depth). The input and output formats do not
 have to match, so this also converts between formats. Pass `-f`/`--force` to
 overwrite an existing output file.
 
@@ -255,8 +255,9 @@ $ uhi add out.root:merged run1.h5:results run2.h5:results
 You can test a file against the schema with `uhi validate`. This needs the
 `schema` extra (`pip install uhi[schema]`). The format is selected by the file
 suffix: `.json`, `.zip`, `.h5`/`.hdf5`/`.hdf` (needs the
-`hdf5` extra), or `.root` (needs the `uproot` extra or PyROOT). Every histogram in a zip file (each
-`*.json` entry), HDF5 file (each group with a `uhi_schema` attribute), or ROOT
+`hdf5` extra), `.zarr` (needs the `zarr` extra), or `.root` (needs the `uproot`
+extra or PyROOT). Every histogram in a zip file (each `*.json` entry), HDF5 or
+Zarr file (each group with a `uhi_schema` attribute), or ROOT
 file (each RNTuple, searched recursively) is checked:
 
 ```console

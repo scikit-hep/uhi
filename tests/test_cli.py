@@ -121,6 +121,7 @@ def test_cli_validate_hdf5_invalid(
         ("data.json", ("data.json", None)),
         ("data.root:sub/dir", ("data.root", "sub/dir")),
         ("some/dir/data.h5:grp", ("some/dir/data.h5", "grp")),
+        ("data.zarr:grp/h", ("data.zarr", "grp/h")),
         ("C:\\dir\\data.ROOT:grp", ("C:\\dir\\data.ROOT", "grp")),
         ("C:\\dir\\data.root", ("C:\\dir\\data.root", None)),
     ],
@@ -218,6 +219,43 @@ def test_cli_validate_hdf5_path(
     with pytest.raises(SystemExit):
         main(["validate", f"{tmp_file}:missing"])
     assert capsys.readouterr().out.startswith("ERROR")
+
+
+def test_cli_validate_zarr_path(
+    resources: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    zarr = pytest.importorskip("zarr")
+    uhi_io_zarr = pytest.importorskip("uhi.io.zarr")
+
+    hists = uhi.io._files.load(resources / "valid" / "reg.json")
+    tmp_file = tmp_path / "test.zarr"
+    root = zarr.open_group(tmp_file, mode="w")
+    good = root.create_group("good")
+    for name, hist in hists.items():
+        uhi_io_zarr.write(good.create_group(name), hist)
+    bad = root.create_group("bad")
+    for name, hist in hists.items():
+        grp = bad.create_group(name)
+        uhi_io_zarr.write(grp, hist)
+        grp["storage"].attrs["type"] = "not_a_storage"
+
+    assert set(uhi.schema.load(tmp_file)) == {
+        f"{d}/{name}" for d in ("good", "bad") for name in hists
+    }
+    assert set(uhi.schema.load(tmp_file, path="/good/")) == set(hists)
+    assert uhi.schema.load(tmp_file, path="good/one")["uhi_schema"] == 1
+
+    main(["validate", f"{tmp_file}:good", f"{tmp_file}:good/one"])
+    assert capsys.readouterr().out.count("OK") == 2
+
+    with pytest.raises(SystemExit):
+        main(["validate", f"{tmp_file}:bad"])
+    assert capsys.readouterr().out.startswith("ERROR")
+
+    with pytest.raises(KeyError, match="'missing' not found in"):
+        uhi.io._files.load(tmp_file, path="missing")
+    with pytest.raises(ValueError, match="not a histogram or group"):
+        uhi.io._files.load(tmp_file, path="good/one/storage/values")
 
 
 def test_cli_validate_json_keeps_raw_types(
