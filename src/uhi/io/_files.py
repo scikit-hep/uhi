@@ -23,10 +23,12 @@ def __dir__() -> list[str]:
     return __all__
 
 
-_SPEC_RE = re.compile(r"^(.+?\.(?:json|zip|h5|hdf5|hdf|root)):(.*)$", re.IGNORECASE)
+_SPEC_RE = re.compile(
+    r"^(.+?\.(?:json|zip|h5|hdf5|hdf|zarr|root)):(.*)$", re.IGNORECASE
+)
 _RNTUPLE_CLASSES = frozenset(["ROOT::RNTuple", "ROOT::Experimental::RNTuple"])
 _DIRECTORY_CLASSES = frozenset(["TDirectory", "TDirectoryFile"])
-_SUFFIXES = "expected .json, .zip, .h5/.hdf5/.hdf, or .root"
+_SUFFIXES = "expected .json, .zip, .h5/.hdf5/.hdf, .zarr, or .root"
 
 
 def split_spec(spec: str, /) -> tuple[str, str | None]:
@@ -47,6 +49,8 @@ def file_format(path: Path, /) -> str:
             return "zip"
         case ".h5" | ".hdf5" | ".hdf":
             return "hdf5"
+        case ".zarr":
+            return "zarr"
         case ".root":
             return "root"
         case "":
@@ -136,6 +140,29 @@ def _load_hdf5(path: Path, subpath: str | None) -> Any:
             return hdf5.read(start)
         start.visititems(visit)
     return hists
+
+
+def _load_zarr(path: Path, subpath: str | None) -> Any:
+    import zarr  # noqa: PLC0415
+
+    from . import zarr as uhi_zarr  # noqa: PLC0415
+
+    root = zarr.open_group(path, mode="r")
+    subpath = subpath.strip("/") if subpath else ""
+    if subpath and subpath not in root:
+        msg = f"{subpath!r} not found in {path}"
+        raise KeyError(msg)
+    start = root[subpath] if subpath else root
+    if not isinstance(start, zarr.Group):
+        msg = f"{subpath!r} in {path} is not a histogram or group"
+        raise ValueError(msg)  # noqa: TRY004
+    if "uhi_schema" in start.attrs:
+        return uhi_zarr.read(start)
+    return {
+        name: uhi_zarr.read(obj)
+        for name, obj in start.members(max_depth=None)
+        if isinstance(obj, zarr.Group) and "uhi_schema" in obj.attrs
+    }
 
 
 def _import_root() -> Any:
@@ -249,6 +276,8 @@ def load(file: str | Path, /, *, path: str | None = None, raw: bool = False) -> 
             return _load_zip(filepath, path)
         case "hdf5":
             return _load_hdf5(filepath, path)
+        case "zarr":
+            return _load_zarr(filepath, path)
         case _:
             return _load_root(filepath, path)
 
@@ -295,6 +324,17 @@ def write(file: str | Path, data: Any, /, *, path: str | None = None) -> None:
                 else:
                     for name, hist in data.items():
                         hdf5.write(h5_file.create_group(name), hist)
+        case "zarr":
+            import zarr  # noqa: PLC0415
+
+            from . import zarr as uhi_zarr  # noqa: PLC0415
+
+            zarr_root = zarr.open_group(filepath, mode="w")
+            if is_single(data):
+                uhi_zarr.write(zarr_root, data)
+            else:
+                for name, hist in data.items():
+                    uhi_zarr.write(zarr_root.create_group(name), hist)
         case _ if _uproot_available():
             import uproot  # noqa: PLC0415
 

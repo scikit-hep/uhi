@@ -37,6 +37,7 @@ repos:
         - importlib_resources
         - tomli
         - boost-histogram>=1.7.1
+        - zarr>=3.2
         - hist>=2.10.1
         - dependency-groups>=1.3
 

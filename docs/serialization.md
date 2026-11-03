@@ -19,8 +19,7 @@ The following formats are being targeted:
 ```
 
 Other formats can be used as well, assuming they support out-of-band data and
-text attributes or files for the metadata. We are working on a Zarr backend in
-the near future.
+text attributes or files for the metadata. There is also a Zarr v3 backend.
 
 ## Caveats
 
@@ -234,8 +233,8 @@ $ uhi add total.zip run1.zip run2.zip run3.zip
 Histograms are matched by name. A name that is only in some of the inputs is
 copied through. The format is chosen by the file extension: `.json` (a JSON
 object mapping names to histograms, or a single histogram), `.zip`,
-`.h5`/`.hdf5`/`.hdf` (every group with a `uhi_schema` attribute, at any depth), or
-`.root` (every RNTuple, at any depth). The input and output formats do not
+`.h5`/`.hdf5`/`.hdf` and `.zarr` (every group with a `uhi_schema` attribute, at
+any depth), or `.root` (every RNTuple, at any depth). The input and output formats do not
 have to match, so this also converts between formats. Pass `-f`/`--force` to
 overwrite an existing output file.
 
@@ -256,8 +255,9 @@ $ uhi add out.root:merged run1.h5:results run2.h5:results
 You can test a file against the schema with `uhi validate`. This needs the
 `schema` extra (`pip install uhi[schema]`). The format is selected by the file
 suffix: `.json`, `.zip`, `.h5`/`.hdf5`/`.hdf` (needs the
-`hdf5` extra), or `.root` (needs the `uproot` extra or PyROOT). Every histogram in a zip file (each
-`*.json` entry), HDF5 file (each group with a `uhi_schema` attribute), or ROOT
+`hdf5` extra), `.zarr` (needs the `zarr` extra), or `.root` (needs the `uproot`
+extra or PyROOT). Every histogram in a zip file (each `*.json` entry), HDF5 or
+Zarr file (each group with a `uhi_schema` attribute), or ROOT
 file (each RNTuple, searched recursively) is checked:
 
 ```console
@@ -407,6 +407,37 @@ you want the histogram to be in.
 By default, we do not compress arrays smaller than 1,000 elements. You can
 control this by setting `min_compress_elements`; set it to 0 to compress all
 arrays. You can also pass through `compression` and `compression_opts`.
+
+### Zarr
+
+The [Zarr](https://zarr.dev) v3 format is a chunked array format that works
+with local and cloud storage. You need `zarr` 3.2+ (`pip install uhi[zarr]`),
+which needs Python 3.12+. The layout is like HDF5, but simpler, since Zarr
+attributes are JSON. The groups are `"axes"` and `"storage"`. The histogram
+group has `"uhi_schema"`, `"metadata"`, and `"writer_info"` as attributes.
+`"axes"` has one group per axis, `"axis_0"`, `"axis_1"`, and so on; the axis
+values are attributes, and `"edges"` and `"categories"` are arrays. String
+categories use the variable-length UTF-8 data type. The `"storage"` group sets
+`"type"` as an attribute; the others are arrays. Each array is one chunk.
+
+We provide `uhi.io.zarr.read` and `uhi.io.zarr.write` to write to an open
+group.
+
+```python
+import zarr
+
+import uhi.io.zarr
+
+root = zarr.open_group("myfile.zarr", mode="w")
+uhi.io.zarr.write(root.create_group("histogram"), h)
+
+root = zarr.open_group("myfile.zarr", mode="r")
+h2 = uhi.io.zarr.read(root["histogram"])
+```
+
+Above, `h` is a histogram that supports `_to_uhi_` or an intermediate
+representation, and `h2` is an intermediate representation; you can pass it to
+`boost_histogram.Histogram` or `hist.Hist`.
 
 ### ROOT
 

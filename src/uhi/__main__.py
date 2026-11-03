@@ -1,8 +1,8 @@
 """
 Command line interface for uhi.
 
-``uhi add`` sums histograms from JSON, ZIP, HDF5, or ROOT files, like ROOT's
-``hadd``. ``uhi validate`` checks histogram files (JSON, zip, HDF5, or ROOT)
+``uhi add`` sums histograms from JSON, ZIP, HDF5, Zarr, or ROOT files, like ROOT's
+``hadd``. ``uhi validate`` checks histogram files (JSON, zip, HDF5, Zarr, or ROOT)
 against the schema.
 """
 
@@ -104,7 +104,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         help="add histograms from several files (like ROOT's hadd)",
         description="Sum the histograms in SOURCE files, bin-by-bin, into TARGET. "
         "Histograms are matched by name. The file extension sets the format "
-        "(.json, .zip, .h5/.hdf5/.hdf, .root). Use file:name to select one "
+        "(.json, .zip, .h5/.hdf5/.hdf, .zarr, .root). Use file:name to select one "
         "histogram (or file:dir for a group or directory) in a SOURCE, and "
         "TARGET:name to name the output. TARGET must not exist unless -f is given.",
     )
@@ -117,14 +117,15 @@ def main(argv: Sequence[str] | None = None) -> None:
 
     validate_parser = subparsers.add_parser(
         "validate",
-        help="validate histogram files (JSON, zip, HDF5, or ROOT) against the schema",
+        help="validate histogram files (JSON, zip, HDF5, Zarr, or ROOT) against the schema",
         description="Validate histogram files against the uhi JSON schema. The "
         "file extension sets the format. Needs the uhi[schema] extra.",
     )
     validate_parser.add_argument(
         "files",
         nargs="+",
-        help="histogram files (.json, .zip, .h5/.hdf5/.hdf, .root); use file.h5:group or "
+        help="histogram files (.json, .zip, .h5/.hdf5/.hdf, .zarr, .root); use "
+        "file.h5:group or "
         "file.root:dir to select a group or directory inside the file",
     )
     validate_parser.set_defaults(func=_validate)

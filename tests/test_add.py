@@ -272,6 +272,13 @@ def _write_file(path: Path, hists: dict[str, bh.Histogram[Any]]) -> None:
             with zipfile.ZipFile(path, "w") as zf:
                 for name, hist in hists.items():
                     uhi.io.zip.write(zf, name, hist)
+        case ".zarr":
+            zarr = pytest.importorskip("zarr")
+            from uhi.io import zarr as uhi_zarr
+
+            root = zarr.open_group(path, mode="w")
+            for name, hist in hists.items():
+                uhi_zarr.write(root.create_group(name), hist)
         case _:
             h5py = pytest.importorskip("h5py")
             from uhi.io import hdf5
@@ -281,15 +288,23 @@ def _write_file(path: Path, hists: dict[str, bh.Histogram[Any]]) -> None:
                     hdf5.write(f.create_group(name), hist)
 
 
+_OPTIONAL_MODULES = {".h5": "h5py", ".zarr": "zarr"}
+
+
+def _skip_missing(*suffixes: str) -> None:
+    for suffix in suffixes:
+        if suffix in _OPTIONAL_MODULES:
+            pytest.importorskip(_OPTIONAL_MODULES[suffix])
+
+
 def _read_file(path: Path, name: str | None = None) -> Any:
     return uhi.io._files.load(path, path=name)
 
 
-@pytest.mark.parametrize("in_suffix", [".json", ".zip", ".h5"])
-@pytest.mark.parametrize("out_suffix", [".json", ".zip", ".h5"])
+@pytest.mark.parametrize("in_suffix", [".json", ".zip", ".h5", ".zarr"])
+@pytest.mark.parametrize("out_suffix", [".json", ".zip", ".h5", ".zarr"])
 def test_cli_add(tmp_path: Path, in_suffix: str, out_suffix: str) -> None:
-    if ".h5" in {in_suffix, out_suffix}:
-        pytest.importorskip("h5py")
+    _skip_missing(in_suffix, out_suffix)
     files, expected = _make_files(tmp_path, in_suffix)
     target = tmp_path / f"out{out_suffix}"
 
@@ -349,11 +364,10 @@ def _write_single(path: Path, hist: bh.Histogram[Any]) -> None:
     path.write_text(json.dumps(hist, default=uhi.io.json.default), encoding="utf-8")
 
 
-@pytest.mark.parametrize("out_suffix", [".json", ".h5"])
+@pytest.mark.parametrize("out_suffix", [".json", ".h5", ".zarr"])
 def test_cli_add_single(tmp_path: Path, out_suffix: str) -> None:
     """Unnamed (top-level) JSON histograms sum to an unnamed histogram."""
-    if out_suffix == ".h5":
-        pytest.importorskip("h5py")
+    _skip_missing(out_suffix)
     a = _fill(bh.Histogram(bh.axis.Regular(3, -1, 1), bh.axis.Regular(4, -2, 2)), 100)
     b = _fill(bh.Histogram(bh.axis.Regular(3, -1, 1), bh.axis.Regular(4, -2, 2)), 100)
     _write_single(tmp_path / "a.json", a)
@@ -367,11 +381,10 @@ def test_cli_add_single(tmp_path: Path, out_suffix: str) -> None:
     _assert_storage_equal(result["storage"], (a + b)._to_uhi_()["storage"])
 
 
-@pytest.mark.parametrize("out_suffix", [".json", ".zip", ".h5"])
+@pytest.mark.parametrize("out_suffix", [".json", ".zip", ".h5", ".zarr"])
 def test_cli_add_named_output(tmp_path: Path, out_suffix: str) -> None:
     """``target:name`` names a single result; ``file:name`` selects inputs."""
-    if out_suffix == ".h5":
-        pytest.importorskip("h5py")
+    _skip_missing(out_suffix)
     files, expected = _make_files(tmp_path, ".json")
     _write_single(tmp_path / "c.json", expected["only_in_first"])
     target = tmp_path / f"out{out_suffix}"
